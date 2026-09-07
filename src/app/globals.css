@@ -2,26 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 31, 41, 55;
+    --background-start-rgb: 244, 246, 248;
+    --background-end-rgb: 255, 255, 255;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .btn-primary {
+    @apply bg-icat-green text-white font-medium py-2 px-4 rounded-md transition-colors hover:bg-icat-green-dark;
+  }
+  .btn-secondary {
+    @apply bg-icat-blue text-white font-medium py-2 px-4 rounded-md transition-colors hover:bg-icat-blue-dark;
+  }
+  .btn-accent {
+    @apply bg-icat-yellow text-icat-gray-dark font-medium py-2 px-4 rounded-md transition-colors hover:brightness-95;
   }
 }
