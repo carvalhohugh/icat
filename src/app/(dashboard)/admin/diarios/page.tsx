@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Search, Download, ClipboardList, Filter } from 'lucide-react';
+import { Download, Filter } from 'lucide-react';
 
 export default function DiariosAdmin() {
   const [filtroTurma, setFiltroTurma] = useState('');
