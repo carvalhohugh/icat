@@ -1,65 +1,42 @@
+'use client';
 import Link from 'next/link';
-import { Users, Calendar, ArrowRight } from 'lucide-react';
+import { BookOpen, Users, ClipboardList, Clock } from 'lucide-react';
 
 export default function ProfessorDashboard() {
-  // Dados MOCKADOS temporariamente até ligarmos ao banco
   const turmas = [
-    {
-      id: '12345',
-      name: 'Ballet Infantil - Turma A',
-      schedule: 'Segundas e Quartas, 14h às 16h',
-      studentsCount: 24,
-      course: 'Ballet Clássico'
-    },
-    {
-      id: '67890',
-      name: 'Escolinha de Futebol - Sub-12',
-      schedule: 'Terças e Quintas, 18h às 20h',
-      studentsCount: 30,
-      course: 'Escolinha de Futebol'
-    }
+    { id: 1, name: 'Escolinha de Futebol', horario: 'Seg/Qua/Sex - 14h às 16h', alunos: 22, vagas: 30 },
+    { id: 2, name: 'Jiu-Jítsu', horario: 'Ter/Qui - 17h às 18h30', alunos: 15, vagas: 30 },
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Portal do Professor</h1>
-          <p className="text-gray-500">Selecione uma turma para realizar a chamada ou ver detalhes.</p>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Portal do Professor</h1>
+        <p className="text-gray-500 text-sm mt-1">Bem-vindo, Professor Carlos. Gerencie suas turmas e presenças.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {turmas.map((turma) => (
-          <div key={turma.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+        {turmas.map(t => (
+          <div key={t.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
             <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <span className="text-xs font-bold text-icat-green uppercase tracking-wider bg-green-50 px-2 py-1 rounded-full">
-                    {turma.course}
-                  </span>
-                  <h3 className="text-xl font-bold text-gray-900 mt-2">{turma.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-900">{t.name}</h3>
+                  <p className="text-sm text-gray-500 flex items-center gap-1 mt-1"><Clock className="w-4 h-4" /> {t.horario}</p>
                 </div>
-              </div>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Calendar className="h-4 w-4 mr-2 text-icat-blue" />
-                  {turma.schedule}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="h-4 w-4 mr-2 text-icat-blue" />
-                  {turma.studentsCount} Alunos Matriculados
-                </div>
+                <span className="bg-blue-50 text-icat-blue px-3 py-1 rounded-full text-xs font-bold">{t.alunos}/{t.vagas}</span>
               </div>
 
-              <div className="pt-4 border-t border-gray-100">
-                <Link 
-                  href={`/professor/turma/${turma.id}`}
-                  className="flex items-center justify-between text-icat-blue font-semibold hover:text-icat-blue-dark group"
-                >
-                  <span>Abrir Diário da Turma</span>
-                  <ArrowRight className="h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+                <Users className="w-4 h-4 text-gray-400" /> {t.alunos} alunos matriculados
+              </div>
+
+              <div className="flex gap-3">
+                <Link href={`/professor/turma/${t.id}/chamada`} className="flex-1 btn-primary flex items-center justify-center gap-2 text-sm py-2.5">
+                  <ClipboardList className="w-4 h-4" /> Diário de Presença
+                </Link>
+                <Link href={`/professor/turma/${t.id}`} className="flex-1 flex items-center justify-center gap-2 text-sm py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors">
+                  <BookOpen className="w-4 h-4" /> Ver Alunos
                 </Link>
               </div>
             </div>

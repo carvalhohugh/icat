@@ -38,8 +38,24 @@ export default function ChamadaPage({ params }: { params: { id: string } }) {
     setAlunos(alunos.map(a => a.id === id ? { ...a, present: !a.present } : a));
   };
 
+  const [showToast, setShowToast] = useState(false);
+
+  const handleSave = () => {
+    // Simulando o salvamento no banco de dados
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 pb-20 relative">
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-20 right-6 bg-icat-green text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 z-50 animate-bounce">
+          <CheckCircle2 className="h-5 w-5" />
+          <span className="font-medium">Chamada salva com sucesso!</span>
+        </div>
+      )}
+
       <div className="mb-6 flex items-center justify-between">
         <Link href={`/professor/turma/${params.id}`} className="text-sm font-medium text-gray-500 hover:text-icat-blue flex items-center">
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -115,7 +131,7 @@ export default function ChamadaPage({ params }: { params: { id: string } }) {
           </ul>
 
           <div className="p-6 bg-gray-50 border-t border-gray-200">
-            <button className="btn-primary w-full md:w-auto">
+            <button className="btn-primary w-full md:w-auto" onClick={handleSave}>
               Salvar Chamada
             </button>
           </div>
