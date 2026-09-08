@@ -31,7 +31,7 @@ export default function FuncionariosAdmin() {
       status: 'Ativo'
     };
     setFuncionarios([newFunc, ...funcionarios]);
-    setFormData({ name: '', role: '', department: '', cpf: '', whatsapp: '', address: '' });
+    setFormData({ name: '', role: '', department: '', perfil: '', cpf: '', whatsapp: '', address: '' });
     setIsModalOpen(false);
   };
 
