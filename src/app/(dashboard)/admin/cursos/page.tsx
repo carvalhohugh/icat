@@ -70,7 +70,14 @@ export default function CursosAdmin() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {cursos.map(c => (
-              <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+              <tr 
+                key={c.id} 
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => {
+                  setFormData({ title: c.title, vacancies: c.vacancies.toString(), cost: c.cost.toString() });
+                  setIsModalOpen(true);
+                }}
+              >
                 <td className="p-4 font-medium text-gray-900">{c.title}</td>
                 <td className="p-4 text-gray-600">
                   {c.cost === 0 ? <span className="text-icat-green font-bold bg-green-50 px-2 py-1 rounded-md">Gratuito</span> : `R$ ${c.cost.toFixed(2)}`}
@@ -80,10 +87,10 @@ export default function CursosAdmin() {
                   <span className="bg-blue-50 text-icat-blue px-2 py-1 rounded-full text-xs font-semibold">{c.status}</span>
                 </td>
                 <td className="p-4 text-right space-x-2">
-                  <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
+                  <button onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={() => setCursos(cursos.filter(x => x.id !== c.id))}>
+                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={(e) => { e.stopPropagation(); setCursos(cursos.filter(x => x.id !== c.id)); }}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>

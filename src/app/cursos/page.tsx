@@ -86,9 +86,9 @@ export default function CursosPublico() {
                     )}
                   </span>
                   
-                  <button className="btn-primary flex items-center gap-1">
+                  <Link href="/cadastro/aluno" className="btn-primary flex items-center gap-1">
                     Matricular <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

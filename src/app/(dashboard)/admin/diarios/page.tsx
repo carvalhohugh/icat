@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Download, Filter } from 'lucide-react';
 
 export default function DiariosAdmin() {
+  const router = useRouter();
   const [filtroTurma, setFiltroTurma] = useState('');
   const [filtroProfessor, setFiltroProfessor] = useState('');
 
@@ -65,7 +67,11 @@ export default function DiariosAdmin() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {filtrados.map(r => (
-              <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+              <tr 
+                key={r.id} 
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => router.push('/professor/turma/1/chamada')}
+              >
                 <td className="p-4 text-gray-600 text-sm">{r.data}</td>
                 <td className="p-4 font-medium text-gray-900 text-sm">{r.turma}</td>
                 <td className="p-4 text-gray-600 text-sm">{r.professor}</td>

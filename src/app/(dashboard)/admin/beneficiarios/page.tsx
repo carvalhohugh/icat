@@ -1,9 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Heart, Users, Link as LinkIcon, CheckCircle } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Heart, Users, Link as LinkIcon, CheckCircle, ClipboardEdit, X } from 'lucide-react';
 
 export default function BeneficiariosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProntuarioOpen, setIsProntuarioOpen] = useState(false);
+  const [selectedBenId, setSelectedBenId] = useState<number | null>(null);
   
   const [beneficiarios, setBeneficiarios] = useState([
     { id: 1, name: 'Maria da Silva', dependents: 3, neighborhood: 'Vila Margarida', status: 'Aprovado' },
@@ -19,6 +21,13 @@ export default function BeneficiariosAdmin() {
 
   const [childrenList, setChildrenList] = useState<{name: string, birthdate: string}[]>([]);
   const [copied, setCopied] = useState(false);
+
+  const [prontuario, setProntuario] = useState([
+    { id: 1, benId: 1, date: '05/09/2026', note: 'Visita domiciliar realizada. Família em situação de vulnerabilidade, necessita de cesta básica com urgência.', assistant: 'Amanda Oliveira' },
+    { id: 2, benId: 1, date: '10/08/2026', note: 'Cadastro inicial aprovado.', assistant: 'Carlos Silva' }
+  ]);
+  
+  const [novaAnotacao, setNovaAnotacao] = useState('');
 
   const handleCopyLink = () => {
     const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/beneficiario` : 'https://icat.org.br/cadastro/beneficiario';
@@ -132,7 +141,9 @@ export default function BeneficiariosAdmin() {
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.status === 'Aprovado' ? 'bg-green-50 text-icat-green' : b.status === 'Suspenso' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>{b.status}</span>
                 </td>
-                <td className="p-4 text-right space-x-2">
+                  <button onClick={() => { setSelectedBenId(b.id); setIsProntuarioOpen(true); }} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Prontuário">
+                    <ClipboardEdit className="w-4 h-4" />
+                  </button>
                   <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50" title="Editar">
                     <Edit2 className="w-4 h-4" />
                   </button>
@@ -280,6 +291,61 @@ export default function BeneficiariosAdmin() {
             <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
               <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancelar</button>
               <button onClick={handleSave} className="btn-primary">Salvar Família</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isProntuarioOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsProntuarioOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Prontuário de Acompanhamento</h2>
+                <p className="text-sm text-gray-500">Histórico da assistência social familiar</p>
+              </div>
+              <button onClick={() => setIsProntuarioOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+              <div className="space-y-3">
+                {prontuario.filter(p => p.benId === selectedBenId).map(p => (
+                  <div key={p.id} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-bold text-gray-900">{p.date}</span>
+                      <span className="text-xs text-gray-500">{p.assistant}</span>
+                    </div>
+                    <p className="text-sm text-gray-700">{p.note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-100 bg-white">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nova Anotação</label>
+              <textarea 
+                rows={3} 
+                value={novaAnotacao}
+                onChange={e => setNovaAnotacao(e.target.value)}
+                placeholder="Descreva o acompanhamento, visita ou entrega de benefícios..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm mb-3"
+              ></textarea>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setIsProntuarioOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 text-sm">Fechar</button>
+                <button 
+                  onClick={() => {
+                    if(!novaAnotacao) return;
+                    setProntuario([{ id: Date.now(), benId: selectedBenId!, date: new Date().toLocaleDateString('pt-BR'), note: novaAnotacao, assistant: 'Admin (Você)' }, ...prontuario]);
+                    setNovaAnotacao('');
+                  }} 
+                  className="btn-primary text-sm py-2"
+                >
+                  Adicionar Registro
+                </button>
+              </div>
             </div>
           </div>
         </div>
