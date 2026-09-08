@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Image as ImageIcon, Clock, X } from 'lucide-react';
 
 export default function CursosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +13,7 @@ export default function CursosAdmin() {
 
   // Estado do formulário
   const [formData, setFormData] = useState({ title: '', cost: '', vacancies: '' });
+  const [horarios, setHorarios] = useState<{dia: string, inicio: string, fim: string}[]>([{ dia: 'Segunda', inicio: '14:00', fim: '16:00' }]);
 
   const handleSave = () => {
     if (!formData.title) return;
@@ -147,6 +148,38 @@ export default function CursosAdmin() {
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Deixe 0 para exibir como &quot;Gratuito&quot;</p>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"><Clock className="w-4 h-4" /> Dias e Horários das Aulas</label>
+                <div className="space-y-2">
+                  {horarios.map((h, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <select value={h.dia} onChange={e => { const n = [...horarios]; n[i].dia = e.target.value; setHorarios(n); }} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm">
+                        <option>Segunda</option>
+                        <option>Terça</option>
+                        <option>Quarta</option>
+                        <option>Quinta</option>
+                        <option>Sexta</option>
+                        <option>Sábado</option>
+                      </select>
+                      <input type="time" value={h.inicio} onChange={e => { const n = [...horarios]; n[i].inicio = e.target.value; setHorarios(n); }} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm w-28" />
+                      <span className="text-gray-400 text-sm">às</span>
+                      <input type="time" value={h.fim} onChange={e => { const n = [...horarios]; n[i].fim = e.target.value; setHorarios(n); }} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm w-28" />
+                      {horarios.length > 1 && (
+                        <button onClick={() => setHorarios(horarios.filter((_, j) => j !== i))} className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50">
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setHorarios([...horarios, { dia: 'Terça', inicio: '14:00', fim: '16:00' }])} 
+                  className="mt-2 text-sm text-icat-green font-semibold flex items-center gap-1 hover:underline"
+                >
+                  <Plus className="w-4 h-4" /> Adicionar outro dia
+                </button>
               </div>
 
               <div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ChevronLeft, ArrowRight, Users, CheckCircle } from 'lucide-react';
+import { ArrowRight, Users, CheckCircle } from 'lucide-react';
+import { Header } from '@/components/Header';
 
 export default function CursosPublico() {
   const cursos = [
@@ -34,15 +35,7 @@ export default function CursosPublico() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header Simples */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center text-gray-500 hover:text-icat-green font-medium">
-            <ChevronLeft className="w-5 h-5 mr-1" /> Voltar ao Início
-          </Link>
-          <img src="/logo.png" alt="ICAT" className="h-10 grayscale opacity-50" />
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         

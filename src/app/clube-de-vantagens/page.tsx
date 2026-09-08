@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ChevronLeft, MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock } from 'lucide-react';
 
 const ofertas = [
   {
@@ -28,17 +28,12 @@ const ofertas = [
   },
 ];
 
+import { Header } from '@/components/Header';
+
 export default function ClubePage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center text-gray-500 hover:text-icat-green font-medium text-sm">
-            <ChevronLeft className="w-5 h-5 mr-1" /> Voltar ao site
-          </Link>
-          <img src="/logo.png" alt="ICAT" className="h-8 opacity-60 grayscale" />
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1">
         {/* Hero */}
