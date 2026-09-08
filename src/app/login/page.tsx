@@ -16,8 +16,11 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
     // Bypass for MVP preview
-    if (email === 'admin@admin' && password === '12345678') {
+    if (cleanEmail === 'admin@admin' && cleanPassword === '12345678') {
       router.push('/admin');
       return;
     }
