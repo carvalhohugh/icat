@@ -141,6 +141,7 @@ export default function BeneficiariosAdmin() {
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.status === 'Aprovado' ? 'bg-green-50 text-icat-green' : b.status === 'Suspenso' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>{b.status}</span>
                 </td>
+                <td className="p-4 text-right space-x-1">
                   <button onClick={() => { setSelectedBenId(b.id); setIsProntuarioOpen(true); }} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Prontuário">
                     <ClipboardEdit className="w-4 h-4" />
                   </button>
