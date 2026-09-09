@@ -73,24 +73,30 @@ export default function AlunosAdmin() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+        <div className="p-4 border-b border-gray-200 flex items-center gap-4 bg-gray-50">
           <div className="relative w-72">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input type="text" placeholder="Buscar aluno..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-icat-green outline-none" />
           </div>
+          <select value={filtroCurso} onChange={e => setFiltroCurso(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm">
+            <option value="">Todos os Cursos / Turmas</option>
+            <option value="Escolinha de Futebol">Escolinha de Futebol</option>
+            <option value="Ballet Infantil">Ballet Infantil</option>
+            <option value="Informática Básica">Informática Básica</option>
+          </select>
         </div>
 
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase bg-white">
-              <th className="p-4 font-semibold">Nome do Aluno</th>
-              <th className="p-4 font-semibold">Curso / Turma</th>
-              <th className="p-4 font-semibold">Idade</th>
-              <th className="p-4 font-semibold text-right">Ações</th>
+              <th className="p-4 font-semibold text-center">Nome do Aluno</th>
+              <th className="p-4 font-semibold text-center">Curso / Turma</th>
+              <th className="p-4 font-semibold text-center">Idade</th>
+              <th className="p-4 font-semibold text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {alunos.filter(a => a.status === 'Matriculado').map((a, idx) => (
+            {alunos.filter(a => a.status === 'Matriculado' && (!filtroCurso || a.course === filtroCurso)).map((a, idx) => (
               <tr 
                 key={a.id} 
                 className={`transition-colors cursor-pointer ${idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50' : 'bg-blue-50/40 hover:bg-blue-50/70'}`}
