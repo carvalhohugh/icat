@@ -12,6 +12,8 @@ export default function AlunosAdmin() {
     { id: 2, name: 'Ana Clara', course: 'Ballet Infantil', age: 8, status: 'Pendente', whatsapp: '(64) 99900-2222', responsavel: 'Carlos Clara' },
     { id: 3, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos' },
     { id: 4, name: 'Julia Oliveira', course: 'Ballet Infantil', age: 7, status: 'Matriculado', whatsapp: '(64) 99900-4444', responsavel: 'Amanda Oliveira' },
+    { id: 5, name: 'Gabriel Costa', course: 'Escolinha de Futebol', age: 10, status: 'Pendente', whatsapp: '(64) 99900-5555', responsavel: 'Fernanda Costa' },
+    { id: 6, name: 'Isabela Ramos', course: 'Informática Básica', age: 13, status: 'Pendente', whatsapp: '(64) 99900-6666', responsavel: 'Roberto Ramos' },
   ]);
 
   const [formData, setFormData] = useState({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
@@ -84,12 +86,11 @@ export default function AlunosAdmin() {
               <th className="p-4 font-semibold">Nome do Aluno</th>
               <th className="p-4 font-semibold">Curso / Turma</th>
               <th className="p-4 font-semibold">Idade</th>
-              <th className="p-4 font-semibold">Status</th>
               <th className="p-4 font-semibold text-right">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {alunos.map((a, idx) => (
+            {alunos.filter(a => a.status === 'Matriculado').map((a, idx) => (
               <tr 
                 key={a.id} 
                 className={`transition-colors cursor-pointer ${idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50' : 'bg-blue-50/40 hover:bg-blue-50/70'}`}
@@ -108,11 +109,6 @@ export default function AlunosAdmin() {
                 </td>
                 <td className="p-4 text-gray-600 text-sm">{a.course}</td>
                 <td className="p-4 text-gray-600 text-sm">{a.age} anos</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${a.status === 'Matriculado' ? 'bg-green-50 text-icat-green' : 'bg-orange-50 text-orange-600'}`}>
-                    {a.status}
-                  </span>
-                </td>
                 <td className="p-4 text-right space-x-2">
                   <button onClick={(e) => { e.stopPropagation(); openProfile(a); }} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
                     <Edit2 className="w-4 h-4" />
@@ -287,8 +283,8 @@ export default function AlunosAdmin() {
                       <td className="p-4 text-sm text-gray-600">{a.age} anos</td>
                       <td className="p-4 text-sm text-gray-600">{a.course}</td>
                       <td className="p-4 text-right space-x-2">
-                        <button className="px-3 py-1 bg-green-50 text-icat-green hover:bg-green-100 rounded-md text-xs font-bold transition-colors">Aprovar</button>
-                        <button className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs font-bold transition-colors">Rejeitar</button>
+                        <button onClick={() => setAlunos(alunos.map(x => x.id === a.id ? {...x, status: 'Matriculado'} : x))} className="px-3 py-1 bg-green-50 text-icat-green hover:bg-green-100 rounded-md text-xs font-bold transition-colors">Aprovar</button>
+                        <button onClick={() => setAlunos(alunos.filter(x => x.id !== a.id))} className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs font-bold transition-colors">Rejeitar</button>
                       </td>
                     </tr>
                   ))}
