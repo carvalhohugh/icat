@@ -44,16 +44,58 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <PieChart className="w-5 h-5 text-gray-400" /> Atendimento por Gênero
             </h2>
-            <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-300">
-              <p className="text-gray-400 text-sm">[Gráfico de Pizza: 58% Fem | 42% Masc]</p>
+            <div className="h-64 flex flex-col md:flex-row items-center justify-center gap-8">
+              <div 
+                className="w-48 h-48 rounded-full shadow-inner" 
+                style={{ background: 'conic-gradient(#05B253 0% 58%, #2A8CFF 58% 100%)' }}
+              ></div>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-sm bg-icat-green"></div>
+                  <span className="text-sm font-medium text-gray-700">Feminino (58%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-sm bg-icat-blue"></div>
+                  <span className="text-sm font-medium text-gray-700">Masculino (42%)</span>
+                </div>
+              </div>
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-gray-400" /> Faixa de Idade
             </h2>
-            <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-300">
-              <p className="text-gray-400 text-sm">[Gráfico de Barras: 0-12, 13-17, 18-35, 36-59, 60+]</p>
+            <div className="h-64 flex items-end justify-between gap-2 md:gap-6 pt-8 pb-4 border-b border-gray-200">
+              <div className="flex flex-col items-center flex-1 group">
+                <div className="w-full bg-icat-yellow rounded-t-sm h-[40%] group-hover:bg-yellow-500 transition-colors relative">
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">40%</span>
+                </div>
+                <span className="text-xs text-gray-500 mt-2 font-medium">0-12</span>
+              </div>
+              <div className="flex flex-col items-center flex-1 group">
+                <div className="w-full bg-icat-green rounded-t-sm h-[30%] group-hover:bg-green-600 transition-colors relative">
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">30%</span>
+                </div>
+                <span className="text-xs text-gray-500 mt-2 font-medium">13-17</span>
+              </div>
+              <div className="flex flex-col items-center flex-1 group">
+                <div className="w-full bg-icat-blue rounded-t-sm h-[15%] group-hover:bg-blue-600 transition-colors relative">
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">15%</span>
+                </div>
+                <span className="text-xs text-gray-500 mt-2 font-medium">18-35</span>
+              </div>
+              <div className="flex flex-col items-center flex-1 group">
+                <div className="w-full bg-purple-500 rounded-t-sm h-[10%] group-hover:bg-purple-600 transition-colors relative">
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">10%</span>
+                </div>
+                <span className="text-xs text-gray-500 mt-2 font-medium">36-59</span>
+              </div>
+              <div className="flex flex-col items-center flex-1 group">
+                <div className="w-full bg-gray-400 rounded-t-sm h-[5%] group-hover:bg-gray-500 transition-colors relative">
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">5%</span>
+                </div>
+                <span className="text-xs text-gray-500 mt-2 font-medium">60+</span>
+              </div>
             </div>
           </div>
         </div>

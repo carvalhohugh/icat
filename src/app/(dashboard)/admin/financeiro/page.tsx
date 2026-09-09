@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { 
   ArrowUpRight, ArrowDownRight, Upload, Search, Filter, 
-  FileText, CheckCircle, Clock, Plus, Building, User, Wallet, FileUp, List
+  FileText, CheckCircle, Clock, Plus, Building, User, Wallet, FileUp, List, X
 } from 'lucide-react';
 
 // Mocks
@@ -27,14 +27,27 @@ const mockAlunos = [
 ];
 
 export default function FinanceiroAdmin() {
-  const [activeTab, setActiveTab] = useState<'geral' | 'transacoes' | 'conciliacao' | 'emendas' | 'mensalidades'>('geral');
+  const [activeTab, setActiveTab] = useState<'geral' | 'transacoes' | 'conciliacao' | 'emendas' | 'mensalidades' | 'doacoes'>('geral');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isNovaEmendaOpen, setIsNovaEmendaOpen] = useState(false);
+  const [isExtratoOpen, setIsExtratoOpen] = useState(false);
+  const [isNovaTransacaoOpen, setIsNovaTransacaoOpen] = useState(false);
+  const [isRelatoriosOpen, setIsRelatoriosOpen] = useState(false);
+  
+  // For autocomplete
+  const [newTransacaoPerson, setNewTransacaoPerson] = useState('');
+  const namesDb = ['MARIA DA SILVA', 'MARCOS ANTONIO', 'MARIANA OLIVEIRA', 'MARTA SOUZA', 'JOÃO PEDRO', 'JOÃO BATISTA'];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Gestão Financeira</h1>
-        <p className="text-gray-500 text-sm mt-1">Acompanhe entradas, saídas, emendas e conciliações bancárias.</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Gestão Financeira</h1>
+          <p className="text-gray-500 text-sm mt-1">Acompanhe entradas, saídas, emendas e conciliações bancárias.</p>
+        </div>
+        <button onClick={() => setIsRelatoriosOpen(true)} className="btn-secondary bg-white border border-gray-200 text-gray-700 flex items-center">
+          <FileText className="w-4 h-4 mr-2" /> Relatórios
+        </button>
       </div>
 
       {/* Tabs */}
@@ -43,6 +56,7 @@ export default function FinanceiroAdmin() {
         <button onClick={() => setActiveTab('transacoes')} className={`pb-3 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${activeTab === 'transacoes' ? 'border-icat-green text-icat-green' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Transações</button>
         <button onClick={() => setActiveTab('conciliacao')} className={`pb-3 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${activeTab === 'conciliacao' ? 'border-icat-green text-icat-green' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Contas e Extratos</button>
         <button onClick={() => setActiveTab('emendas')} className={`pb-3 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${activeTab === 'emendas' ? 'border-icat-green text-icat-green' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Emendas Parlamentares</button>
+        <button onClick={() => setActiveTab('doacoes')} className={`pb-3 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${activeTab === 'doacoes' ? 'border-icat-green text-icat-green' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Doações</button>
         <button onClick={() => setActiveTab('mensalidades')} className={`pb-3 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${activeTab === 'mensalidades' ? 'border-icat-green text-icat-green' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Mensalidades / Repasses</button>
       </div>
 
@@ -134,7 +148,7 @@ export default function FinanceiroAdmin() {
               <button className="btn-secondary bg-white border border-gray-200 flex items-center text-gray-700">
                 <Filter className="w-4 h-4 mr-2" /> Filtros
               </button>
-              <button className="btn-primary flex items-center">
+              <button onClick={() => setIsNovaTransacaoOpen(true)} className="btn-primary flex items-center">
                 <Plus className="w-4 h-4 mr-2" /> Nova Transação
               </button>
             </div>
@@ -177,6 +191,54 @@ export default function FinanceiroAdmin() {
         </div>
       )}
 
+      {activeTab === 'doacoes' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-4 border-b border-gray-200 flex flex-wrap gap-4 justify-between items-center bg-gray-50">
+            <div className="relative w-full sm:w-80">
+              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input type="text" placeholder="Buscar doador..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-icat-green outline-none" />
+            </div>
+            <button className="btn-primary flex items-center">
+              <Plus className="w-4 h-4 mr-2" /> Nova Doação
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
+              <thead>
+                <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase bg-white">
+                  <th className="p-4 font-semibold">Data</th>
+                  <th className="p-4 font-semibold">Doador</th>
+                  <th className="p-4 font-semibold">Banco/Forma</th>
+                  <th className="p-4 font-semibold text-right">Valor</th>
+                  <th className="p-4 font-semibold text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {mockTransacoes.filter(t => t.categoria === 'Doações').map(t => (
+                  <tr key={t.id} className="hover:bg-gray-50">
+                    <td className="p-4 text-sm text-gray-600">{t.data}</td>
+                    <td className="p-4">
+                      <p className="font-medium text-gray-900 text-sm">{t.descricao}</p>
+                    </td>
+                    <td className="p-4 text-sm text-gray-600">{t.banco}</td>
+                    <td className="p-4 text-right">
+                      <span className="font-bold text-sm text-green-600">
+                        + R$ {t.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${t.status === 'pago' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600'}`}>
+                        {t.status.toUpperCase()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'conciliacao' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
@@ -187,7 +249,7 @@ export default function FinanceiroAdmin() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+            <div onClick={() => setIsExtratoOpen(true)} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden cursor-pointer hover:border-icat-green transition-colors">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
               <h3 className="font-bold text-gray-900">Caixa Econômica</h3>
               <p className="text-sm text-gray-500 mb-4">Ag: 0001 • CC: 12345-6</p>
@@ -197,7 +259,7 @@ export default function FinanceiroAdmin() {
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+            <div onClick={() => setIsExtratoOpen(true)} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden cursor-pointer hover:border-icat-green transition-colors">
               <div className="absolute top-0 left-0 w-1 h-full bg-yellow-400"></div>
               <h3 className="font-bold text-gray-900">Banco do Brasil</h3>
               <p className="text-sm text-gray-500 mb-4">Ag: 0002 • CC: 98765-4</p>
@@ -207,7 +269,7 @@ export default function FinanceiroAdmin() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+            <div onClick={() => setIsExtratoOpen(true)} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden cursor-pointer hover:border-icat-green transition-colors">
               <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
               <h3 className="font-bold text-gray-900">Sicoob</h3>
               <p className="text-sm text-gray-500 mb-4">Ag: 4004 • CC: 1111-1</p>
@@ -227,7 +289,7 @@ export default function FinanceiroAdmin() {
               <h2 className="text-lg font-bold text-gray-900">Emendas Parlamentares</h2>
               <p className="text-sm text-gray-500">Controle de verbas governamentais e prestação de contas.</p>
             </div>
-            <button className="btn-primary flex items-center">
+            <button onClick={() => setIsNovaEmendaOpen(true)} className="btn-primary flex items-center">
               <Plus className="w-4 h-4 mr-2" /> Nova Emenda
             </button>
           </div>
@@ -339,6 +401,163 @@ export default function FinanceiroAdmin() {
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
               <button onClick={() => setIsUploadModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium">Cancelar</button>
               <button onClick={() => setIsUploadModalOpen(false)} className="btn-primary">Processar Arquivo</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Nova Emenda */}
+      {isNovaEmendaOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsNovaEmendaOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Cadastrar Nova Emenda</h2>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Autor da Emenda</label>
+                <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Deputado João..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Número / Código</label>
+                <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Valor Previsto (R$)</label>
+                <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="0,00" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Finalidade / Objeto</label>
+                <textarea className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" rows={3}></textarea>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <button onClick={() => setIsNovaEmendaOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium">Cancelar</button>
+              <button onClick={() => setIsNovaEmendaOpen(false)} className="btn-primary">Salvar Emenda</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Nova Transação com Autocomplete */}
+      {isNovaTransacaoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsNovaTransacaoOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Registrar Transação</h2>
+            <div className="space-y-4 mb-6">
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="ttipo" defaultChecked className="text-icat-green focus:ring-icat-green" />
+                  <span className="text-gray-700">Entrada</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="ttipo" className="text-icat-green focus:ring-icat-green" />
+                  <span className="text-gray-700">Saída</span>
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+              </div>
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pessoa / Fornecedor / Doador</label>
+                <input 
+                  type="text" 
+                  value={newTransacaoPerson} 
+                  onChange={e => setNewTransacaoPerson(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" 
+                  placeholder="Comece a digitar para buscar..." 
+                />
+                {newTransacaoPerson.length > 0 && (
+                  <ul className="absolute z-10 w-full bg-white border border-gray-200 mt-1 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {namesDb.filter(n => n.toLowerCase().includes(newTransacaoPerson.toLowerCase())).map(n => (
+                       <li key={n} className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-700 font-medium" onClick={() => setNewTransacaoPerson(n)}>
+                         {n}
+                       </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Conta Bancária</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
+                    <option>Caixa Econômica</option>
+                    <option>Banco do Brasil</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <button onClick={() => setIsNovaTransacaoOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium">Cancelar</button>
+              <button onClick={() => setIsNovaTransacaoOpen(false)} className="btn-primary">Registrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Visualizar Extrato (Card Bank) */}
+      {isExtratoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsExtratoOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Extrato de Movimentações</h2>
+              <button onClick={() => setIsExtratoOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6"/></button>
+            </div>
+            <div className="overflow-y-auto max-h-[60vh] space-y-4">
+               {mockTransacoes.slice(0, 3).map(t => (
+                  <div key={t.id} className="flex justify-between items-center py-3 border-b border-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${t.tipo === 'entrada' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
+                        {t.tipo === 'entrada' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm">{t.descricao}</p>
+                        <p className="text-xs text-gray-500">{t.data}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-bold text-sm ${t.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'}`}>
+                        {t.tipo === 'entrada' ? '+' : '-'} R$ {t.valor.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Central de Relatórios */}
+      {isRelatoriosOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsRelatoriosOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Central de Relatórios Financeiros</h2>
+              <button onClick={() => setIsRelatoriosOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6"/></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+                  <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><List className="w-4 h-4"/> Fluxo de Caixa Mensal</h4>
+                  <p className="text-xs text-gray-500 mt-1">Exportação das entradas e saídas detalhadas do período selecionado.</p>
+               </div>
+               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+                  <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><Building className="w-4 h-4"/> Relatório de Emendas</h4>
+                  <p className="text-xs text-gray-500 mt-1">Evolução e prestação de contas de emendas parlamentares ativas.</p>
+               </div>
+               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+                  <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><User className="w-4 h-4"/> Inadimplência</h4>
+                  <p className="text-xs text-gray-500 mt-1">Lista de alunos e beneficiários com mensalidades pendentes ou atrasadas.</p>
+               </div>
+               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+                  <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><FileText className="w-4 h-4"/> Demonstrativo de Resultados</h4>
+                  <p className="text-xs text-gray-500 mt-1">Resumo consolidado anual para apresentações em assembleia.</p>
+               </div>
             </div>
           </div>
         </div>

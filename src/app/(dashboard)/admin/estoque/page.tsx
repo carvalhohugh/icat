@@ -136,9 +136,30 @@ export default function EstoqueAdmin() {
                   <option>Kit Material Escolar</option>
                 </select>
               </div>
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Beneficiário (Responsável) / Doador</label>
-                <input type="text" value={formData.person} onChange={e => setFormData({...formData, person: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Buscar pelo nome..." />
+                <input 
+                  type="text" 
+                  value={formData.person} 
+                  onChange={e => {
+                    setFormData({...formData, person: e.target.value});
+                  }} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" 
+                  placeholder="Buscar pelo nome..." 
+                />
+                {formData.person.length > 0 && (
+                  <ul className="absolute z-10 w-full bg-white border border-gray-200 mt-1 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {['MARIA DA SILVA', 'MARCOS ANTONIO', 'MARIANA OLIVEIRA', 'MARTA SOUZA', 'JOÃO PEDRO', 'JOÃO BATISTA']
+                      .filter(n => n.toLowerCase().includes(formData.person.toLowerCase()))
+                      .map(n => (
+                       <li key={n} className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-700 font-medium" onClick={() => {
+                          setFormData({...formData, person: n});
+                       }}>
+                         {n}
+                       </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
 
