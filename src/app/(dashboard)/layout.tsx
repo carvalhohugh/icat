@@ -11,6 +11,7 @@ export default function DashboardLayout({
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState('admin');
 
   useEffect(() => {
@@ -39,29 +40,31 @@ export default function DashboardLayout({
         
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-3">
-            {['admin', 'professor', 'financeiro', 'assistencia'].includes(currentRole) && (
+            {['admin', 'professor', 'financeiro', 'assistencia', 'secretaria'].includes(currentRole) && (
               <Link href="/admin" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
                 <LayoutDashboard className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
                 Dashboard
               </Link>
             )}
             {['admin', 'professor'].includes(currentRole) && (
-              <>
-                <Link href="/admin/projetos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-                  Projetos
-                </Link>
-                <Link href="/admin/cursos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-                  Cursos e Turmas
-                </Link>
-                <Link href="/admin/diarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-                  Diários de Presença
-                </Link>
-              </>
+              <Link href="/admin/projetos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Projetos
+              </Link>
             )}
-            {['admin', 'professor', 'assistencia'].includes(currentRole) && (
+            {['admin', 'professor', 'secretaria'].includes(currentRole) && (
+              <Link href="/admin/cursos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Cursos e Turmas
+              </Link>
+            )}
+            {['admin', 'professor', 'secretaria'].includes(currentRole) && (
+              <Link href="/admin/diarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Diários de Presença
+              </Link>
+            )}
+            {['admin', 'professor', 'assistencia', 'secretaria'].includes(currentRole) && (
               <Link href="/admin/alunos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
                 <Users className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
                 Alunos e Matrículas
@@ -146,25 +149,27 @@ export default function DashboardLayout({
             
             <div className="mt-8 h-0 flex-1 overflow-y-auto">
               <nav className="space-y-1 px-2">
-                {['admin', 'professor', 'financeiro', 'assistencia'].includes(currentRole) && (
+                {['admin', 'professor', 'financeiro', 'assistencia', 'secretaria'].includes(currentRole) && (
                   <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
                     <LayoutDashboard className="mr-3 h-5 w-5 text-gray-400" /> Dashboard
                   </Link>
                 )}
                 {['admin', 'professor'].includes(currentRole) && (
-                  <>
-                    <Link href="/admin/projetos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Projetos
-                    </Link>
-                    <Link href="/admin/cursos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Cursos e Turmas
-                    </Link>
-                    <Link href="/admin/diarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Diários de Presença
-                    </Link>
-                  </>
+                  <Link href="/admin/projetos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Projetos
+                  </Link>
                 )}
-                {['admin', 'professor', 'assistencia'].includes(currentRole) && (
+                {['admin', 'professor', 'secretaria'].includes(currentRole) && (
+                  <Link href="/admin/cursos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Cursos e Turmas
+                  </Link>
+                )}
+                {['admin', 'professor', 'secretaria'].includes(currentRole) && (
+                  <Link href="/admin/diarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Diários de Presença
+                  </Link>
+                )}
+                {['admin', 'professor', 'assistencia', 'secretaria'].includes(currentRole) && (
                   <Link href="/admin/alunos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
                     <Users className="mr-3 h-5 w-5 text-gray-400" /> Alunos e Matrículas
                   </Link>
@@ -252,6 +257,7 @@ export default function DashboardLayout({
               <option value="/admin/financeiro|financeiro">Equipe Financeiro</option>
               <option value="/admin/diarios|professor">Professor</option>
               <option value="/admin/estoque|assistencia">Assistência Social</option>
+              <option value="/admin/alunos|secretaria">Secretaria</option>
               <option value="/beneficiario|beneficiario">Aluno / Beneficiário</option>
             </select>
 
@@ -305,7 +311,7 @@ export default function DashboardLayout({
             )}
 
             {/* Perfil */}
-            <div className="flex items-center space-x-3 cursor-pointer group">
+            <div className="flex items-center space-x-3 cursor-pointer group relative" onClick={() => setIsProfileModalOpen(true)}>
               <div className="h-9 w-9 rounded-full bg-gradient-to-r from-icat-blue to-icat-green text-white flex items-center justify-center font-bold shadow-sm">
                 A
               </div>
@@ -314,6 +320,49 @@ export default function DashboardLayout({
                 <span className="text-xs text-gray-500">Gestão Geral</span>
               </div>
             </div>
+
+            {/* Modal de Perfil */}
+            {isProfileModalOpen && (
+              <>
+                <div className="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsProfileModalOpen(false)}>
+                  <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                      <h3 className="font-bold text-gray-900">Meu Perfil</h3>
+                      <button onClick={() => setIsProfileModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5"/></button>
+                    </div>
+                    <div className="p-6 space-y-5">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="h-20 w-20 rounded-full bg-gradient-to-r from-icat-blue to-icat-green text-white flex items-center justify-center text-3xl font-bold shadow-sm relative group cursor-pointer overflow-hidden">
+                          <span>A</span>
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] text-white">Alterar Foto</span>
+                          </div>
+                        </div>
+                        <p className="text-sm font-semibold text-gray-500">Alterar foto do perfil</p>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-700 mb-1">Nome Completo</label>
+                          <input type="text" defaultValue="Super Admin" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-700 mb-1">E-mail</label>
+                          <input type="email" defaultValue="admin@icat.org.br" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-700 mb-1">Nova Senha</label>
+                          <input type="password" placeholder="Deixe em branco para não alterar" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                      <button onClick={() => setIsProfileModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
+                      <button onClick={() => setIsProfileModalOpen(false)} className="px-4 py-2 text-sm font-medium text-white bg-icat-green hover:bg-green-600 rounded-lg transition-colors">Salvar Alterações</button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
           </div>
         </header>

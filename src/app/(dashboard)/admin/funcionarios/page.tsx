@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Briefcase, Link as LinkIcon, CheckCircle } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Briefcase, Link as LinkIcon, CheckCircle, Camera } from 'lucide-react';
 
 export default function FuncionariosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -122,8 +122,10 @@ export default function FuncionariosAdmin() {
             <div className="p-6 overflow-y-auto space-y-6 max-h-[80vh]">
               
               <div className="flex gap-6 items-start">
-                <div className="w-32 h-32 bg-gray-100 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all">
-                  <span className="text-xs text-center px-2">Foto<br/>Perfil</span>
+                <div className="w-32 h-32 bg-gray-100 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all relative overflow-hidden group">
+                  <Camera className="w-6 h-6 mb-1 group-hover:text-icat-green" />
+                  <span className="text-xs text-center px-2">Adicionar<br/>Foto</span>
+                  <input type="file" accept="image/*" capture="user" className="absolute inset-0 opacity-0 cursor-pointer" />
                 </div>
                 
                 <div className="flex-1 grid grid-cols-2 gap-4">

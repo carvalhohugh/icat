@@ -131,6 +131,7 @@ export default function ConfiguracoesAdmin() {
               <div className="space-y-6">
                 {[
                   { title: 'Administrador Geral', desc: 'Acesso total e irrestrito ao sistema.', defaultEnabled: true, locked: true },
+                  { title: 'Secretaria', desc: 'Acesso às turmas, alunos e gestão de matrículas.', defaultEnabled: true },
                   { title: 'Professor / Instrutor', desc: 'Acesso apenas a turmas, alunos e diários de presença.', defaultEnabled: true },
                   { title: 'Financeiro', desc: 'Acesso ao fluxo de caixa, emendas, doações e relatórios.', defaultEnabled: true },
                   { title: 'Assistência Social', desc: 'Acesso ao controle de estoque, benefícios e beneficiários.', defaultEnabled: true },
