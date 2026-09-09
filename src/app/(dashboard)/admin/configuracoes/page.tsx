@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Save, Globe, Building, MessageCircle } from 'lucide-react';
+import { Save, Globe, Building, MessageCircle, Shield, Check } from 'lucide-react';
 
 export default function ConfiguracoesAdmin() {
   const [activeTab, setActiveTab] = useState('instituicao');
@@ -49,6 +49,12 @@ export default function ConfiguracoesAdmin() {
             className={`w-full flex items-center p-3 text-sm font-medium rounded-lg transition-colors ${activeTab === 'redes' ? 'bg-white border border-gray-200 text-icat-green shadow-sm' : 'hover:bg-gray-50 text-gray-700'}`}
           >
             <MessageCircle className="w-5 h-5 mr-3" /> Redes Sociais
+          </button>
+          <button 
+            onClick={() => setActiveTab('perfis')}
+            className={`w-full flex items-center p-3 text-sm font-medium rounded-lg transition-colors ${activeTab === 'perfis' ? 'bg-white border border-gray-200 text-icat-green shadow-sm' : 'hover:bg-gray-50 text-gray-700'}`}
+          >
+            <Shield className="w-5 h-5 mr-3" /> Perfis e Acessos
           </button>
         </div>
 
@@ -117,7 +123,43 @@ export default function ConfiguracoesAdmin() {
             </>
           )}
 
-
+          {activeTab === 'perfis' && (
+            <>
+              <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4">Perfis e Permissões de Acesso</h2>
+              <p className="text-sm text-gray-500 mb-6">Controle quais menus e funcionalidades cada tipo de usuário pode visualizar no painel.</p>
+              
+              <div className="space-y-6">
+                {[
+                  { title: 'Administrador Geral', desc: 'Acesso total e irrestrito ao sistema.', defaultEnabled: true, locked: true },
+                  { title: 'Professor / Instrutor', desc: 'Acesso apenas a turmas, alunos e diários de presença.', defaultEnabled: true },
+                  { title: 'Financeiro', desc: 'Acesso ao fluxo de caixa, emendas, doações e relatórios.', defaultEnabled: true },
+                  { title: 'Assistência Social', desc: 'Acesso ao controle de estoque, benefícios e beneficiários.', defaultEnabled: true },
+                ].map((perfil, i) => (
+                  <div key={i} className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="font-bold text-gray-900">{perfil.title}</h4>
+                        <p className="text-xs text-gray-500 mt-1">{perfil.desc}</p>
+                      </div>
+                      {perfil.locked ? (
+                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">Bloqueado (Sistema)</span>
+                      ) : (
+                         <button className="text-sm font-semibold text-icat-blue hover:underline">Editar Permissões</button>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                       {['Dashboard', 'Cursos e Turmas', 'Alunos', 'Financeiro', 'Beneficiários', 'Estoque', 'Configurações'].map((menu, j) => (
+                          <label key={j} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${perfil.locked || perfil.defaultEnabled ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white border-gray-200 text-gray-600'}`}>
+                             <input type="checkbox" className="hidden" checked={perfil.locked || perfil.defaultEnabled} readOnly />
+                             <Check className="w-3 h-3" /> {menu}
+                          </label>
+                       ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

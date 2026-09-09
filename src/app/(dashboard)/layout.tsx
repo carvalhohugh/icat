@@ -186,6 +186,17 @@ export default function DashboardLayout({
 
           <div className="flex items-center space-x-6 relative">
             
+            {/* Seletor Rápido de Telas (Mock Admin) */}
+            <select 
+              className="hidden sm:block text-xs font-bold text-gray-700 bg-gray-100 border-none rounded-full px-4 py-2 cursor-pointer outline-none focus:ring-2 focus:ring-icat-blue"
+              onChange={(e) => { if(e.target.value) window.location.href = e.target.value; }}
+            >
+              <option value="">Simular Visão: Administrador</option>
+              <option value="/admin/financeiro">Simular: Equipe Financeiro</option>
+              <option value="/admin/diarios">Simular: Professor</option>
+              <option value="/beneficiario">Simular: Aluno / Beneficiário</option>
+            </select>
+
             {/* Botão de Notificação */}
             <button 
               className="relative p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-full hover:bg-gray-50"
