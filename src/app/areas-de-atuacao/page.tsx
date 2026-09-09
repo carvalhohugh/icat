@@ -27,22 +27,22 @@ export default function AreasDeAtuacao() {
       num: '04',
       title: 'Cultura e Arte',
       desc: 'Música, teatro, ballet e oficinas que valorizam a expressão corporal, criatividade e cultura na região.',
-      color: 'bg-purple-100 text-purple-600',
-      hover: 'group-hover:text-purple-600',
+      color: 'bg-icat-blue/10 text-icat-blue',
+      hover: 'group-hover:text-icat-blue',
     },
     {
       num: '05',
       title: 'Cidadania e Direitos',
       desc: 'Informação, participação social, orientação jurídica e defesa de direitos no território de Catalão.',
-      color: 'bg-orange-100 text-orange-600',
-      hover: 'group-hover:text-orange-600',
+      color: 'bg-icat-green/10 text-icat-green',
+      hover: 'group-hover:text-icat-green',
     },
     {
       num: '06',
       title: 'Saúde e Bem-Estar',
       desc: 'Campanhas educativas de orientação, prevenção, Defesa Pessoal para Mulheres e promoção do bem-estar.',
-      color: 'bg-red-100 text-red-500',
-      hover: 'group-hover:text-red-500',
+      color: 'bg-icat-yellow/20 text-icat-yellow',
+      hover: 'group-hover:text-icat-yellow',
     }
   ];
 

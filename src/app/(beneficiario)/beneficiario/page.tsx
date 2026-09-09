@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Heart, Package, MessageCircle, Edit2, Plus, Users, CheckCircle2, Clock, X, Trash2 } from 'lucide-react';
+import { Heart, Package, MessageCircle, Edit2, Plus, Users, CheckCircle2, Clock, X, Trash2, DollarSign, CreditCard } from 'lucide-react';
 
 export default function BeneficiarioDashboard() {
   const [editOpen, setEditOpen] = useState(false);
@@ -77,6 +77,42 @@ export default function BeneficiarioDashboard() {
             <MessageCircle className="w-5 h-5" /> Falar pelo WhatsApp
           </a>
           <p className="text-xs text-gray-400 text-center mt-2">(64) 99911-9610</p>
+        </div>
+      </div>
+
+      {/* Área Financeira */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-icat-yellow" /> Área Financeira</h2>
+        <p className="text-gray-500 text-sm mb-4">Acompanhe suas obrigações financeiras, mensalidades e repasses a receber.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex justify-between items-center">
+            <div>
+              <p className="font-medium text-gray-900 text-sm">Mensalidade: Futebol Sub-12</p>
+              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> Vencimento: 10/10/2026</p>
+            </div>
+            <div className="text-right">
+              <p className="font-bold text-gray-900">R$ 80,00</p>
+              <span className="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full mt-1 inline-block">Pendente</span>
+            </div>
+          </div>
+
+          <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex justify-between items-center">
+            <div>
+              <p className="font-medium text-gray-900 text-sm">Mensalidade: Ballet Infantil</p>
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> Vencimento: 10/09/2026</p>
+            </div>
+            <div className="text-right">
+              <p className="font-bold text-gray-900">R$ 80,00</p>
+              <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded-full mt-1 inline-block">Atrasado</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 justify-end pt-4 border-t border-gray-100">
+          <button className="text-sm font-medium text-icat-blue hover:underline flex items-center">
+            <CreditCard className="w-4 h-4 mr-1" /> Gerar 2ª Via / Pix
+          </button>
         </div>
       </div>
 

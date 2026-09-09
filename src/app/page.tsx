@@ -133,30 +133,30 @@ export default function Home() {
 
             {/* Card 4 */}
             <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-              <span className="text-5xl font-black text-purple-300 group-hover:text-purple-600 transition-colors mb-6 block">04</span>
-              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-colors">Cultura e Arte</h4>
+              <span className="text-5xl font-black text-icat-blue/40 group-hover:text-icat-blue transition-colors mb-6 block">04</span>
+              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-icat-blue transition-colors">Cultura e Arte</h4>
               <p className="text-gray-600 mb-6 leading-relaxed">Música, teatro, ballet e oficinas que valorizam a expressão corporal, criatividade e cultura na região.</p>
-              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-purple-600 group-hover:gap-2 transition-all">
+              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-icat-blue group-hover:gap-2 transition-all">
                 Saiba mais <ArrowUpRight className="w-4 h-4 ml-1" />
               </Link>
             </div>
 
             {/* Card 5 */}
             <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-              <span className="text-5xl font-black text-orange-300 group-hover:text-orange-600 transition-colors mb-6 block">05</span>
-              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-orange-600 transition-colors">Cidadania e Direitos</h4>
+              <span className="text-5xl font-black text-icat-green/40 group-hover:text-icat-green transition-colors mb-6 block">05</span>
+              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-icat-green transition-colors">Cidadania e Direitos</h4>
               <p className="text-gray-600 mb-6 leading-relaxed">Informação, participação social, orientação jurídica e defesa de direitos no território de Catalão.</p>
-              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-orange-600 group-hover:gap-2 transition-all">
+              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-icat-green group-hover:gap-2 transition-all">
                 Saiba mais <ArrowUpRight className="w-4 h-4 ml-1" />
               </Link>
             </div>
 
             {/* Card 6 */}
             <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-              <span className="text-5xl font-black text-red-300 group-hover:text-red-500 transition-colors mb-6 block">06</span>
-              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-red-500 transition-colors">Saúde e Bem-Estar</h4>
+              <span className="text-5xl font-black text-icat-yellow/60 group-hover:text-icat-yellow transition-colors mb-6 block">06</span>
+              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-icat-yellow transition-colors">Saúde e Bem-Estar</h4>
               <p className="text-gray-600 mb-6 leading-relaxed">Campanhas educativas de orientação, prevenção, Defesa Pessoal para Mulheres e promoção do bem-estar.</p>
-              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-red-500 group-hover:gap-2 transition-all">
+              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-icat-yellow group-hover:gap-2 transition-all">
                 Saiba mais <ArrowUpRight className="w-4 h-4 ml-1" />
               </Link>
             </div>

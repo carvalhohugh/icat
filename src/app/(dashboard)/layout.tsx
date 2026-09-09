@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building } from 'lucide-react';
+import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building, DollarSign } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -64,6 +64,10 @@ export default function DashboardLayout({
             <Link href="/admin/estoque" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
               <Package className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
               Benefícios e Estoque
+            </Link>
+            <Link href="/admin/financeiro" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+              <DollarSign className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+              Financeiro
             </Link>
             <Link href="/admin/configuracoes" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
               <Settings className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
@@ -145,6 +149,9 @@ export default function DashboardLayout({
                 </Link>
                 <Link href="/admin/clube" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
                   <Heart className="mr-3 h-5 w-5 text-gray-400" /> Clube de Vantagens
+                </Link>
+                <Link href="/admin/financeiro" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                  <DollarSign className="mr-3 h-5 w-5 text-gray-400" /> Financeiro
                 </Link>
               </nav>
             </div>
