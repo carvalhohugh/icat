@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building, DollarSign } from 'lucide-react';
 
@@ -11,6 +11,12 @@ export default function DashboardLayout({
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [currentRole, setCurrentRole] = useState('admin');
+
+  useEffect(() => {
+    const role = localStorage.getItem('mockRole');
+    if (role) setCurrentRole(role);
+  }, []);
   
   // Mock de notificações
   const notifications = [
@@ -33,54 +39,74 @@ export default function DashboardLayout({
         
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-3">
-            <Link href="/admin" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <LayoutDashboard className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Dashboard
-            </Link>
-            <Link href="/admin/projetos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Projetos
-            </Link>
-            <Link href="/admin/cursos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Cursos e Turmas
-            </Link>
-            <Link href="/admin/alunos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Users className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Alunos e Matrículas
-            </Link>
-            <Link href="/admin/diarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Diários de Presença
-            </Link>
-            <Link href="/admin/funcionarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Users className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Equipe e Funcionários
-            </Link>
-            <Link href="/admin/beneficiarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Heart className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Assistência Social
-            </Link>
-            <Link href="/admin/estoque" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Package className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Benefícios e Estoque
-            </Link>
-            <Link href="/admin/financeiro" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <DollarSign className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Financeiro
-            </Link>
-            <Link href="/admin/configuracoes" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Settings className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Configurações
-            </Link>
-            <Link href="/admin/empresas-parceiras" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Building className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Parceiros Oficiais
-            </Link>
-            <Link href="/admin/clube" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-              <Heart className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-              Clube de Vantagens
-            </Link>
+            {['admin', 'professor', 'financeiro', 'assistencia'].includes(currentRole) && (
+              <Link href="/admin" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <LayoutDashboard className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Dashboard
+              </Link>
+            )}
+            {['admin', 'professor'].includes(currentRole) && (
+              <>
+                <Link href="/admin/projetos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Projetos
+                </Link>
+                <Link href="/admin/cursos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Cursos e Turmas
+                </Link>
+                <Link href="/admin/diarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Diários de Presença
+                </Link>
+              </>
+            )}
+            {['admin', 'professor', 'assistencia'].includes(currentRole) && (
+              <Link href="/admin/alunos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <Users className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Alunos e Matrículas
+              </Link>
+            )}
+            {['admin'].includes(currentRole) && (
+              <Link href="/admin/funcionarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <Users className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Equipe e Funcionários
+              </Link>
+            )}
+            {['admin', 'assistencia'].includes(currentRole) && (
+              <>
+                <Link href="/admin/beneficiarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <Heart className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Assistência Social
+                </Link>
+                <Link href="/admin/estoque" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <Package className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Benefícios e Estoque
+                </Link>
+              </>
+            )}
+            {['admin', 'financeiro'].includes(currentRole) && (
+              <>
+                <Link href="/admin/financeiro" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <DollarSign className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Financeiro
+                </Link>
+                <Link href="/admin/empresas-parceiras" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <Building className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Parceiros Oficiais
+                </Link>
+                <Link href="/admin/clube" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <Heart className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Clube de Vantagens
+                </Link>
+              </>
+            )}
+            {['admin'].includes(currentRole) && (
+              <Link href="/admin/configuracoes" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                <Settings className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                Configurações
+              </Link>
+            )}
           </nav>
         </div>
         
@@ -120,39 +146,62 @@ export default function DashboardLayout({
             
             <div className="mt-8 h-0 flex-1 overflow-y-auto">
               <nav className="space-y-1 px-2">
-                <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <LayoutDashboard className="mr-3 h-5 w-5 text-gray-400" /> Dashboard
-                </Link>
-                <Link href="/admin/projetos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Projetos
-                </Link>
-                <Link href="/admin/cursos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Cursos e Turmas
-                </Link>
-                <Link href="/admin/alunos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <Users className="mr-3 h-5 w-5 text-gray-400" /> Alunos e Matrículas
-                </Link>
-                <Link href="/admin/diarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Diários de Presença
-                </Link>
-                <Link href="/admin/funcionarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <Users className="mr-3 h-5 w-5 text-gray-400" /> Equipe e Funcionários
-                </Link>
-                <Link href="/admin/beneficiarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <Heart className="mr-3 h-5 w-5 text-gray-400" /> Assistência Social
-                </Link>
-                <Link href="/admin/estoque" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <Package className="mr-3 h-5 w-5 text-gray-400" /> Benefícios e Estoque
-                </Link>
-                <Link href="/admin/empresas-parceiras" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <Building className="mr-3 h-5 w-5 text-gray-400" /> Parceiros Oficiais
-                </Link>
-                <Link href="/admin/clube" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <Heart className="mr-3 h-5 w-5 text-gray-400" /> Clube de Vantagens
-                </Link>
-                <Link href="/admin/financeiro" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                  <DollarSign className="mr-3 h-5 w-5 text-gray-400" /> Financeiro
-                </Link>
+                {['admin', 'professor', 'financeiro', 'assistencia'].includes(currentRole) && (
+                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <LayoutDashboard className="mr-3 h-5 w-5 text-gray-400" /> Dashboard
+                  </Link>
+                )}
+                {['admin', 'professor'].includes(currentRole) && (
+                  <>
+                    <Link href="/admin/projetos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Projetos
+                    </Link>
+                    <Link href="/admin/cursos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Cursos e Turmas
+                    </Link>
+                    <Link href="/admin/diarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Diários de Presença
+                    </Link>
+                  </>
+                )}
+                {['admin', 'professor', 'assistencia'].includes(currentRole) && (
+                  <Link href="/admin/alunos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <Users className="mr-3 h-5 w-5 text-gray-400" /> Alunos e Matrículas
+                  </Link>
+                )}
+                {['admin'].includes(currentRole) && (
+                  <Link href="/admin/funcionarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <Users className="mr-3 h-5 w-5 text-gray-400" /> Equipe e Funcionários
+                  </Link>
+                )}
+                {['admin', 'assistencia'].includes(currentRole) && (
+                  <>
+                    <Link href="/admin/beneficiarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <Heart className="mr-3 h-5 w-5 text-gray-400" /> Assistência Social
+                    </Link>
+                    <Link href="/admin/estoque" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <Package className="mr-3 h-5 w-5 text-gray-400" /> Benefícios e Estoque
+                    </Link>
+                  </>
+                )}
+                {['admin', 'financeiro'].includes(currentRole) && (
+                  <>
+                    <Link href="/admin/financeiro" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <DollarSign className="mr-3 h-5 w-5 text-gray-400" /> Financeiro
+                    </Link>
+                    <Link href="/admin/empresas-parceiras" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <Building className="mr-3 h-5 w-5 text-gray-400" /> Parceiros Oficiais
+                    </Link>
+                    <Link href="/admin/clube" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <Heart className="mr-3 h-5 w-5 text-gray-400" /> Clube de Vantagens
+                    </Link>
+                  </>
+                )}
+                {['admin'].includes(currentRole) && (
+                  <Link href="/admin/configuracoes" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                    <Settings className="mr-3 h-5 w-5 text-gray-400" /> Configurações
+                  </Link>
+                )}
               </nav>
             </div>
             <div className="p-4 border-t border-gray-200">

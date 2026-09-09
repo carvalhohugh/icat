@@ -135,6 +135,16 @@ export default function CursosAdmin() {
                 <textarea rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Detalhes sobre o que será ensinado..."></textarea>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Professor / Instrutor Responsável</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
+                  <option value="">Selecione um professor cadastrado...</option>
+                  <option value="prof1">João Carlos (Esportes)</option>
+                  <option value="prof2">Maria Antonieta (Artes)</option>
+                  <option value="prof3">Ricardo Silva (Informática)</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade de Vagas</label>

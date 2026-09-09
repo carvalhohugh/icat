@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Filter } from 'lucide-react';
 
@@ -15,10 +15,24 @@ export default function DiariosAdmin() {
     { id: 4, data: '05/09/2026', turma: 'Escolinha de Futebol', professor: 'Carlos Silva', presentes: 19, ausentes: 3, percentual: 86 },
     { id: 5, data: '04/09/2026', turma: 'Informática Básica', professor: 'João Pedro', presentes: 7, ausentes: 1, percentual: 88 },
   ];
+  
+  const [currentRole, setCurrentRole] = useState('admin');
+
+  useEffect(() => {
+    const role = localStorage.getItem('mockRole');
+    if (role) {
+      setCurrentRole(role);
+      // Simular login do professor Carlos Silva
+      if (role === 'professor') {
+        setFiltroProfessor('Carlos Silva');
+      }
+    }
+  }, []);
 
   const filtrados = registros.filter(r => {
     if (filtroTurma && r.turma !== filtroTurma) return false;
     if (filtroProfessor && r.professor !== filtroProfessor) return false;
+    if (currentRole === 'professor' && r.professor !== 'Carlos Silva') return false; // Travar view no professor logado
     return true;
   });
 
@@ -44,12 +58,14 @@ export default function DiariosAdmin() {
           <option>Ballet Infantil</option>
           <option>Informática Básica</option>
         </select>
-        <select value={filtroProfessor} onChange={e => setFiltroProfessor(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm">
-          <option value="">Todos os Professores</option>
-          <option>Carlos Silva</option>
-          <option>Amanda Oliveira</option>
-          <option>João Pedro</option>
-        </select>
+        {currentRole !== 'professor' && (
+          <select value={filtroProfessor} onChange={e => setFiltroProfessor(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm">
+            <option value="">Todos os Professores</option>
+            <option>Carlos Silva</option>
+            <option>Amanda Oliveira</option>
+            <option>João Pedro</option>
+          </select>
+        )}
       </div>
 
       {/* Tabela */}
