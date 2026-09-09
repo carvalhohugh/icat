@@ -238,12 +238,21 @@ export default function DashboardLayout({
             {/* Seletor Rápido de Telas (Mock Admin) */}
             <select 
               className="hidden sm:block text-xs font-bold text-gray-700 bg-gray-100 border-none rounded-full px-4 py-2 cursor-pointer outline-none focus:ring-2 focus:ring-icat-blue"
-              onChange={(e) => { if(e.target.value) window.location.href = e.target.value; }}
+              onChange={(e) => { 
+                if(e.target.value) {
+                  const [url, role] = e.target.value.split('|');
+                  localStorage.setItem('mockRole', role);
+                  window.location.href = url;
+                }
+              }}
+              defaultValue=""
             >
-              <option value="">Simular Visão: Administrador</option>
-              <option value="/admin/financeiro">Simular: Equipe Financeiro</option>
-              <option value="/admin/diarios">Simular: Professor</option>
-              <option value="/beneficiario">Simular: Aluno / Beneficiário</option>
+              <option value="" disabled>Alternar Perfil Simulador...</option>
+              <option value="/admin|admin">Admin Geral</option>
+              <option value="/admin/financeiro|financeiro">Equipe Financeiro</option>
+              <option value="/admin/diarios|professor">Professor</option>
+              <option value="/admin/estoque|assistencia">Assistência Social</option>
+              <option value="/beneficiario|beneficiario">Aluno / Beneficiário</option>
             </select>
 
             {/* Botão de Notificação */}
