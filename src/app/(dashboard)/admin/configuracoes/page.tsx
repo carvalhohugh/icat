@@ -135,6 +135,7 @@ export default function ConfiguracoesAdmin() {
                   { title: 'Professor / Instrutor', desc: 'Acesso apenas a turmas, alunos e diários de presença.', defaultEnabled: true },
                   { title: 'Financeiro', desc: 'Acesso ao fluxo de caixa, emendas, doações e relatórios.', defaultEnabled: true },
                   { title: 'Assistência Social', desc: 'Acesso ao controle de estoque, benefícios e beneficiários.', defaultEnabled: true },
+                  { title: 'Entrevistador', desc: 'Acesso exclusivo ao App Mobile de coleta de pesquisas urbanas (sem acesso ao painel admin).', defaultEnabled: false, locked: true },
                 ].map((perfil, i) => (
                   <div key={i} className="border border-gray-200 rounded-xl p-4 bg-gray-50">
                     <div className="flex justify-between items-start mb-4">
