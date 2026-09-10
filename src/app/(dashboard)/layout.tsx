@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building, DollarSign } from 'lucide-react';
+import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building, DollarSign, ClipboardList } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -105,10 +105,16 @@ export default function DashboardLayout({
               </>
             )}
             {['admin'].includes(currentRole) && (
-              <Link href="/admin/configuracoes" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-                <Settings className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-                Configurações
-              </Link>
+              <>
+                <Link href="/admin/pesquisas" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <ClipboardList className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Pesquisas Urbanas
+                </Link>
+                <Link href="/admin/configuracoes" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <Settings className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Configurações
+                </Link>
+              </>
             )}
           </nav>
         </div>
@@ -203,9 +209,14 @@ export default function DashboardLayout({
                   </>
                 )}
                 {['admin'].includes(currentRole) && (
-                  <Link href="/admin/configuracoes" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                    <Settings className="mr-3 h-5 w-5 text-gray-400" /> Configurações
-                  </Link>
+                  <>
+                    <Link href="/admin/pesquisas" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <ClipboardList className="mr-3 h-5 w-5 text-gray-400" /> Pesquisas Urbanas
+                    </Link>
+                    <Link href="/admin/configuracoes" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <Settings className="mr-3 h-5 w-5 text-gray-400" /> Configurações
+                    </Link>
+                  </>
                 )}
               </nav>
             </div>

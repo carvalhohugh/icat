@@ -97,6 +97,9 @@ export default function FuncionariosAdmin() {
                   </span>
                 </td>
                 <td className="p-4 text-right space-x-2">
+                  <button onClick={() => alert('Senha resetada para 123456')} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50" title="Resetar Senha para 123456">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                  </button>
                   <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
                     <Edit2 className="w-4 h-4" />
                   </button>
