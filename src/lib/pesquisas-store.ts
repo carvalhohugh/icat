@@ -27,6 +27,7 @@ export type Pesquisa = {
   opcoes: Opcao[];
   entrevistadores: number[];
   respostas: Resposta[];
+  metaDiaria?: number;
 };
 
 const STORAGE_KEY = 'icat_pesquisas_v1';
@@ -128,4 +129,13 @@ export function addPesquisa(p: Omit<Pesquisa, 'id' | 'respostas'>) {
 export function deletePesquisa(id: number) {
   const pesquisas = loadStore().filter(p => p.id !== id);
   saveStore(pesquisas);
+}
+
+export function updatePesquisa(id: number, data: Partial<Pesquisa>) {
+  const pesquisas = loadStore();
+  const idx = pesquisas.findIndex(p => p.id === id);
+  if (idx > -1) {
+    pesquisas[idx] = { ...pesquisas[idx], ...data };
+    saveStore(pesquisas);
+  }
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Target, ShieldCheck, Sun, ArrowUpRight } from 'lucide-react';
 import { Header } from '@/components/Header';
+import { EnquetesSection } from '@/components/EnquetesSection';
 
 export default function Home() {
   return (
@@ -160,6 +161,15 @@ export default function Home() {
                 Saiba mais <ArrowUpRight className="w-4 h-4 ml-1" />
               </Link>
             </div>
+            {/* Card 7 */}
+            <div className="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group md:col-span-2 lg:col-span-3 bg-gradient-to-r from-white to-blue-50/50">
+              <span className="text-5xl font-black text-icat-blue/40 group-hover:text-icat-blue transition-colors mb-6 block">07</span>
+              <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-icat-blue transition-colors">Pesquisas Políticas e Institucionais</h4>
+              <p className="text-gray-600 mb-6 leading-relaxed max-w-4xl">Realização de pesquisas de opinião pública, intenção de voto e levantamentos institucionais. Contamos com equipe de campo capacitada e tecnologia própria de coleta de dados em tempo real, fornecendo relatórios precisos para a tomada de decisões no Sudeste Goiano.</p>
+              <Link href="/areas-de-atuacao" className="inline-flex items-center font-bold text-icat-blue group-hover:gap-2 transition-all">
+                Saiba mais <ArrowUpRight className="w-4 h-4 ml-1" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -261,6 +271,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <EnquetesSection />
 
       {/* Footer Minimalista */}
       <footer className="bg-white py-12 border-t border-gray-100 text-center">

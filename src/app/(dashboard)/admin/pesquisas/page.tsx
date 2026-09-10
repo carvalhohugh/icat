@@ -23,6 +23,7 @@ export default function PesquisasAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEntrevistadorModal, setIsEntrevistadorModal] = useState(false);
   const [resultadoPesquisaId, setResultadoPesquisaId] = useState<number | null>(null);
+  const [relatorioEntrevistadorId, setRelatorioEntrevistadorId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [pesquisas, setPesquisas] = useState<Pesquisa[]>([]);
 
@@ -48,7 +49,7 @@ export default function PesquisasAdmin() {
     { id: 4, nome: 'Fernanda Lima', cpf: '444.444.444-44', telefone: '(64) 99900-4444', email: 'fernanda@icat.org.br', senha: '123' },
   ]);
 
-  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false });
+  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50 });
   const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string}[]>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
   const [entrevSelecionados, setEntrevSelecionados] = useState<number[]>([]);
   const [novoEntrevistador, setNovoEntrevistador] = useState({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
@@ -59,10 +60,11 @@ export default function PesquisasAdmin() {
       nome: novaPesquisa.nome, tipo: novaPesquisa.tipo,
       status: 'Ativa', induzida: novaPesquisa.induzida,
       multiSelect: novaPesquisa.multiSelect,
+      metaDiaria: novaPesquisa.metaDiaria,
       opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0 })),
       entrevistadores: entrevSelecionados,
     });
-    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false });
+    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50 });
     setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]);
     setEntrevSelecionados([]);
     setIsModalOpen(false);
@@ -145,19 +147,33 @@ export default function PesquisasAdmin() {
                   ))}
                   {!p.induzida && <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border border-dashed border-gray-300 text-gray-400">+ Outro</span>}
                 </div>
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-                  <span className="text-xs text-gray-400 font-medium">Entrevistadores:</span>
-                  <div className="flex -space-x-2">
-                    {p.entrevistadores.map(eId => {
-                      const e = entrevistadores.find(x => x.id === eId);
-                      return e ? (
-                        <div key={eId} className="h-7 w-7 rounded-full bg-gradient-to-br from-icat-blue to-icat-green text-white flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-sm" title={e.nome}>
-                          {e.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
-                      ) : null;
-                    })}
+                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-medium">Entrevistadores:</span>
+                    <div className="flex -space-x-2">
+                      {p.entrevistadores.map(eId => {
+                        const e = entrevistadores.find(x => x.id === eId);
+                        return e ? (
+                          <div key={eId} className="h-7 w-7 rounded-full bg-gradient-to-br from-icat-blue to-icat-green text-white flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-sm" title={e.nome}>
+                            {e.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
                   </div>
-                  <span className="text-xs text-gray-400">{p.opcoes.reduce((s, o) => s + o.votos, 0)} respostas</span>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+                    <span>Meta: {p.metaDiaria || 0}/dia</span>
+                    <button onClick={() => {
+                      const m = prompt('Nova meta diária:', String(p.metaDiaria || 50));
+                      if (m && !isNaN(Number(m))) {
+                        import('@/lib/pesquisas-store').then(mod => {
+                          mod.updatePesquisa(p.id, { metaDiaria: Number(m) });
+                          setPesquisas(mod.getPesquisas());
+                        });
+                      }
+                    }} className="text-icat-blue hover:underline font-semibold ml-1">Editar</button>
+                  </div>
+                  <span className="text-xs text-gray-400 ml-auto">{p.opcoes.reduce((s, o) => s + o.votos, 0)} respostas</span>
                 </div>
               </div>
             ))}
@@ -186,7 +202,14 @@ export default function PesquisasAdmin() {
               <tbody className="divide-y divide-gray-100">
                 {entrevistadores.map(e => (
                   <tr key={e.id} className="hover:bg-gray-50">
-                    <td className="p-4"><div className="flex items-center gap-3"><div className="h-9 w-9 rounded-full bg-gradient-to-br from-icat-blue to-icat-green text-white flex items-center justify-center font-bold text-sm shadow-sm">{e.nome.charAt(0)}</div><span className="font-medium text-gray-900">{e.nome}</span></div></td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setRelatorioEntrevistadorId(e.id)}>
+                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-icat-blue to-icat-green text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">
+                          {e.nome.charAt(0)}
+                        </div>
+                        <span className="font-medium text-gray-900 group-hover:text-icat-blue transition-colors border-b border-transparent group-hover:border-icat-blue">{e.nome}</span>
+                      </div>
+                    </td>
                     <td className="p-4 text-gray-600 text-sm text-center">{e.cpf}</td>
                     <td className="p-4 text-gray-600 text-sm text-center">{e.telefone}</td>
                     <td className="p-4 text-center"><code className="text-xs bg-gray-100 px-2 py-1 rounded">{e.email}</code></td>
@@ -287,7 +310,7 @@ export default function PesquisasAdmin() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Pesquisa</label>
                 <input type="text" value={novaPesquisa.nome} onChange={e => setNovaPesquisa({ ...novaPesquisa, nome: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Intenção de Voto — Prefeito Catalão 2026" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
                   <select value={novaPesquisa.tipo} onChange={e => setNovaPesquisa({ ...novaPesquisa, tipo: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
@@ -297,9 +320,13 @@ export default function PesquisasAdmin() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Formato</label>
                   <select value={novaPesquisa.induzida ? 'true' : 'false'} onChange={e => setNovaPesquisa({ ...novaPesquisa, induzida: e.target.value === 'true' })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
-                    <option value="true">Induzida (apenas opções fixas)</option>
-                    <option value="false">Espontânea (com campo &quot;Outro&quot;)</option>
+                    <option value="true">Induzida (fixas)</option>
+                    <option value="false">Espontânea (+ Outro)</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Meta Diária</label>
+                  <input type="number" min="1" value={novaPesquisa.metaDiaria} onChange={e => setNovaPesquisa({ ...novaPesquisa, metaDiaria: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
                 </div>
               </div>
               <div>
@@ -371,6 +398,72 @@ export default function PesquisasAdmin() {
           </div>
         </div>
       )}
+      {relatorioEntrevistadorId !== null && (() => {
+        const entrevistador = entrevistadores.find(e => e.id === relatorioEntrevistadorId);
+        if (!entrevistador) return null;
+        
+        // Coleta de estatísticas (mock simples)
+        // No mundo real, filtraríamos as pesquisas e agruparíamos por data.
+        const respostasDele = pesquisas.flatMap(p => p.respostas.filter(r => r.entrevistadorId === entrevistador.id));
+        const total = respostasDele.length;
+        const porDia = respostasDele.reduce((acc, r) => {
+          const d = r.data.split(' ')[0]; // dd/mm/yyyy
+          acc[d] = (acc[d] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+        
+        const media = Object.keys(porDia).length > 0 ? (total / Object.keys(porDia).length).toFixed(1) : '0';
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setRelatorioEntrevistadorId(null)}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col">
+              <div className="p-6 border-b border-gray-100 flex justify-between items-start bg-gray-50">
+                <div className="flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-full bg-gradient-to-br from-icat-blue to-icat-green text-white flex items-center justify-center font-bold text-2xl shadow-sm">
+                    {entrevistador.nome.charAt(0)}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">{entrevistador.nome}</h2>
+                    <p className="text-sm text-gray-500">Relatório de Desempenho</p>
+                  </div>
+                </div>
+                <button onClick={() => setRelatorioEntrevistadorId(null)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 overflow-y-auto space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 text-center">
+                    <p className="text-3xl font-black text-icat-blue mb-1">{total}</p>
+                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total de Entrevistas</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 text-center">
+                    <p className="text-3xl font-black text-icat-green mb-1">{media}</p>
+                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Média por Dia</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-3">Atendimentos por Dia</h3>
+                  {Object.keys(porDia).length === 0 ? (
+                    <p className="text-gray-500 text-sm">Nenhuma entrevista registrada ainda.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {Object.entries(porDia).map(([data, qtde]) => (
+                        <div key={data} className="flex items-center gap-4">
+                          <span className="text-sm font-medium text-gray-600 w-24">{data}</span>
+                          <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                            <div className="bg-gradient-to-r from-icat-blue to-icat-green h-full rounded-full" style={{ width: `${Math.min((qtde / 50) * 100, 100)}%` }}></div>
+                          </div>
+                          <span className="text-sm font-bold text-gray-900 w-12 text-right">{qtde}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

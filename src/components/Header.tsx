@@ -21,6 +21,7 @@ export function Header() {
             <Link href="/cursos" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">CURSOS</Link>
             <Link href="/#projetos" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">PROJETOS</Link>
             <Link href="/clube-de-vantagens" className="text-gray-600 hover:text-icat-yellow font-medium text-sm tracking-wide">CLUBE</Link>
+            <Link href="/#enquetes" className="text-icat-blue hover:text-blue-700 font-bold text-sm tracking-wide">ENQUETES</Link>
           </nav>
           <div className="hidden lg:flex items-center space-x-4">
             <Link href="/login" className="text-gray-500 hover:text-icat-blue text-sm font-medium">Acesso Restrito</Link>
@@ -50,6 +51,7 @@ export function Header() {
             <Link onClick={() => setIsOpen(false)} href="/cursos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">CURSOS</Link>
             <Link onClick={() => setIsOpen(false)} href="/#projetos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">PROJETOS</Link>
             <Link onClick={() => setIsOpen(false)} href="/clube-de-vantagens" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-yellow hover:bg-gray-50">CLUBE</Link>
+            <Link onClick={() => setIsOpen(false)} href="/#enquetes" className="block px-3 py-2 rounded-md text-base font-bold text-icat-blue hover:text-blue-700 hover:bg-blue-50">ENQUETES</Link>
             <div className="border-t border-gray-100 my-2 pt-2 flex flex-col gap-2">
               <Link onClick={() => setIsOpen(false)} href="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-blue hover:bg-gray-50">Acesso Restrito</Link>
               <Link onClick={() => setIsOpen(false)} href="/doacoes" className="block px-3 py-2 rounded-md text-base font-bold text-white bg-icat-green hover:bg-green-700 text-center">Quero Apoiar</Link>
