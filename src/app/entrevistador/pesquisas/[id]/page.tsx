@@ -24,16 +24,22 @@ const ICONES_OPINIAO: Record<string, React.ReactNode> = {
 };
 
 // Mock data — em produção viria do backend via params.id
-const PESQUISA_MOCK: Record<string, { nome: string; tipo: string; induzida: boolean; opcoes: string[] }> = {
+const PESQUISA_MOCK: Record<string, { nome: string; tipo: string; induzida: boolean; opcoes: {nome: string, partido?: string}[] }> = {
   '1': {
     nome: 'Intenção de Voto — Prefeito Catalão 2026',
     tipo: 'Intenção de Voto', induzida: true,
-    opcoes: ['Renato Ribeiro', 'Velomar Rios', 'Adilson Cardoso']
+    opcoes: [
+      {nome: 'Renato Ribeiro', partido: 'PL'},
+      {nome: 'Velomar Rios', partido: 'MDB'},
+      {nome: 'Adilson Cardoso', partido: 'PT'}
+    ]
   },
   '2': {
     nome: 'Melhorias Necessárias — Catalão',
     tipo: 'Opinião', induzida: false,
-    opcoes: ['Saúde', 'Segurança', 'Educação', 'Infraestrutura', 'Transporte']
+    opcoes: [
+      {nome: 'Saúde'}, {nome: 'Segurança'}, {nome: 'Educação'}, {nome: 'Infraestrutura'}, {nome: 'Transporte'}
+    ]
   }
 };
 
@@ -47,7 +53,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
   const [outroNome, setOutroNome] = useState('');
 
   const respostaNome = selecionado !== null
-    ? (selecionado === pesquisa.opcoes.length ? outroNome : pesquisa.opcoes[selecionado])
+    ? (selecionado === pesquisa.opcoes.length ? outroNome : pesquisa.opcoes[selecionado].nome)
     : '';
 
   const reset = () => {
@@ -128,18 +134,21 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
             <div className="grid grid-cols-2 gap-3">
               {pesquisa.opcoes.map((op, i) => {
                 const selected = selecionado === i;
-                const icone = ICONES_OPINIAO[op];
+                const icone = ICONES_OPINIAO[op.nome];
                 return (
                   <button key={i} onClick={() => setSelecionado(i)}
-                    className={`relative rounded-2xl p-4 text-left transition-all duration-200 border-2 ${
+                    className={`relative rounded-2xl p-4 text-left transition-all duration-200 border-2 flex flex-col items-start ${
                       selected
                         ? 'border-green-400 shadow-lg scale-[1.02] ring-2 ring-green-200'
                         : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                     }`}>
-                    <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${CORES_BG[i % CORES_BG.length]} flex items-center justify-center mb-3 shadow-sm text-white`}>
-                      {icone || <span className="text-xl font-black">{op.charAt(0)}</span>}
+                    <div className="flex w-full justify-between items-start mb-3">
+                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${CORES_BG[i % CORES_BG.length]} flex items-center justify-center shadow-sm text-white flex-shrink-0`}>
+                        {icone || <span className="text-xl font-black">{op.nome.charAt(0)}</span>}
+                      </div>
+                      {op.partido && <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full uppercase tracking-wider">{op.partido}</span>}
                     </div>
-                    <p className="font-bold text-gray-900 text-sm leading-tight">{op}</p>
+                    <p className="font-bold text-gray-900 text-sm leading-tight">{op.nome}</p>
                     {selected && (
                       <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-green-500 flex items-center justify-center shadow-sm">
                         <Check className="w-4 h-4 text-white" />

@@ -24,16 +24,22 @@ const ICONES_OPINIAO: Record<string, React.ReactNode> = {
 };
 
 // Mock data 
-const PESQUISA_MOCK: Record<string, { nome: string; tipo: string; induzida: boolean; opcoes: string[] }> = {
+const PESQUISA_MOCK: Record<string, { nome: string; tipo: string; induzida: boolean; opcoes: {nome: string, partido?: string}[] }> = {
   '1': {
     nome: 'Intenção de Voto — Prefeito Catalão 2026',
     tipo: 'Intenção de Voto', induzida: true,
-    opcoes: ['Renato Ribeiro', 'Velomar Rios', 'Adilson Cardoso']
+    opcoes: [
+      {nome: 'Renato Ribeiro', partido: 'PL'},
+      {nome: 'Velomar Rios', partido: 'MDB'},
+      {nome: 'Adilson Cardoso', partido: 'PT'}
+    ]
   },
   '2': {
     nome: 'Melhorias Necessárias — Catalão',
     tipo: 'Opinião', induzida: false,
-    opcoes: ['Saúde', 'Segurança', 'Educação', 'Infraestrutura', 'Transporte']
+    opcoes: [
+      {nome: 'Saúde'}, {nome: 'Segurança'}, {nome: 'Educação'}, {nome: 'Infraestrutura'}, {nome: 'Transporte'}
+    ]
   }
 };
 
@@ -48,7 +54,7 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
   const [outroNome, setOutroNome] = useState('');
 
   const respostaNome = selecionado !== null
-    ? (selecionado === pesquisa.opcoes.length ? outroNome : pesquisa.opcoes[selecionado])
+    ? (selecionado === pesquisa.opcoes.length ? outroNome : pesquisa.opcoes[selecionado].nome)
     : '';
 
   return (
@@ -127,18 +133,21 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
               <div className="grid grid-cols-2 gap-3 flex-1">
                 {pesquisa.opcoes.map((op, i) => {
                   const selected = selecionado === i;
-                  const icone = ICONES_OPINIAO[op];
+                  const icone = ICONES_OPINIAO[op.nome];
                   return (
                     <button key={i} onClick={() => setSelecionado(i)}
-                      className={`relative rounded-2xl p-5 text-left transition-all duration-300 border-2 ${
+                      className={`relative rounded-2xl p-5 text-left transition-all duration-300 border-2 flex flex-col items-start ${
                         selected
                           ? 'border-icat-green bg-green-50/50 shadow-xl shadow-green-500/10 scale-[1.02]'
                           : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'
                       }`}>
-                      <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${CORES_BG[i % CORES_BG.length]} flex items-center justify-center mb-4 shadow-sm text-white`}>
-                        {icone || <span className="text-2xl font-black">{op.charAt(0)}</span>}
+                      <div className="flex w-full justify-between items-start mb-4">
+                        <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${CORES_BG[i % CORES_BG.length]} flex items-center justify-center shadow-sm text-white flex-shrink-0`}>
+                          {icone || <span className="text-2xl font-black">{op.nome.charAt(0)}</span>}
+                        </div>
+                        {op.partido && <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full uppercase tracking-wider">{op.partido}</span>}
                       </div>
-                      <p className="font-bold text-gray-900 text-[15px] leading-tight">{op}</p>
+                      <p className="font-bold text-gray-900 text-[15px] leading-tight">{op.nome}</p>
                       {selected && (
                         <div className="absolute top-4 right-4 h-6 w-6 rounded-full bg-icat-green flex items-center justify-center shadow-sm">
                           <Check className="w-4 h-4 text-white" />
@@ -208,7 +217,7 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
                   <div className="bg-white p-5 rounded-2xl shadow-sm text-center border-2 border-green-100">
                     <span className="block text-xs font-bold text-green-500 uppercase tracking-wider mb-3">Sua Escolha</span>
                     <div className={`mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br ${selecionado !== null ? CORES_BG[selecionado % CORES_BG.length] : 'from-gray-400 to-gray-500'} flex items-center justify-center mb-3 shadow-md text-white`}>
-                       {selecionado !== null && selecionado < pesquisa.opcoes.length ? (ICONES_OPINIAO[pesquisa.opcoes[selecionado]] || <span className="text-3xl font-black">{pesquisa.opcoes[selecionado].charAt(0)}</span>) : <span className="text-3xl font-black">{outroNome.charAt(0).toUpperCase()}</span>}
+                       {selecionado !== null && selecionado < pesquisa.opcoes.length ? (ICONES_OPINIAO[pesquisa.opcoes[selecionado].nome] || <span className="text-3xl font-black">{pesquisa.opcoes[selecionado].nome.charAt(0)}</span>) : <span className="text-3xl font-black">{outroNome.charAt(0).toUpperCase()}</span>}
                     </div>
                     <span className="block text-xl font-black text-gray-900">
                       {respostaNome}

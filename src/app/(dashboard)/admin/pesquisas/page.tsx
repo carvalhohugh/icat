@@ -15,7 +15,7 @@ const CORES_LIGHT = [
   'bg-rose-50 border-rose-200 text-rose-700', 'bg-lime-50 border-lime-200 text-lime-700'
 ];
 
-type Opcao = { nome: string; votos: number };
+type Opcao = { nome: string; partido?: string; votos: number };
 type Pesquisa = {
   id: number; nome: string; tipo: string; status: string;
   induzida: boolean; opcoes: Opcao[]; entrevistadores: number[];
@@ -34,9 +34,9 @@ export default function PesquisasAdmin() {
     {
       id: 1, nome: 'Intenção de Voto — Prefeito Catalão 2026', tipo: 'Intenção de Voto', status: 'Ativa', induzida: true,
       opcoes: [
-        { nome: 'Renato Ribeiro', votos: 142 },
-        { nome: 'Velomar Rios', votos: 98 },
-        { nome: 'Adilson Cardoso', votos: 67 },
+        { nome: 'Renato Ribeiro', partido: 'PL', votos: 142 },
+        { nome: 'Velomar Rios', partido: 'MDB', votos: 98 },
+        { nome: 'Adilson Cardoso', partido: 'PT', votos: 67 },
       ],
       entrevistadores: [1, 2],
       respostas: [
@@ -67,21 +67,21 @@ export default function PesquisasAdmin() {
   ]);
 
   const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true });
-  const [novasOpcoes, setNovasOpcoes] = useState<string[]>(['', '']);
+  const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string}[]>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
   const [entrevSelecionados, setEntrevSelecionados] = useState<number[]>([]);
   const [novoEntrevistador, setNovoEntrevistador] = useState({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
 
   const handleSavePesquisa = () => {
-    if (!novaPesquisa.nome || novasOpcoes.filter(o => o.trim()).length < 2) return;
+    if (!novaPesquisa.nome || novasOpcoes.filter(o => o.nome.trim()).length < 2) return;
     const nova: Pesquisa = {
       id: Date.now(), nome: novaPesquisa.nome, tipo: novaPesquisa.tipo,
       status: 'Ativa', induzida: novaPesquisa.induzida,
-      opcoes: novasOpcoes.filter(o => o.trim()).map(o => ({ nome: o.trim(), votos: 0 })),
+      opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0 })),
       entrevistadores: entrevSelecionados, respostas: []
     };
     setPesquisas([nova, ...pesquisas]);
     setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true });
-    setNovasOpcoes(['', '']);
+    setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]);
     setEntrevSelecionados([]);
     setIsModalOpen(false);
   };
@@ -153,7 +153,7 @@ export default function PesquisasAdmin() {
                 <div className="flex flex-wrap gap-2 mt-4">
                   {p.opcoes.map((op, j) => (
                     <span key={j} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${CORES_LIGHT[j % CORES_LIGHT.length]}`}>
-                      <span className={`w-2.5 h-2.5 rounded-full ${CORES[j % CORES.length]}`}></span> {op.nome}
+                      <span className={`w-2.5 h-2.5 rounded-full ${CORES[j % CORES.length]}`}></span> {op.nome} {op.partido && <span className="opacity-70 text-[10px]">({op.partido})</span>}
                     </span>
                   ))}
                   {!p.induzida && <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border border-dashed border-gray-300 text-gray-400">+ Outro</span>}
@@ -247,7 +247,7 @@ export default function PesquisasAdmin() {
                         <div className="flex justify-between mb-1.5">
                           <div className="flex items-center gap-2">
                             <span className={`w-3.5 h-3.5 rounded-full ${CORES[origIdx % CORES.length]}`}></span>
-                            <span className="text-sm font-semibold text-gray-900">{op.nome}</span>
+                            <span className="text-sm font-semibold text-gray-900">{op.nome} {op.partido && <span className="text-gray-400 text-xs ml-1">({op.partido})</span>}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-bold text-gray-900">{pct}%</span>
@@ -321,12 +321,13 @@ export default function PesquisasAdmin() {
                   {novasOpcoes.map((op, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span className={`w-4 h-4 rounded-full flex-shrink-0 ${CORES[i % CORES.length]}`}></span>
-                      <input type="text" value={op} onChange={e => { const arr = [...novasOpcoes]; arr[i] = e.target.value; setNovasOpcoes(arr); }} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder={`Opção ${i + 1}`} />
+                      <input type="text" value={op.nome} onChange={e => { const arr = [...novasOpcoes]; arr[i].nome = e.target.value; setNovasOpcoes(arr); }} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder={`Opção ${i + 1}`} />
+                      <input type="text" value={op.partido} onChange={e => { const arr = [...novasOpcoes]; arr[i].partido = e.target.value; setNovasOpcoes(arr); }} className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder="Partido" />
                       {novasOpcoes.length > 2 && <button onClick={() => setNovasOpcoes(novasOpcoes.filter((_, j) => j !== i))} className="p-1.5 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>}
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setNovasOpcoes([...novasOpcoes, ''])} className="mt-2 text-sm text-icat-blue font-semibold hover:underline flex items-center gap-1"><Plus className="w-4 h-4" /> Adicionar Opção</button>
+                <button onClick={() => setNovasOpcoes([...novasOpcoes, {nome: '', partido: ''}])} className="mt-2 text-sm text-icat-blue font-semibold hover:underline flex items-center gap-1"><Plus className="w-4 h-4" /> Adicionar Opção</button>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Atribuir Entrevistadores</label>
