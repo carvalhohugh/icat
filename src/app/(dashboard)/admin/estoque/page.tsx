@@ -334,26 +334,83 @@ export default function EstoqueAdmin() {
             <div className="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
               
               <div className="md:col-span-1 space-y-6">
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 text-center">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 text-center relative group">
                   <p className="text-sm font-semibold text-blue-700 uppercase tracking-wider mb-1">Estoque Atual</p>
-                  <p className="text-4xl font-black text-blue-900">{activeItemConfig.qty} <span className="text-lg font-medium">un.</span></p>
-                  <p className="text-xs text-blue-600 mt-2">Alerta de Baixa: {activeItemConfig.limitWarning} un.</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <input 
+                      type="number" 
+                      value={activeItemConfig.qty} 
+                      onChange={(e) => {
+                        const newQty = parseInt(e.target.value) || 0;
+                        setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, qty: newQty } : b));
+                      }}
+                      className="text-4xl font-black text-blue-900 bg-transparent border-b-2 border-transparent hover:border-blue-300 focus:border-blue-500 focus:outline-none w-24 text-center transition-colors" 
+                    />
+                    <span className="text-lg font-medium text-blue-900">un.</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-1 mt-2">
+                    <span className="text-xs text-blue-600">Alerta de Baixa:</span>
+                    <input 
+                      type="number" 
+                      value={activeItemConfig.limitWarning} 
+                      onChange={(e) => {
+                        const newLimit = parseInt(e.target.value) || 0;
+                        setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, limitWarning: newLimit } : b));
+                      }}
+                      className="text-xs font-bold text-blue-600 bg-transparent border-b border-transparent hover:border-blue-300 focus:border-blue-500 focus:outline-none w-12 text-center transition-colors" 
+                    />
+                    <span className="text-xs text-blue-600">un.</span>
+                  </div>
                 </div>
 
-                {activeItemConfig.packageItems.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                       Conteúdo do Pacote
                     </h3>
+                    <button 
+                      onClick={() => {
+                        const novo = prompt('Novo item do pacote (Ex: 2kg Feijão):');
+                        if (novo) {
+                          setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: [...b.packageItems, novo] } : b));
+                        }
+                      }}
+                      className="text-xs font-bold text-icat-green hover:text-green-700"
+                    >
+                      + Adicionar
+                    </button>
+                  </div>
+                  {activeItemConfig.packageItems.length > 0 ? (
                     <ul className="space-y-2">
                       {activeItemConfig.packageItems.map((pi, idx) => (
-                        <li key={idx} className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-icat-green"></div> {pi}
+                        <li key={idx} className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 flex items-center gap-2 group">
+                          <div className="w-1.5 h-1.5 rounded-full bg-icat-green flex-shrink-0"></div> 
+                          <input 
+                            type="text" 
+                            value={pi} 
+                            onChange={(e) => {
+                              const newArr = [...activeItemConfig.packageItems];
+                              newArr[idx] = e.target.value;
+                              setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
+                            }}
+                            className="bg-transparent border-none focus:ring-0 p-0 m-0 flex-1 outline-none font-medium" 
+                          />
+                          <button 
+                            onClick={() => {
+                              const newArr = activeItemConfig.packageItems.filter((_, i) => i !== idx);
+                              setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
+                            }}
+                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </li>
                       ))}
                     </ul>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-xs text-gray-400">Nenhum item cadastrado no pacote.</p>
+                  )}
+                </div>
               </div>
 
               <div className="md:col-span-2">
