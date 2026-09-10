@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { ClipboardList, ChevronRight, LogOut, BarChart3 } from 'lucide-react';
+import { ClipboardList, ChevronRight, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
 export default function EntrevistadorPesquisas() {

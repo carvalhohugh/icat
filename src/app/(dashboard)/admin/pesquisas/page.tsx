@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, ChevronDown, Eye } from 'lucide-react';
+import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check } from 'lucide-react';
 
 const CORES = [
   'bg-blue-500', 'bg-red-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500',
