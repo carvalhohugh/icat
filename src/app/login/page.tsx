@@ -21,6 +21,7 @@ export default function LoginPage() {
 
     // Bypass for MVP preview
     if (cleanEmail === 'admin@admin' && cleanPassword === 'super123') {
+      document.cookie = 'icat-session=admin; path=/; max-age=86400';
       router.push('/admin');
       return;
     }

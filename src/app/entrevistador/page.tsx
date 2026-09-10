@@ -2,15 +2,25 @@
 import { useState } from 'react';
 import { ClipboardList, LogIn } from 'lucide-react';
 
+const MOCK_ENTREVISTADORES = [
+  { id: 1, nome: 'Carlos Silva', email: 'carlos@icat.org.br', senha: '123' },
+  { id: 2, nome: 'Amanda Oliveira', email: 'amanda@icat.org.br', senha: '123' },
+  { id: 3, nome: 'Roberto Santos', email: 'roberto@icat.org.br', senha: '123' },
+  { id: 4, nome: 'Fernanda Lima', email: 'fernanda@icat.org.br', senha: '123' },
+];
+
 export default function EntrevistadorLogin() {
   const [login, setLogin] = useState('');
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = () => {
-    if (!login || !senha) { setError('Preencha login e senha.'); return; }
-    localStorage.setItem('entrevistadorLogin', login);
-    localStorage.setItem('entrevistadorNome', login.split('.').map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(' '));
+    if (!login || !senha) { setError('Preencha e-mail e senha.'); return; }
+    const found = MOCK_ENTREVISTADORES.find(
+      e => e.email === login.trim().toLowerCase() && e.senha === senha
+    );
+    if (!found) { setError('E-mail ou senha incorretos.'); return; }
+    localStorage.setItem('entrevistador_session', JSON.stringify({ id: found.id, nome: found.nome }));
     window.location.href = '/entrevistador/pesquisas';
   };
 

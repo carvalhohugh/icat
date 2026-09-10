@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check } from 'lucide-react';
+import { getPesquisas, addPesquisa, deletePesquisa, type Pesquisa } from '@/lib/pesquisas-store';
 
 const CORES = [
   'bg-blue-500', 'bg-red-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500',
@@ -15,12 +16,6 @@ const CORES_LIGHT = [
   'bg-rose-50 border-rose-200 text-rose-700', 'bg-lime-50 border-lime-200 text-lime-700'
 ];
 
-type Opcao = { nome: string; partido?: string; votos: number };
-type Pesquisa = {
-  id: number; nome: string; tipo: string; status: string;
-  induzida: boolean; opcoes: Opcao[]; entrevistadores: number[];
-  respostas: { entrevistado: string; telefone: string; cpf?: string; opcaoIdx: number; entrevistadorId: number; data: string }[];
-};
 type Entrevistador = { id: number; nome: string; cpf: string; telefone: string; email: string; senha: string };
 
 export default function PesquisasAdmin() {
@@ -29,35 +24,22 @@ export default function PesquisasAdmin() {
   const [isEntrevistadorModal, setIsEntrevistadorModal] = useState(false);
   const [resultadoPesquisaId, setResultadoPesquisaId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [pesquisas, setPesquisas] = useState<Pesquisa[]>([]);
 
-  const [pesquisas, setPesquisas] = useState<Pesquisa[]>([
-    {
-      id: 1, nome: 'Intenção de Voto — Prefeito Catalão 2026', tipo: 'Intenção de Voto', status: 'Ativa', induzida: true,
-      opcoes: [
-        { nome: 'Renato Ribeiro', partido: 'PL', votos: 142 },
-        { nome: 'Velomar Rios', partido: 'MDB', votos: 98 },
-        { nome: 'Adilson Cardoso', partido: 'PT', votos: 67 },
-      ],
-      entrevistadores: [1, 2],
-      respostas: [
-        { entrevistado: 'José da Silva', telefone: '(64) 99900-0001', opcaoIdx: 0, entrevistadorId: 1, data: '09/09/2026 14:22' },
-        { entrevistado: 'Maria Santos', telefone: '(64) 99900-0002', opcaoIdx: 1, entrevistadorId: 2, data: '09/09/2026 14:35' },
-        { entrevistado: 'Carlos Pereira', telefone: '(64) 99900-0003', opcaoIdx: 0, entrevistadorId: 1, data: '09/09/2026 15:01' },
-      ]
-    },
-    {
-      id: 2, nome: 'Melhorias Necessárias — Catalão', tipo: 'Opinião', status: 'Ativa', induzida: false,
-      opcoes: [
-        { nome: 'Saúde', votos: 87 },
-        { nome: 'Segurança', votos: 65 },
-        { nome: 'Educação', votos: 54 },
-        { nome: 'Infraestrutura', votos: 43 },
-        { nome: 'Transporte', votos: 31 },
-      ],
-      entrevistadores: [1, 3],
-      respostas: []
-    }
-  ]);
+  // Real-time: reload from store on updates (localStorage events)
+  useEffect(() => {
+    setPesquisas(getPesquisas());
+    const handler = () => setPesquisas(getPesquisas());
+    window.addEventListener('icat_pesquisas_update', handler);
+    window.addEventListener('storage', handler);
+    // Poll every 5s to catch cross-tab updates
+    const interval = setInterval(() => setPesquisas(getPesquisas()), 5000);
+    return () => {
+      window.removeEventListener('icat_pesquisas_update', handler);
+      window.removeEventListener('storage', handler);
+      clearInterval(interval);
+    };
+  }, []);
 
   const [entrevistadores, setEntrevistadores] = useState<Entrevistador[]>([
     { id: 1, nome: 'Carlos Silva', cpf: '111.111.111-11', telefone: '(64) 99900-1111', email: 'carlos@icat.org.br', senha: '123' },
@@ -66,24 +48,29 @@ export default function PesquisasAdmin() {
     { id: 4, nome: 'Fernanda Lima', cpf: '444.444.444-44', telefone: '(64) 99900-4444', email: 'fernanda@icat.org.br', senha: '123' },
   ]);
 
-  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true });
+  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false });
   const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string}[]>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
   const [entrevSelecionados, setEntrevSelecionados] = useState<number[]>([]);
   const [novoEntrevistador, setNovoEntrevistador] = useState({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
 
   const handleSavePesquisa = () => {
     if (!novaPesquisa.nome || novasOpcoes.filter(o => o.nome.trim()).length < 2) return;
-    const nova: Pesquisa = {
-      id: Date.now(), nome: novaPesquisa.nome, tipo: novaPesquisa.tipo,
+    addPesquisa({
+      nome: novaPesquisa.nome, tipo: novaPesquisa.tipo,
       status: 'Ativa', induzida: novaPesquisa.induzida,
+      multiSelect: novaPesquisa.multiSelect,
       opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0 })),
-      entrevistadores: entrevSelecionados, respostas: []
-    };
-    setPesquisas([nova, ...pesquisas]);
-    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true });
+      entrevistadores: entrevSelecionados,
+    });
+    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false });
     setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]);
     setEntrevSelecionados([]);
     setIsModalOpen(false);
+  };
+
+  const handleDeletePesquisa = (id: number) => {
+    deletePesquisa(id);
+    setPesquisas(getPesquisas());
   };
 
   const handleSaveEntrevistador = () => {
@@ -314,6 +301,14 @@ export default function PesquisasAdmin() {
                     <option value="false">Espontânea (com campo &quot;Outro&quot;)</option>
                   </select>
                 </div>
+              </div>
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <div onClick={() => setNovaPesquisa({...novaPesquisa, multiSelect: !novaPesquisa.multiSelect})} className={`relative w-11 h-6 rounded-full transition-colors ${novaPesquisa.multiSelect ? 'bg-icat-green' : 'bg-gray-300'}`}>
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${novaPesquisa.multiSelect ? 'translate-x-6' : 'translate-x-1'}`}></div>
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Permitir múltipla escolha <span className="text-gray-400 font-normal">(ex: pesquisas de opinião)</span></span>
+                </label>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Opções de Resposta</label>

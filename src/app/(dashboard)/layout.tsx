@@ -270,6 +270,7 @@ export default function DashboardLayout({
               <option value="/admin/estoque|assistencia">Assistência Social</option>
               <option value="/admin/alunos|secretaria">Secretaria</option>
               <option value="/beneficiario|beneficiario">Aluno / Beneficiário</option>
+              <option value="/entrevistador|entrevistador">Entrevistador (App)</option>
             </select>
 
             {/* Botão de Notificação */}
