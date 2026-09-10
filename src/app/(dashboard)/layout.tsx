@@ -16,7 +16,14 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const role = localStorage.getItem('mockRole');
-    if (role) setCurrentRole(role);
+    if (role) {
+      if ((role === 'beneficiario' || role === 'entrevistador') && window.location.pathname.startsWith('/admin')) {
+        setCurrentRole('admin');
+        localStorage.setItem('mockRole', 'admin');
+      } else {
+        setCurrentRole(role);
+      }
+    }
   }, []);
   
   // Mock de notificações
