@@ -23,7 +23,7 @@ export default function LoginPage() {
     if (cleanEmail === 'admin@admin' && cleanPassword === 'super123') {
       document.cookie = 'icat-session=admin; path=/; max-age=86400';
       localStorage.setItem('icat_currentRole', 'admin');
-      router.push('/admin');
+      window.location.href = '/admin';
       return;
     }
 
@@ -34,7 +34,11 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError("E-mail ou senha incorretos.");
+        if (error.message.includes('Email not confirmed')) {
+          setError('E-mail não confirmado. Libere o acesso no painel do Supabase.');
+        } else {
+          setError('E-mail ou senha incorretos.');
+        }
         setLoading(false);
         return;
       }
@@ -54,15 +58,15 @@ export default function LoginPage() {
         localStorage.setItem('icat_currentRole', role);
 
         if (role === 'student' || role === 'beneficiario') {
-          router.push('/beneficiario');
+          window.location.href = '/beneficiario';
         } else if (role === 'entrevistador') {
-          router.push('/entrevistador');
+          window.location.href = '/entrevistador';
         } else {
-          router.push('/admin');
+          window.location.href = '/admin';
         }
       }
     } catch (err: unknown) {
-      setError('E-mail ou senha incorretos.');
+      setError('Erro de conexão com o servidor.');
       setLoading(false);
     }
   };

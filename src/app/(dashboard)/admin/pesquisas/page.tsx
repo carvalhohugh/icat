@@ -282,7 +282,16 @@ export default function PesquisasAdmin() {
                         <tr key={ri} className="hover:bg-gray-50 text-sm">
                           <td className="p-3 font-medium text-gray-900">{r.entrevistado}</td>
                           <td className="p-3 text-gray-500">{r.telefone}</td>
-                          <td className="p-3"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${CORES_LIGHT[r.opcaoIdx % CORES_LIGHT.length]}`}><span className={`w-2 h-2 rounded-full ${CORES[r.opcaoIdx % CORES.length]}`}></span>{pesquisaResultado.opcoes[r.opcaoIdx]?.nome}</span></td>
+                          <td className="p-3">
+                            <div className="flex flex-wrap gap-1">
+                              {r.opcaoIdxs.map(idx => (
+                                <span key={idx} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${CORES_LIGHT[idx % CORES_LIGHT.length]}`}>
+                                  <span className={`w-2 h-2 rounded-full ${CORES[idx % CORES.length]}`}></span>
+                                  {pesquisaResultado.opcoes[idx]?.nome}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
                           <td className="p-3 text-gray-500">{entrevistadores.find(e => e.id === r.entrevistadorId)?.nome || '-'}</td>
                           <td className="p-3 text-gray-400 text-xs">{r.data}</td>
                         </tr>
