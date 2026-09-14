@@ -21,6 +21,7 @@ export default function LoginPage() {
 
     // Fallback manual para o administrador testar (já que o Supabase exige formato de e-mail válido com .com/.br)
     if (cleanEmail === 'admin@admin' && cleanPassword === 'super123') {
+      document.cookie = 'icat-session=admin; path=/; max-age=86400';
       localStorage.setItem('icat_currentRole', 'admin');
       router.push('/admin');
       return;
@@ -39,6 +40,9 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        // Fallback for middleware to allow access (since standard supabase-js doesn't set cookies by default)
+        document.cookie = 'icat-session=authenticated; path=/; max-age=86400';
+        
         // Buscar o perfil do usuário para saber a role
         const { data: profile } = await supabase
           .from('profiles')
