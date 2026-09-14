@@ -19,6 +19,13 @@ export default function LoginPage() {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
+    // Fallback manual para o administrador testar (já que o Supabase exige formato de e-mail válido com .com/.br)
+    if (cleanEmail === 'admin@admin' && cleanPassword === 'super123') {
+      localStorage.setItem('icat_currentRole', 'admin');
+      router.push('/admin');
+      return;
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
