@@ -19,10 +19,25 @@ export default function LoginPage() {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    // Bypass for MVP preview
-    if (cleanEmail === 'admin@admin' && cleanPassword === 'super123') {
-      document.cookie = 'icat-session=admin; path=/; max-age=86400';
-      router.push('/admin');
+    // Mock para MVP
+    if (cleanPassword === '123456' || (cleanEmail === 'admin@admin' && cleanPassword === 'super123')) {
+      let role = 'beneficiario';
+      if (cleanEmail.includes('admin')) role = 'admin';
+      else if (cleanEmail.includes('prof')) role = 'professor';
+      else if (cleanEmail.includes('fin')) role = 'financeiro';
+      else if (cleanEmail.includes('sec')) role = 'secretaria';
+      else if (cleanEmail.includes('assist')) role = 'assistencia';
+      else if (cleanEmail.includes('entrev')) role = 'entrevistador';
+      
+      localStorage.setItem('icat_currentRole', role);
+      
+      if (role === 'beneficiario') {
+        router.push('/beneficiario');
+      } else if (role === 'entrevistador') {
+        router.push('/entrevistador');
+      } else {
+        router.push('/admin');
+      }
       return;
     }
 
@@ -33,7 +48,8 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError(error.message);
+        setError("E-mail ou senha incorretos.");
+        setLoading(false);
         return;
       }
 
@@ -41,12 +57,7 @@ export default function LoginPage() {
         router.push('/admin');
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Erro ao realizar login. Verifique suas credenciais.');
-      }
-    } finally {
+      setError('E-mail ou senha incorretos.');
       setLoading(false);
     }
   };

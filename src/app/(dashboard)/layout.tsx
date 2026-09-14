@@ -15,11 +15,11 @@ export default function DashboardLayout({
   const [currentRole, setCurrentRole] = useState('admin');
 
   useEffect(() => {
-    const role = localStorage.getItem('mockRole');
+    const role = localStorage.getItem('icat_currentRole');
     if (role) {
       if ((role === 'beneficiario' || role === 'entrevistador') && window.location.pathname.startsWith('/admin')) {
         setCurrentRole('admin');
-        localStorage.setItem('mockRole', 'admin');
+        localStorage.setItem('icat_currentRole', 'admin');
       } else {
         setCurrentRole(role);
       }

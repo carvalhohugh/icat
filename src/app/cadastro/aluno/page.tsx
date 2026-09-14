@@ -1,26 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, GraduationCap, Heart, User, ClipboardList } from 'lucide-react';
 
-export default function AlunoCadastro() {
+const cursosDisponiveis = [
+  { id: 'futebol', nome: 'Escolinha de Futebol', vagas: 15 },
+  { id: 'ballet', nome: 'Ballet Infantil', vagas: 8 },
+  { id: 'informatica', nome: 'Informática Básica', vagas: 20 },
+  { id: 'jiujitsu', nome: 'Jiu-Jítsu', vagas: 12 }
+];
+
+function AlunoCadastroForm() {
+  const searchParams = useSearchParams();
+  const initialCurso = searchParams.get('curso') || '';
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     nomeAluno: '',
     dataNascimento: '',
-    curso: '',
+    curso: initialCurso,
     nomeResponsavel: '',
     cpfResponsavel: '',
     whatsapp: ''
   });
 
-  const cursos = [
-    { id: 'futebol', nome: 'Escolinha de Futebol', vagas: 15 },
-    { id: 'ballet', nome: 'Ballet Infantil', vagas: 8 },
-    { id: 'informatica', nome: 'Informática Básica', vagas: 20 },
-    { id: 'jiujitsu', nome: 'Jiu-Jítsu', vagas: 12 }
-  ];
+  const selectedCursoInfo = cursosDisponiveis.find(c => c.id === formData.curso);
+  const projectTitle = selectedCursoInfo ? `Inscrição - ${selectedCursoInfo.nome}` : 'Inscrição de Aluno';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -57,7 +64,7 @@ export default function AlunoCadastro() {
             <Heart className="w-10 h-10 text-icat-green mr-2" />
             <h1 className="text-3xl font-bold text-gray-900">Projeto ICAT</h1>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Inscrição de Aluno</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{projectTitle}</h2>
           <p className="mt-2 text-gray-600">Garanta a vaga em nossas atividades sociais e esportivas</p>
         </div>
 
@@ -71,7 +78,7 @@ export default function AlunoCadastro() {
             <div className="space-y-4">
               <label className="block text-sm font-medium text-gray-700">Turma / Curso Desejado *</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {cursos.map(curso => (
+                {cursosDisponiveis.map(curso => (
                   <label key={curso.id} className={`border rounded-lg p-4 cursor-pointer transition-all ${formData.curso === curso.id ? 'border-icat-green bg-green-50 ring-2 ring-icat-green ring-opacity-50' : 'hover:border-gray-400'}`}>
                     <div className="flex items-center">
                       <input type="radio" name="curso" value={curso.id} checked={formData.curso === curso.id} onChange={handleInputChange} className="h-4 w-4 text-icat-green focus:ring-icat-green border-gray-300" required />
@@ -132,5 +139,13 @@ export default function AlunoCadastro() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AlunoCadastro() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Carregando...</div>}>
+      <AlunoCadastroForm />
+    </Suspense>
   );
 }

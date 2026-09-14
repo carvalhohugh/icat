@@ -61,19 +61,31 @@ export default function ProjetosAdmin() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {projetos.map(p => (
-              <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${p.status === 'Suspenso' ? 'opacity-60' : ''}`}>
                 <td className="p-4 font-medium text-gray-900 flex items-center gap-2">
                   <Folder className="w-5 h-5 text-gray-400" /> {p.title}
                 </td>
                 <td className="p-4 text-gray-600">{p.area}</td>
                 <td className="p-4">
-                  <span className="bg-green-50 text-icat-green px-2 py-1 rounded-full text-xs font-semibold">{p.status}</span>
+                  <span className={`${p.status === 'Ativo' ? 'bg-green-50 text-icat-green' : 'bg-red-50 text-red-600'} px-2 py-1 rounded-full text-xs font-semibold`}>{p.status}</span>
                 </td>
                 <td className="p-4 text-right space-x-2">
+                  {p.status === 'Ativo' ? (
+                    <button onClick={() => setProjetos(projetos.map(x => x.id === p.id ? { ...x, status: 'Suspenso' } : x))} className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50" title="Suspender">
+                      <span className="text-xs font-bold mr-1">Suspender</span>
+                    </button>
+                  ) : (
+                    <button onClick={() => setProjetos(projetos.map(x => x.id === p.id ? { ...x, status: 'Ativo' } : x))} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Ativar">
+                      <span className="text-xs font-bold mr-1">Ativar</span>
+                    </button>
+                  )}
+                  <a href={`/cadastro/aluno?curso=${p.id}`} target="_blank" rel="noreferrer" className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50 inline-block" title="Link de Inscrição">
+                    <span className="text-xs font-bold">Link Inscrição</span>
+                  </a>
                   <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                  <button onClick={() => setProjetos(projetos.filter(x => x.id !== p.id))} className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>
@@ -110,6 +122,10 @@ export default function ProjetosAdmin() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
                 <textarea rows={3} value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Detalhes do projeto..."></textarea>
+              </div>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="allowEnroll" className="w-4 h-4 text-icat-green border-gray-300 rounded focus:ring-icat-green" defaultChecked />
+                <label htmlFor="allowEnroll" className="text-sm font-medium text-gray-700">Permitir inscrições online via form de cadastro</label>
               </div>
             </div>
 

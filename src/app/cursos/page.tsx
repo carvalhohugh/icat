@@ -6,6 +6,7 @@ export default function CursosPublico() {
   const cursos = [
     { 
       id: 1, 
+      cursoId: 'ballet',
       title: 'Ballet Infantil', 
       desc: 'Iniciação à dança focada na coordenação motora, expressão e disciplina para crianças.',
       cost: 0, 
@@ -15,6 +16,7 @@ export default function CursosPublico() {
     },
     { 
       id: 2, 
+      cursoId: 'futebol',
       title: 'Escolinha de Futebol', 
       desc: 'Treinamento tático e físico promovendo o trabalho em equipe, saúde e inclusão social.',
       cost: 50, 
@@ -24,6 +26,7 @@ export default function CursosPublico() {
     },
     { 
       id: 3, 
+      cursoId: 'informatica',
       title: 'Informática Básica', 
       desc: 'Inclusão digital, pacote office e noções básicas de internet e mercado de trabalho.',
       cost: 0, 
@@ -79,7 +82,7 @@ export default function CursosPublico() {
                     )}
                   </span>
                   
-                  <Link href="/cadastro/aluno" className="btn-primary flex items-center gap-1">
+                  <Link href={`/cadastro/aluno?curso=${curso.cursoId}`} className="btn-primary flex items-center gap-1">
                     Matricular <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
