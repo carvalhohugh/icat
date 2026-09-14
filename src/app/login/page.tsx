@@ -19,32 +19,10 @@ export default function LoginPage() {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    // Mock para MVP
-    if (cleanPassword === '123456' || (cleanEmail === 'admin@admin' && cleanPassword === 'super123')) {
-      let role = 'beneficiario';
-      if (cleanEmail.includes('admin')) role = 'admin';
-      else if (cleanEmail.includes('prof')) role = 'professor';
-      else if (cleanEmail.includes('fin')) role = 'financeiro';
-      else if (cleanEmail.includes('sec')) role = 'secretaria';
-      else if (cleanEmail.includes('assist')) role = 'assistencia';
-      else if (cleanEmail.includes('entrev')) role = 'entrevistador';
-      
-      localStorage.setItem('icat_currentRole', role);
-      
-      if (role === 'beneficiario') {
-        router.push('/beneficiario');
-      } else if (role === 'entrevistador') {
-        router.push('/entrevistador');
-      } else {
-        router.push('/admin');
-      }
-      return;
-    }
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: cleanEmail,
+        password: cleanPassword,
       });
 
       if (error) {
@@ -54,7 +32,23 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        router.push('/admin');
+        // Buscar o perfil do usuário para saber a role
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        const role = profile?.role || 'admin'; // Fallback
+        localStorage.setItem('icat_currentRole', role);
+
+        if (role === 'student' || role === 'beneficiario') {
+          router.push('/beneficiario');
+        } else if (role === 'entrevistador') {
+          router.push('/entrevistador');
+        } else {
+          router.push('/admin');
+        }
       }
     } catch (err: unknown) {
       setError('E-mail ou senha incorretos.');
