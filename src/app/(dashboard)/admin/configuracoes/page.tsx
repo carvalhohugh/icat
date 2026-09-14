@@ -56,6 +56,25 @@ export default function ConfiguracoesAdmin() {
           >
             <Shield className="w-5 h-5 mr-3" /> Perfis e Acessos
           </button>
+          
+          <div className="pt-4 border-t border-gray-200 mt-4 mb-2">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3">Gestão do Sistema</span>
+          </div>
+          
+          <button 
+            onClick={() => setActiveTab('usuarios')}
+            className={`w-full flex items-center p-3 text-sm font-medium rounded-lg transition-colors ${activeTab === 'usuarios' ? 'bg-white border border-gray-200 text-icat-blue shadow-sm' : 'hover:bg-gray-50 text-gray-700'}`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> 
+            Usuários do Sistema
+          </button>
+          <button 
+            onClick={() => setActiveTab('logs')}
+            className={`w-full flex items-center p-3 text-sm font-medium rounded-lg transition-colors ${activeTab === 'logs' ? 'bg-white border border-gray-200 text-icat-blue shadow-sm' : 'hover:bg-gray-50 text-gray-700'}`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
+            Logs do Sistema
+          </button>
         </div>
 
         {/* Formulário */}
@@ -162,6 +181,111 @@ export default function ConfiguracoesAdmin() {
               </div>
             </>
           )}
+          {activeTab === 'usuarios' && (
+            <>
+              <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4 flex justify-between items-center">
+                <span>Usuários do Sistema</span>
+                <button className="text-sm bg-icat-blue hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg transition-colors flex items-center gap-1">
+                  + Novo Usuário
+                </button>
+              </h2>
+              <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 uppercase font-semibold">Total de Contas</p>
+                  <p className="text-2xl font-black text-icat-blue">145</p>
+                </div>
+                <div className="w-64">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Filtrar por Perfil</label>
+                  <select className="w-full px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-blue outline-none text-sm">
+                    <option value="todos">Todos os Perfis</option>
+                    <option value="admin">Administrador</option>
+                    <option value="alunos">Alunos</option>
+                    <option value="funcionarios">Funcionários</option>
+                    <option value="beneficiarios">Beneficiários</option>
+                    <option value="professores">Professores</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto border border-gray-200 rounded-xl">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 uppercase">
+                      <th className="p-3 font-semibold">Nome</th>
+                      <th className="p-3 font-semibold">E-mail / Usuário</th>
+                      <th className="p-3 font-semibold">Perfil</th>
+                      <th className="p-3 font-semibold text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {[
+                      { nome: 'Hugo Carvalho', email: 'hugo@icat.org.br', usuario: 'hugo.admin', perfil: 'Administrador' },
+                      { nome: 'Maria Silva', email: 'maria@gmail.com', usuario: 'maria.silva', perfil: 'Beneficiários' },
+                      { nome: 'João Pedro', email: 'joao.prof@icat.org.br', usuario: 'joao.prof', perfil: 'Professores' },
+                    ].map((u, i) => (
+                      <tr key={i} className={`hover:bg-blue-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                        <td className="p-3 font-medium text-gray-900">{u.nome}</td>
+                        <td className="p-3 text-gray-600">
+                          <div>{u.email}</div>
+                          <div className="text-xs text-gray-400">@{u.usuario}</div>
+                        </td>
+                        <td className="p-3">
+                          <span className="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-semibold">{u.perfil}</span>
+                        </td>
+                        <td className="p-3 text-right space-x-2">
+                          <button className="text-icat-blue hover:underline text-xs font-bold" title="Editar">Editar</button>
+                          <button className="text-yellow-600 hover:underline text-xs font-bold" title="Bloquear Conta">Bloquear</button>
+                          <button className="text-green-600 hover:underline text-xs font-bold" title="Resetar Senha para 123456">Resetar Senha</button>
+                          <button className="text-red-600 hover:underline text-xs font-bold" title="Excluir Definitivamente">Excluir</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'logs' && (
+            <>
+              <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4 flex justify-between items-center">
+                <span>Logs do Sistema</span>
+                <button className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1.5 px-3 rounded-lg transition-colors flex items-center gap-1">
+                  Exportar Relatório
+                </button>
+              </h2>
+              <div className="overflow-x-auto border border-gray-200 rounded-xl">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 uppercase">
+                      <th className="p-3 font-semibold">Data/Hora</th>
+                      <th className="p-3 font-semibold">Usuário</th>
+                      <th className="p-3 font-semibold">Ação Realizada</th>
+                      <th className="p-3 font-semibold">Módulo</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {[
+                      { data: '14/09/2026 14:32', user: 'hugo.admin', acao: 'Excluiu o item "Tomate" do pacote Cesta Básica', modulo: 'Estoque' },
+                      { data: '14/09/2026 14:15', user: 'maria.fin', acao: 'Aprovou Emenda Parlamentar #123', modulo: 'Financeiro' },
+                      { data: '14/09/2026 10:05', user: 'joao.prof', acao: 'Registrou presença turma "Futebol Sub-12"', modulo: 'Diários' },
+                      { data: '13/09/2026 16:40', user: 'hugo.admin', acao: 'Alterou permissões do perfil Secretaria', modulo: 'Configurações' },
+                    ].map((l, i) => (
+                      <tr key={i} className="hover:bg-gray-50 transition-colors bg-white">
+                        <td className="p-3 text-gray-500 whitespace-nowrap">{l.data}</td>
+                        <td className="p-3 font-medium text-gray-900">@{l.user}</td>
+                        <td className="p-3 text-gray-700">{l.acao}</td>
+                        <td className="p-3">
+                          <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-semibold">{l.modulo}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
         </div>
       </div>
     </div>

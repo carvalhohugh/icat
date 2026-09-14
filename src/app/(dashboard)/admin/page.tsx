@@ -1,11 +1,12 @@
 import { Users, BookOpen, Package, Heart, Cake, MessageCircle, BarChart3, PieChart } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
   const stats = [
-    { title: 'Famílias Beneficiadas', value: '45', icon: Heart, color: 'text-icat-yellow', bg: 'bg-yellow-50' },
-    { title: 'Pessoas Atendidas', value: '187', icon: Users, color: 'text-icat-blue', bg: 'bg-blue-50' },
-    { title: 'Alunos Matriculados', value: '112', icon: BookOpen, color: 'text-icat-green', bg: 'bg-green-50' },
-    { title: 'Benefícios Entregues', value: '89', icon: Package, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { title: 'Famílias Beneficiadas', value: '45', icon: Heart, color: 'text-icat-yellow', bg: 'bg-yellow-50', link: '/admin/beneficiarios' },
+    { title: 'Pessoas Atendidas', value: '187', icon: Users, color: 'text-icat-blue', bg: 'bg-blue-50', link: '/admin/beneficiarios' },
+    { title: 'Alunos Matriculados', value: '112', icon: BookOpen, color: 'text-icat-green', bg: 'bg-green-50', link: '/admin/alunos' },
+    { title: 'Benefícios Entregues', value: '89', icon: Package, color: 'text-orange-500', bg: 'bg-orange-50', link: '/admin/estoque' },
   ];
 
   const aniversariantes = [
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center">
+          <Link href={stat.link} key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center hover:shadow-md transition-shadow cursor-pointer hover:border-icat-green">
             <div className={`${stat.bg} p-4 rounded-full mr-4`}>
               <stat.icon className={`w-6 h-6 ${stat.color}`} />
             </div>
@@ -32,7 +33,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-medium text-gray-500">{stat.title}</p>
               <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

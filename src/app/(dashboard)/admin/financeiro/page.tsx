@@ -33,6 +33,7 @@ export default function FinanceiroAdmin() {
   const [isExtratoOpen, setIsExtratoOpen] = useState(false);
   const [isNovaTransacaoOpen, setIsNovaTransacaoOpen] = useState(false);
   const [isRelatoriosOpen, setIsRelatoriosOpen] = useState(false);
+  const [activeReport, setActiveReport] = useState<'fluxo' | 'emendas' | 'inadimplencia' | 'demonstrativo' | null>(null);
   
   // For autocomplete
   const [newTransacaoPerson, setNewTransacaoPerson] = useState('');
@@ -542,22 +543,174 @@ export default function FinanceiroAdmin() {
               <button onClick={() => setIsRelatoriosOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6"/></button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => setActiveReport('fluxo')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><List className="w-4 h-4"/> Fluxo de Caixa Mensal</h4>
                   <p className="text-xs text-gray-500 mt-1">Exportação das entradas e saídas detalhadas do período selecionado.</p>
                </div>
-               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => setActiveReport('emendas')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><Building className="w-4 h-4"/> Relatório de Emendas</h4>
                   <p className="text-xs text-gray-500 mt-1">Evolução e prestação de contas de emendas parlamentares ativas.</p>
                </div>
-               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => setActiveReport('inadimplencia')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><User className="w-4 h-4"/> Inadimplência</h4>
                   <p className="text-xs text-gray-500 mt-1">Lista de alunos e beneficiários com mensalidades pendentes ou atrasadas.</p>
                </div>
-               <div className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => setActiveReport('demonstrativo')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><FileText className="w-4 h-4"/> Demonstrativo de Resultados</h4>
                   <p className="text-xs text-gray-500 mt-1">Resumo consolidado anual para apresentações em assembleia.</p>
                </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DETALHE DO RELATÓRIO ESCOLHIDO */}
+      {activeReport && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setActiveReport(null)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-lg font-bold text-gray-900 capitalize">Relatório: {activeReport}</h2>
+              <div className="flex items-center gap-3">
+                <button onClick={() => window.print()} className="text-sm font-bold text-icat-blue bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1 print:hidden">
+                  <Upload className="w-4 h-4" /> Exportar PDF
+                </button>
+                <button onClick={() => setActiveReport(null)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5"/></button>
+              </div>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-6">
+              {activeReport === 'fluxo' && (
+                <div>
+                  <div className="flex justify-between items-end border-b pb-2 mb-4">
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-lg">Fluxo de Caixa Mensal</h3>
+                      <p className="text-sm text-gray-500">Setembro de 2026</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500 uppercase font-semibold">Saldo Líquido</p>
+                      <p className="text-2xl font-black text-green-600">+ R$ 1.630,00</p>
+                    </div>
+                  </div>
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 text-gray-500 uppercase">
+                        <th className="py-2 font-semibold">Data</th>
+                        <th className="py-2 font-semibold">Descrição</th>
+                        <th className="py-2 font-semibold text-right">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {mockTransacoes.map(t => (
+                        <tr key={t.id}>
+                          <td className="py-3 text-gray-500">{t.data}</td>
+                          <td className="py-3 font-medium text-gray-900">{t.descricao}</td>
+                          <td className={`py-3 text-right font-bold ${t.tipo === 'entrada' ? 'text-green-600' : 'text-red-500'}`}>
+                            {t.tipo === 'entrada' ? '+' : '-'} R$ {t.valor.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {activeReport === 'emendas' && (
+                <div>
+                  <div className="border-b pb-2 mb-4">
+                    <h3 className="font-bold text-gray-900 text-lg">Relatório de Emendas Parlamentares</h3>
+                    <p className="text-sm text-gray-500">Ano Vigente: 2026</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {mockEmendas.map(e => (
+                      <div key={e.id} className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-bold text-gray-900">{e.numero}</span>
+                          <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">{e.status}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-4">{e.finalidade}</p>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">Total: R$ {e.valor.toLocaleString()}</span>
+                          <span className="font-bold text-green-600">Recebido: R$ {e.recebido.toLocaleString()}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
+                          <div className="bg-icat-green h-full" style={{ width: `${(e.recebido / e.valor) * 100}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeReport === 'inadimplencia' && (
+                <div>
+                  <div className="flex justify-between items-end border-b pb-2 mb-4">
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-lg">Relatório de Inadimplência</h3>
+                      <p className="text-sm text-gray-500">Mensalidades Atrasadas</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-red-500 uppercase font-semibold">Total a Receber</p>
+                      <p className="text-xl font-black text-red-600">R$ 80,00</p>
+                    </div>
+                  </div>
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 text-gray-500 uppercase">
+                        <th className="py-2 font-semibold">Nome</th>
+                        <th className="py-2 font-semibold">Turma/Atividade</th>
+                        <th className="py-2 font-semibold">Vencimento</th>
+                        <th className="py-2 font-semibold text-right">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {mockAlunos.filter(a => a.status === 'Atrasado').map(a => (
+                        <tr key={a.id}>
+                          <td className="py-3 font-medium text-gray-900">{a.nome}</td>
+                          <td className="py-3 text-gray-500">{a.turma}</td>
+                          <td className="py-3 text-red-500 font-bold">{a.proxVencimento}</td>
+                          <td className="py-3 text-right font-bold text-gray-900">R$ {a.valor.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {activeReport === 'demonstrativo' && (
+                <div>
+                  <div className="border-b pb-2 mb-4">
+                    <h3 className="font-bold text-gray-900 text-lg">DRE - Demonstrativo de Resultados</h3>
+                    <p className="text-sm text-gray-500">Exercício 2026</p>
+                  </div>
+                  <div className="space-y-4 text-sm">
+                    <div className="flex justify-between items-center p-3 bg-green-50 text-green-900 rounded-lg">
+                      <span className="font-bold">1. RECEITAS TOTAIS</span>
+                      <span className="font-black">R$ 250.000,00</span>
+                    </div>
+                    <div className="pl-4 space-y-2 text-gray-600">
+                      <div className="flex justify-between"><span>1.1 Emendas Parlamentares</span><span>R$ 120.000,00</span></div>
+                      <div className="flex justify-between"><span>1.2 Mensalidades</span><span>R$ 80.000,00</span></div>
+                      <div className="flex justify-between"><span>1.3 Doações</span><span>R$ 50.000,00</span></div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center p-3 bg-red-50 text-red-900 rounded-lg mt-4">
+                      <span className="font-bold">2. DESPESAS TOTAIS</span>
+                      <span className="font-black">R$ 195.000,00</span>
+                    </div>
+                    <div className="pl-4 space-y-2 text-gray-600">
+                      <div className="flex justify-between"><span>2.1 Pessoal e Encargos</span><span>R$ 100.000,00</span></div>
+                      <div className="flex justify-between"><span>2.2 Operacional / Projetos</span><span>R$ 75.000,00</span></div>
+                      <div className="flex justify-between"><span>2.3 Custos Fixos</span><span>R$ 20.000,00</span></div>
+                    </div>
+
+                    <div className="flex justify-between items-center p-4 bg-gray-900 text-white rounded-lg mt-6 shadow-md">
+                      <span className="font-bold text-lg">RESULTADO DO EXERCÍCIO (Superávit)</span>
+                      <span className="font-black text-xl text-green-400">R$ 55.000,00</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
