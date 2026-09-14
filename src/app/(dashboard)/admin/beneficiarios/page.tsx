@@ -23,11 +23,12 @@ export default function BeneficiariosAdmin() {
   const [copied, setCopied] = useState(false);
 
   const [prontuario, setProntuario] = useState([
-    { id: 1, benId: 1, date: '05/09/2026', note: 'Visita domiciliar realizada. Família em situação de vulnerabilidade, necessita de cesta básica com urgência.', assistant: 'Amanda Oliveira' },
-    { id: 2, benId: 1, date: '10/08/2026', note: 'Cadastro inicial aprovado.', assistant: 'Carlos Silva' }
+    { id: 1, benId: 1, date: '05/09/2026', type: 'Assistência Social', note: 'Visita domiciliar realizada. Família em situação de vulnerabilidade, necessita de cesta básica com urgência.', assistant: 'Amanda Oliveira' },
+    { id: 2, benId: 1, date: '10/08/2026', type: 'Assistência Social', note: 'Cadastro inicial aprovado.', assistant: 'Carlos Silva' }
   ]);
   
   const [novaAnotacao, setNovaAnotacao] = useState('');
+  const [tipoAtendimento, setTipoAtendimento] = useState('Assistência Social');
 
   const handleCopyLink = () => {
     const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/beneficiario` : 'https://icat.org.br/cadastro/beneficiario';
@@ -316,7 +317,10 @@ export default function BeneficiariosAdmin() {
                 {prontuario.filter(p => p.benId === selectedBenId).map(p => (
                   <div key={p.id} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-bold text-gray-900">{p.date}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-gray-900">{p.date}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">{p.type}</span>
+                      </div>
                       <span className="text-xs text-gray-500">{p.assistant}</span>
                     </div>
                     <p className="text-sm text-gray-700">{p.note}</p>
@@ -325,22 +329,41 @@ export default function BeneficiariosAdmin() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-100 bg-white">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nova Anotação</label>
-              <textarea 
-                rows={3} 
-                value={novaAnotacao}
-                onChange={e => setNovaAnotacao(e.target.value)}
-                placeholder="Descreva o acompanhamento, visita ou entrega de benefícios..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm mb-3"
-              ></textarea>
-              <div className="flex justify-end gap-3">
+            <div className="p-4 border-t border-gray-100 bg-white space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Especialidade / Tipo de Atendimento</label>
+                <select 
+                  value={tipoAtendimento}
+                  onChange={e => setTipoAtendimento(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm"
+                >
+                  <option value="Assistência Social">Assistência Social</option>
+                  <option value="Psicologia">Psicóloga(o)</option>
+                  <option value="Jurídico">Advogado(a)</option>
+                  <option value="Nutrição">Nutricionista</option>
+                  <option value="Contabilidade">Contador(a)</option>
+                  <option value="Médico">Médico(a)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nova Anotação</label>
+                <textarea 
+                  rows={3} 
+                  value={novaAnotacao}
+                  onChange={e => setNovaAnotacao(e.target.value)}
+                  placeholder="Descreva o acompanhamento, consulta ou orientação..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm"
+                ></textarea>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
                 <button onClick={() => setIsProntuarioOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 text-sm">Fechar</button>
                 <button 
                   onClick={() => {
                     if(!novaAnotacao) return;
-                    setProntuario([{ id: Date.now(), benId: selectedBenId!, date: new Date().toLocaleDateString('pt-BR'), note: novaAnotacao, assistant: 'Admin (Você)' }, ...prontuario]);
+                    setProntuario([{ id: Date.now(), benId: selectedBenId!, date: new Date().toLocaleDateString('pt-BR'), type: tipoAtendimento, note: novaAnotacao, assistant: 'Admin (Você)' }, ...prontuario]);
                     setNovaAnotacao('');
+                    setTipoAtendimento('Assistência Social');
                   }} 
                   className="btn-primary text-sm py-2"
                 >
