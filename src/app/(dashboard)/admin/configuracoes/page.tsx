@@ -185,7 +185,7 @@ export default function ConfiguracoesAdmin() {
             <>
               <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4 flex justify-between items-center">
                 <span>Usuários do Sistema</span>
-                <button className="text-sm bg-icat-blue hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg transition-colors flex items-center gap-1">
+                <button onClick={() => alert('Em desenvolvimento. Na V2 abrirá modal de cadastro de novo usuário.')} className="text-sm bg-icat-blue hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg transition-colors flex items-center gap-1">
                   + Novo Usuário
                 </button>
               </h2>
@@ -233,10 +233,10 @@ export default function ConfiguracoesAdmin() {
                           <span className="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-semibold">{u.perfil}</span>
                         </td>
                         <td className="p-3 text-right space-x-2">
-                          <button className="text-icat-blue hover:underline text-xs font-bold" title="Editar">Editar</button>
-                          <button className="text-yellow-600 hover:underline text-xs font-bold" title="Bloquear Conta">Bloquear</button>
-                          <button className="text-green-600 hover:underline text-xs font-bold" title="Resetar Senha para 123456">Resetar Senha</button>
-                          <button className="text-red-600 hover:underline text-xs font-bold" title="Excluir Definitivamente">Excluir</button>
+                          <button onClick={() => alert('Em desenvolvimento.')} className="text-icat-blue hover:underline text-xs font-bold" title="Editar">Editar</button>
+                          <button onClick={() => alert('Em desenvolvimento.')} className="text-yellow-600 hover:underline text-xs font-bold" title="Bloquear Conta">Bloquear</button>
+                          <button onClick={() => alert('Em desenvolvimento.')} className="text-green-600 hover:underline text-xs font-bold" title="Resetar Senha para 123456">Resetar Senha</button>
+                          <button onClick={() => alert('Em desenvolvimento.')} className="text-red-600 hover:underline text-xs font-bold" title="Excluir Definitivamente">Excluir</button>
                         </td>
                       </tr>
                     ))}
@@ -250,7 +250,7 @@ export default function ConfiguracoesAdmin() {
             <>
               <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4 flex justify-between items-center">
                 <span>Logs do Sistema</span>
-                <button className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1.5 px-3 rounded-lg transition-colors flex items-center gap-1">
+                <button onClick={() => alert('O relatório completo de logs será baixado no formato CSV na V2.')} className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1.5 px-3 rounded-lg transition-colors flex items-center gap-1">
                   Exportar Relatório
                 </button>
               </h2>
