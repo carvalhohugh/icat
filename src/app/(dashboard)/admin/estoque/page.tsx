@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Search, Package, ArrowDownToLine, ArrowUpFromLine, Settings, Trash2, X, AlertTriangle } from 'lucide-react';
 
 type ItemEstoque = {
@@ -26,6 +26,7 @@ export default function EstoqueAdmin() {
   const [isNewItemModal, setIsNewItemModal] = useState(false);
   const [itemConfigId, setItemConfigId] = useState<number | null>(null);
   const [lowStockAlert, setLowStockAlert] = useState<{itemName: string, qty: number} | null>(null);
+  const [loaded, setLoaded] = useState(false);
   
   const [beneficios, setBeneficios] = useState<ItemEstoque[]>([
     { id: 1, name: 'Cesta Básica', category: 'Alimentação', qty: 45, limitWarning: 5, description: 'Cesta padrão para doação', packageItems: ['5kg Arroz', '2kg Feijão', '2 un. Óleo', 'Extrato de Tomate', 'Macarrão', 'Açúcar'] },
@@ -36,6 +37,21 @@ export default function EstoqueAdmin() {
     { id: 1, type: 'Saída (Entrega)', itemName: 'Cesta Básica', qtyChange: 1, person: 'Maria da Silva', date: '07/09/2026 10:00' },
     { id: 2, type: 'Entrada (Doação)', itemName: 'Cesta Básica', qtyChange: 20, person: 'Supermercado Bretas', date: '06/09/2026 14:30' }
   ]);
+
+  useEffect(() => {
+    const savedB = localStorage.getItem('icat_estoque_beneficios');
+    const savedM = localStorage.getItem('icat_estoque_movimentos');
+    if (savedB) setBeneficios(JSON.parse(savedB));
+    if (savedM) setMovimentos(JSON.parse(savedM));
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem('icat_estoque_beneficios', JSON.stringify(beneficios));
+      localStorage.setItem('icat_estoque_movimentos', JSON.stringify(movimentos));
+    }
+  }, [beneficios, movimentos, loaded]);
 
   const [formData, setFormData] = useState({ tipo: 'Saída', itemId: 1, qty: 1, person: '' });
   

@@ -1,14 +1,20 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, ImageIcon, Tag } from 'lucide-react';
 
 export default function ClubeVantagensAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [canEdit, setCanEdit] = useState(true);
   
-  const vantagens = [
+  const [vantagens, setVantagens] = useState([
     { id: 1, company: 'Farmácia Preço Baixo', title: '15% de Desconto em Remédios', status: 'Ativo' },
     { id: 2, company: 'Supermercado Bretas', title: '5% de Desconto nas Compras', status: 'Ativo' },
-  ];
+  ]);
+
+  useEffect(() => {
+    const role = localStorage.getItem('icat_currentRole');
+    if (role === 'financeiro' || role === 'assistencia') setCanEdit(false);
+  }, []);
 
   const handleSave = () => setIsModalOpen(false);
 
@@ -43,27 +49,38 @@ export default function ClubeVantagensAdmin() {
               <th className="p-4 font-semibold">Empresa</th>
               <th className="p-4 font-semibold">Vantagem / Desconto</th>
               <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold text-right">Ações</th>
+              {canEdit && <th className="p-4 font-semibold text-right">Ações</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {vantagens.map(v => (
-              <tr key={v.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={v.id} className={`hover:bg-gray-50 transition-colors ${v.status === 'Suspenso' ? 'opacity-60' : ''}`}>
                 <td className="p-4 font-medium text-gray-900">{v.company}</td>
                 <td className="p-4 text-gray-600 flex items-center gap-2">
                   <Tag className="w-4 h-4 text-icat-green" /> {v.title}
                 </td>
                 <td className="p-4">
-                  <span className="bg-green-50 text-icat-green px-2 py-1 rounded-full text-xs font-semibold">{v.status}</span>
+                  <span className={`${v.status === 'Ativo' ? 'bg-green-50 text-icat-green' : 'bg-red-50 text-red-600'} px-2 py-1 rounded-full text-xs font-semibold`}>{v.status}</span>
                 </td>
-                <td className="p-4 text-right space-x-2">
-                  <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
+                {canEdit && (
+                  <td className="p-4 text-right space-x-2">
+                    {v.status === 'Ativo' ? (
+                      <button onClick={() => setVantagens(vantagens.map(x => x.id === v.id ? { ...x, status: 'Suspenso' } : x))} className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50" title="Suspender (Tirar do Site)">
+                        <span className="text-xs font-bold mr-1">Suspender</span>
+                      </button>
+                    ) : (
+                      <button onClick={() => setVantagens(vantagens.map(x => x.id === v.id ? { ...x, status: 'Ativo' } : x))} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Ativar">
+                        <span className="text-xs font-bold mr-1">Ativar</span>
+                      </button>
+                    )}
+                    <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setVantagens(vantagens.filter(x => x.id !== v.id))} className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

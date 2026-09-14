@@ -66,31 +66,31 @@ export default function AdminDashboard() {
               <BarChart3 className="w-5 h-5 text-gray-400" /> Faixa de Idade
             </h2>
             <div className="h-64 flex items-end justify-between gap-2 md:gap-6 pt-8 pb-4 border-b border-gray-200">
-              <div className="flex flex-col items-center flex-1 group">
+              <div className="flex flex-col items-center justify-end h-full flex-1 group">
                 <div className="w-full bg-icat-yellow rounded-t-sm h-[40%] group-hover:bg-yellow-500 transition-colors relative">
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">40%</span>
                 </div>
                 <span className="text-xs text-gray-500 mt-2 font-medium">0-12</span>
               </div>
-              <div className="flex flex-col items-center flex-1 group">
+              <div className="flex flex-col items-center justify-end h-full flex-1 group">
                 <div className="w-full bg-icat-green rounded-t-sm h-[30%] group-hover:bg-green-600 transition-colors relative">
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">30%</span>
                 </div>
                 <span className="text-xs text-gray-500 mt-2 font-medium">13-17</span>
               </div>
-              <div className="flex flex-col items-center flex-1 group">
+              <div className="flex flex-col items-center justify-end h-full flex-1 group">
                 <div className="w-full bg-icat-blue rounded-t-sm h-[15%] group-hover:bg-blue-600 transition-colors relative">
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">15%</span>
                 </div>
                 <span className="text-xs text-gray-500 mt-2 font-medium">18-35</span>
               </div>
-              <div className="flex flex-col items-center flex-1 group">
+              <div className="flex flex-col items-center justify-end h-full flex-1 group">
                 <div className="w-full bg-purple-500 rounded-t-sm h-[10%] group-hover:bg-purple-600 transition-colors relative">
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">10%</span>
                 </div>
                 <span className="text-xs text-gray-500 mt-2 font-medium">36-59</span>
               </div>
-              <div className="flex flex-col items-center flex-1 group">
+              <div className="flex flex-col items-center justify-end h-full flex-1 group">
                 <div className="w-full bg-gray-400 rounded-t-sm h-[5%] group-hover:bg-gray-500 transition-colors relative">
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600">5%</span>
                 </div>
