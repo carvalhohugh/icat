@@ -577,16 +577,16 @@ export default function FinanceiroAdmin() {
 
       {/* MODAL DETALHE DO RELATÓRIO ESCOLHIDO */}
       {activeReport && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={() => setActiveReport(null)}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 print:static print:p-0 print:m-0 print:block">
+          <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm print:hidden" onClick={() => setActiveReport(null)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh] print:shadow-none print:rounded-none print:max-w-none print:w-full print:max-h-none print:block">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 print:hidden">
               <h2 className="text-lg font-bold text-gray-900 capitalize">Relatório: {activeReport}</h2>
               <div className="flex items-center gap-3">
                 <button onClick={() => window.print()} className="text-sm font-bold text-icat-blue bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1 print:hidden">
                   <Upload className="w-4 h-4" /> Exportar PDF
                 </button>
-                <button onClick={() => setActiveReport(null)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5"/></button>
+                <button onClick={() => setActiveReport(null)} className="text-gray-400 hover:text-gray-600 print:hidden"><X className="w-5 h-5"/></button>
               </div>
             </div>
             
