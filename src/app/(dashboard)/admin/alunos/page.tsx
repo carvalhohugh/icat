@@ -499,7 +499,7 @@ export default function AlunosAdmin() {
                   {/* Cartão PVC (Proporção CR80) */}
                   <div 
                     id="carteirinha-pvc-card"
-                    className="relative bg-white shadow-2xl overflow-hidden print:shadow-none print:m-0"
+                    className="relative bg-white shadow-2xl overflow-hidden print:shadow-none print:m-0 print-exact"
                     style={{
                       width: '54mm',
                       height: '86mm',

@@ -30,23 +30,16 @@ body {
 }
 
 /* ═══ IMPRESSÃO PVC / RELATÓRIOS ═══ */
-@media print {
-  /* Força o navegador a imprimir cores de fundo e gradientes */
-  * {
+@layer utilities {
+  .print-exact {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
+}
 
-  /* Cartão PVC: remove margens da página e centraliza */
+@media print {
   @page {
     size: 54mm 86mm;
     margin: 0;
-  }
-
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
   }
 }
