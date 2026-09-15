@@ -466,36 +466,40 @@ export default function AlunosAdmin() {
                     }}
                   >
                     {/* Elementos Decorativos da Marca */}
-                    <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-br from-icat-blue to-icat-green rounded-b-[40%] shadow-inner"></div>
+                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-br from-icat-blue to-icat-green rounded-b-[40%]"></div>
 
-                    {/* Foto */}
-                    <div className="relative z-10 pt-10 flex flex-col items-center">
-                      <div className="w-[30mm] h-[30mm] rounded-full bg-gray-100 border-4 border-white shadow-md overflow-hidden flex items-center justify-center">
+                    {/* Conteúdo do Cartão — Flow Layout (sem absolute) */}
+                    <div className="relative z-10 flex flex-col items-center h-full pt-6 pb-3 px-3">
+                      {/* Foto */}
+                      <div className="w-[22mm] h-[22mm] rounded-full bg-gray-100 border-[3px] border-white shadow-md overflow-hidden flex items-center justify-center shrink-0">
                         {(aluno as any).foto ? (
                           <img src={(aluno as any).foto} alt="Foto" className="w-full h-full object-cover" />
                         ) : (
-                          <User className="w-12 h-12 text-gray-300" />
+                          <User className="w-10 h-10 text-gray-300" />
                         )}
                       </div>
                       
-                      <div className="w-full px-4 text-center mt-3">
-                        <h2 className="font-black text-sm text-gray-900 leading-tight uppercase line-clamp-2">{aluno.name}</h2>
-                        <span className="inline-block bg-icat-yellow text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full mt-1">ALUNO(A)</span>
+                      {/* Nome e Badge */}
+                      <h2 className="font-black text-[11px] text-gray-900 leading-tight uppercase text-center line-clamp-2 mt-2">{aluno.name}</h2>
+                      <span className="inline-block bg-icat-yellow text-white text-[7px] font-black uppercase px-2 py-0.5 rounded-full mt-1">ALUNO(A)</span>
+
+                      {/* Dados */}
+                      <div className="w-full text-center mt-2 space-y-0">
+                        <p className="text-[9px] text-gray-700"><span className="font-bold">Matrícula:</span> ICAT-{aluno.id}</p>
+                        <p className="text-[9px] text-gray-700"><span className="font-bold">Idade:</span> {aluno.age} anos</p>
+                        <p className="text-[9px] text-gray-700 font-medium truncate">{aluno.course}</p>
                       </div>
 
-                      <div className="w-full px-4 text-center mt-3 space-y-0.5">
-                        <p className="text-[10px] text-gray-800"><span className="font-bold">Matrícula:</span> ICAT-{aluno.id}</p>
-                        <p className="text-[10px] text-gray-800"><span className="font-bold">Nasc:</span> {aluno.age} anos</p>
-                        <p className="text-[10px] text-gray-800 font-medium truncate">{aluno.course}</p>
-                      </div>
-                    </div>
+                      {/* Spacer */}
+                      <div className="flex-1"></div>
 
-                    {/* QR Code no Rodapé */}
-                    <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center">
-                      <div className="bg-white p-1 rounded border border-gray-200">
-                        <QRCodeSVG value={`icat-access-${aluno.id}`} size={48} level="M" />
+                      {/* QR Code */}
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className="bg-white p-0.5 rounded border border-gray-200">
+                          <QRCodeSVG value={`icat-access-${aluno.id}`} size={36} level="M" />
+                        </div>
+                        <p className="text-[7px] text-gray-400 mt-0.5 uppercase font-bold">Válido até 12/2026</p>
                       </div>
-                      <p className="text-[8px] text-gray-400 mt-1 uppercase font-bold">Válido até 12/2026</p>
                     </div>
                   </div>
                 </div>
