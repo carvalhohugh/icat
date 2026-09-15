@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Link as LinkIcon, CheckCircle, X, Camera } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { Plus, Search, Edit2, Trash2, Link as LinkIcon, CheckCircle, X, Camera, User } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import Webcam from 'react-webcam';
 
 export default function AlunosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -9,9 +10,9 @@ export default function AlunosAdmin() {
   const [copied, setCopied] = useState(false);
   
   const [alunos, setAlunos] = useState([
-    { id: 7001, name: 'Pedro Henrique', course: 'Escolinha de Futebol', age: 12, status: 'Matriculado', whatsapp: '(64) 99900-1111', responsavel: 'Maria Henrique' },
-    { id: 7002, name: 'Ana Clara', course: 'Ballet Infantil', age: 8, status: 'Pendente', whatsapp: '(64) 99900-2222', responsavel: 'Carlos Clara' },
-    { id: 7003, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos' },
+    { id: 7001, name: 'Pedro Henrique', course: 'Escolinha de Futebol', age: 12, status: 'Matriculado', whatsapp: '(64) 99900-1111', responsavel: 'Maria Henrique', foto: '' },
+    { id: 7002, name: 'Ana Clara', course: 'Ballet Infantil', age: 8, status: 'Pendente', whatsapp: '(64) 99900-2222', responsavel: 'Carlos Clara', foto: '' },
+    { id: 7003, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos', foto: '' },
   ]);
 
   const [formData, setFormData] = useState({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
@@ -19,6 +20,17 @@ export default function AlunosAdmin() {
   const [isCarteirinhaOpen, setIsCarteirinhaOpen] = useState(false);
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | null>(null);
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
+  
+  const [isWebcamOpen, setIsWebcamOpen] = useState(false);
+  const webcamRef = useRef<Webcam>(null);
+
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef.current?.getScreenshot();
+    if (imageSrc && selectedAlunoId) {
+      setAlunos(alunos.map(a => a.id === selectedAlunoId ? {...a, foto: imageSrc} : a));
+      setIsWebcamOpen(false);
+    }
+  }, [webcamRef, selectedAlunoId, alunos]);
 
   const handleCopyLink = () => {
     const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/aluno` : 'https://icat.org.br/cadastro/aluno';
@@ -318,78 +330,182 @@ export default function AlunosAdmin() {
         </div>
       )}
       {/* MODAL DE CARTEIRINHA */}
-      {isCarteirinhaOpen && selectedAlunoId && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h2 className="text-xl font-bold text-gray-900">Gerar Carteirinha do Aluno</h2>
-              <button onClick={() => setIsCarteirinhaOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {isCarteirinhaOpen && selectedAlunoId && (() => {
+        const aluno = alunos.find(b => b.id === selectedAlunoId);
+        if(!aluno) return null;
 
-            <div className="p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Imagem de Fundo (Opcional)</label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (e) => setCarteirinhaBg(e.target?.result as string);
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-              </div>
+        return (
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[800px]">
+              
+              {/* Lado Esquerdo: Configurações e WebCam */}
+              <div className="w-full md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-gray-100 bg-gray-50 overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Emissão de Carteirinha (PVC)</h2>
+                  <button onClick={() => setIsCarteirinhaOpen(false)} className="text-gray-400 hover:text-gray-600 md:hidden"><X className="w-6 h-6" /></button>
+                </div>
+                
+                <p className="text-sm text-gray-600 mb-6">O layout foi ajustado para a dimensão padrão de Cartões PVC (CR80 - 54x86mm). Use uma impressora térmica para imprimir.</p>
 
-              {/* Preview da Carteirinha */}
-              <div className="flex justify-center bg-gray-100 p-4 rounded-xl">
-                <div 
-                  id="carteirinha-card"
-                  className="relative w-80 h-48 rounded-xl shadow-lg overflow-hidden flex flex-col border border-gray-200 bg-white"
-                  style={{
-                    backgroundImage: carteirinhaBg ? `url(${carteirinhaBg})` : 'linear-gradient(to right bottom, #f8fafc, #e2e8f0)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
-                  {carteirinhaBg && <div className="absolute inset-0 bg-white/60"></div>}
-                  <div className="relative z-10 flex flex-col h-full p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <img src="/logo.png" alt="ICAT" className="h-8 w-auto mb-2" />
-                        <h3 className="font-bold text-gray-900 text-sm leading-tight max-w-[140px]">
-                          {alunos.find(b => b.id === selectedAlunoId)?.name}
-                        </h3>
-                        <p className="text-xs text-gray-700 font-medium mt-1">ID: ICAT-{selectedAlunoId.toString().padStart(4, '0')}</p>
-                      </div>
-                      <div className="bg-white p-1 rounded-lg shadow-sm">
-                        <QRCodeSVG 
-                          value={`icat-access-${selectedAlunoId}`}
-                          size={64}
-                          level="M"
-                        />
-                      </div>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">1. Capturar ou Enviar Foto</label>
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.onchange = (e: any) => {
+                            const file = e.target.files?.[0];
+                            if(file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                setAlunos(alunos.map(a => a.id === selectedAlunoId ? {...a, foto: ev.target?.result as string} : a));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          };
+                          input.click();
+                        }}
+                        className="flex-1 bg-white border border-gray-300 rounded-lg py-2 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="w-5 h-5 text-icat-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span className="text-xs font-semibold text-gray-600">Fazer Upload</span>
+                      </button>
+                      <button 
+                        onClick={() => setIsWebcamOpen(true)}
+                        className="flex-1 bg-white border border-gray-300 rounded-lg py-2 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition-colors"
+                      >
+                        <Camera className="w-5 h-5 text-icat-green" />
+                        <span className="text-xs font-semibold text-gray-600">Usar Webcam</span>
+                      </button>
                     </div>
-                    
-                    <div className="mt-auto flex justify-between items-end">
-                      <span className="text-[10px] font-bold text-icat-green px-2 py-1 bg-green-50 rounded border border-green-100">
-                        ALUNO MATRICULADO
-                      </span>
-                      <span className="text-[10px] text-gray-600 font-medium">Válido até 12/2026</span>
-                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">2. Imagem de Fundo (Opcional)</label>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (ev) => setCarteirinhaBg(ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                  </div>
+
+                  <div className="pt-6 border-t border-gray-200">
+                    <button 
+                      onClick={() => {
+                        const printContent = document.getElementById('carteirinha-print-area');
+                        if (printContent) {
+                          const originalContents = document.body.innerHTML;
+                          document.body.innerHTML = printContent.innerHTML;
+                          window.print();
+                          window.location.reload();
+                        }
+                      }}
+                      className="w-full btn-primary py-3 flex justify-center items-center gap-2 text-lg"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                      Imprimir Cartão
+                    </button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-              <button onClick={() => setIsCarteirinhaOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 text-sm">Fechar</button>
+              {/* Lado Direito: Preview */}
+              <div className="w-full md:w-1/2 p-6 flex flex-col items-center justify-center bg-gray-200 relative">
+                <button onClick={() => setIsCarteirinhaOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 hidden md:block">
+                  <X className="w-6 h-6" />
+                </button>
+                
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Preview em Tempo Real</p>
+                
+                <div id="carteirinha-print-area" className="flex justify-center items-center">
+                  {/* Cartão PVC (Proporção CR80) */}
+                  <div 
+                    className="relative bg-white shadow-2xl overflow-hidden print:shadow-none print:m-0"
+                    style={{
+                      width: '54mm',
+                      height: '86mm',
+                      backgroundImage: carteirinhaBg ? `url(${carteirinhaBg})` : 'none',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  >
+                    {/* Elementos Decorativos da Marca */}
+                    <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-br from-icat-blue to-icat-green rounded-b-[40%] shadow-inner"></div>
+
+                    {/* Foto */}
+                    <div className="relative z-10 pt-10 flex flex-col items-center">
+                      <div className="w-[30mm] h-[30mm] rounded-full bg-gray-100 border-4 border-white shadow-md overflow-hidden flex items-center justify-center">
+                        {(aluno as any).foto ? (
+                          <img src={(aluno as any).foto} alt="Foto" className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-12 h-12 text-gray-300" />
+                        )}
+                      </div>
+                      
+                      <div className="w-full px-4 text-center mt-3">
+                        <h2 className="font-black text-sm text-gray-900 leading-tight uppercase line-clamp-2">{aluno.name}</h2>
+                        <span className="inline-block bg-icat-yellow text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full mt-1">ALUNO(A)</span>
+                      </div>
+
+                      <div className="w-full px-4 text-center mt-3 space-y-0.5">
+                        <p className="text-[10px] text-gray-800"><span className="font-bold">Matrícula:</span> ICAT-{aluno.id}</p>
+                        <p className="text-[10px] text-gray-800"><span className="font-bold">Nasc:</span> {aluno.age} anos</p>
+                        <p className="text-[10px] text-gray-800 font-medium truncate">{aluno.course}</p>
+                      </div>
+                    </div>
+
+                    {/* QR Code no Rodapé */}
+                    <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center">
+                      <div className="bg-white p-1 rounded border border-gray-200">
+                        <QRCodeSVG value={`icat-access-${aluno.id}`} size={48} level="M" />
+                      </div>
+                      <p className="text-[8px] text-gray-400 mt-1 uppercase font-bold">Válido até 12/2026</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* MODAL WEBCAM */}
+      {isWebcamOpen && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-gray-900/90 backdrop-blur-sm">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="font-bold text-gray-900">Tirar Foto</h2>
+              <button onClick={() => setIsWebcamOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6" /></button>
+            </div>
+            <div className="bg-black relative flex justify-center items-center aspect-video">
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{ facingMode: "user" }}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-4 bg-gray-50 flex justify-center border-t border-gray-200">
+              <button 
+                onClick={capture}
+                className="w-16 h-16 bg-white border-4 border-gray-300 rounded-full shadow-md flex items-center justify-center hover:border-icat-blue transition-colors focus:outline-none focus:ring-4 focus:ring-blue-100"
+              >
+                <div className="w-12 h-12 bg-icat-blue rounded-full"></div>
+              </button>
             </div>
           </div>
         </div>
