@@ -517,10 +517,16 @@ export default function AlunosAdmin() {
                     }}
                   >
                     {/* Elementos Decorativos da Marca */}
-                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-br from-icat-blue to-icat-green rounded-b-[40%]"></div>
+                    <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-br from-icat-blue to-icat-green rounded-b-[40%]"></div>
 
                     {/* Conteúdo do Cartão — Flow Layout (sem absolute) */}
-                    <div className="relative z-10 flex flex-col items-center h-full pt-6 pb-3 px-3">
+                    <div className="relative z-10 flex flex-col items-center h-full pt-2 pb-3 px-3">
+                      
+                      {/* Logo ICAT Centralizada no Topo */}
+                      <div className="w-full flex justify-center mb-1.5">
+                        <img src="/logo.png" alt="ICAT" className="h-5 w-auto object-contain bg-white/90 backdrop-blur px-2 py-0.5 rounded-full shadow-sm" />
+                      </div>
+
                       {/* Foto */}
                       <div className="w-[22mm] h-[22mm] rounded-full bg-gray-100 border-[3px] border-white shadow-md overflow-hidden flex items-center justify-center shrink-0">
                         {(aluno as any).foto ? (

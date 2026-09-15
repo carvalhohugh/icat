@@ -397,90 +397,151 @@ export default function BeneficiariosAdmin() {
       )}
 
       {/* MODAL DE CARTEIRINHA */}
-      {isCarteirinhaOpen && selectedBenId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h2 className="text-xl font-bold text-gray-900">Gerar Carteirinha de Acesso</h2>
-              <button onClick={() => setIsCarteirinhaOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {isCarteirinhaOpen && selectedBenId && (() => {
+        const beneficiario = beneficiarios.find(b => b.id === selectedBenId);
+        if (!beneficiario) return null;
 
-            <div className="p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Imagem de Fundo (Opcional)</label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (e) => setCarteirinhaBg(e.target?.result as string);
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-              </div>
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[800px]">
+              
+              <style>{`
+                @media print {
+                  @page {
+                    size: 54mm 86mm;
+                    margin: 0;
+                  }
+                }
+              `}</style>
+              
+              {/* Lado Esquerdo: Configurações */}
+              <div className="w-full md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-gray-100 bg-gray-50 overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Emissão de Carteirinha (PVC)</h2>
+                  <button onClick={() => setIsCarteirinhaOpen(false)} className="text-gray-400 hover:text-gray-600 md:hidden"><X className="w-6 h-6" /></button>
+                </div>
+                
+                <p className="text-sm text-gray-600 mb-6">O layout padrão de Cartões PVC (CR80 - 54x86mm). Use uma impressora térmica para imprimir.</p>
 
-              {/* Preview da Carteirinha */}
-              <div className="flex justify-center bg-gray-100 p-4 rounded-xl">
-                <div 
-                  id="carteirinha-card"
-                  className="relative w-80 h-48 rounded-xl shadow-lg overflow-hidden flex flex-col border border-gray-200 bg-white"
-                  style={{
-                    backgroundImage: carteirinhaBg ? `url(${carteirinhaBg})` : 'linear-gradient(to right bottom, #f8fafc, #e2e8f0)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
-                  {/* Overlay for better text readability if there's a background */}
-                  {carteirinhaBg && <div className="absolute inset-0 bg-white/60"></div>}
-                  
-                  <div className="relative z-10 flex flex-col h-full p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <img src="/logo.png" alt="ICAT" className="h-8 w-auto mb-2" />
-                        <h3 className="font-bold text-gray-900 text-sm leading-tight max-w-[140px]">
-                          {beneficiarios.find(b => b.id === selectedBenId)?.name}
-                        </h3>
-                        <p className="text-xs text-gray-700 font-medium mt-1">ID: ICAT-{selectedBenId.toString().padStart(4, '0')}</p>
-                      </div>
-                      <div className="bg-white p-1 rounded-lg shadow-sm">
-                        <QRCodeSVG 
-                          value={`icat-access-${selectedBenId}`}
-                          size={64}
-                          level="M"
-                        />
-                      </div>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">1. Capturar ou Enviar Foto</label>
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.onchange = (e: any) => {
+                            const file = e.target.files?.[0];
+                            if(file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                setBeneficiarios(beneficiarios.map(b => b.id === selectedBenId ? {...b, foto: ev.target?.result as string} : b));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          };
+                          input.click();
+                        }}
+                        className="flex-1 bg-white border border-gray-300 rounded-lg py-2 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="w-5 h-5 text-icat-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span className="text-xs font-semibold text-gray-600">Fazer Upload</span>
+                      </button>
                     </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-gray-200 space-y-3">
+                    <button 
+                      onClick={async () => {
+                        const { toPng } = await import('html-to-image');
+                        const node = document.getElementById('carteirinha-pvc-card');
+                        if (!node) return;
+                        const dataUrl = await toPng(node, { pixelRatio: 4, backgroundColor: '#ffffff' });
+                        const link = document.createElement('a');
+                        link.download = `carteirinha-ICAT-${beneficiario.id}.png`;
+                        link.href = dataUrl;
+                        link.click();
+                      }}
+                      className="w-full bg-icat-blue hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2 text-sm font-bold transition-colors"
+                    >
+                      Baixar PNG (300 DPI)
+                    </button>
                     
-                    <div className="mt-auto flex justify-between items-end">
-                      <span className="text-[10px] font-bold text-icat-green px-2 py-1 bg-green-50 rounded border border-green-100">
-                        ACESSO LIBERADO
-                      </span>
-                      <span className="text-[10px] text-gray-600 font-medium">Válido até 12/2026</span>
-                    </div>
+                    <button 
+                      onClick={() => window.print()}
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded-lg flex justify-center items-center gap-2 text-xs font-medium transition-colors"
+                    >
+                      Imprimir pelo Navegador (Ctrl+P)
+                    </button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-              <button onClick={() => setIsCarteirinhaOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 text-sm">Fechar</button>
-              <button onClick={() => {
-                alert('Funcionalidade de download será feita na V2.');
-              }} className="btn-primary flex items-center gap-2 text-sm py-2">
-                <Download className="w-4 h-4" />
-                Baixar Imagem
-              </button>
+              {/* Lado Direito: Preview */}
+              <div className="w-full md:w-1/2 p-6 flex flex-col items-center justify-center bg-gray-200 relative">
+                <button onClick={() => setIsCarteirinhaOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 hidden md:block">
+                  <X className="w-6 h-6" />
+                </button>
+                
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Preview em Tempo Real</p>
+                
+                <div id="carteirinha-print-area" className="flex justify-center items-center">
+                  <div 
+                    id="carteirinha-pvc-card"
+                    className="relative bg-white shadow-2xl overflow-hidden print:shadow-none print:m-0 print-exact"
+                    style={{
+                      width: '54mm',
+                      height: '86mm',
+                      backgroundImage: carteirinhaBg ? `url(${carteirinhaBg})` : 'none',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-br from-icat-blue to-icat-green rounded-b-[40%]"></div>
+
+                    <div className="relative z-10 flex flex-col items-center h-full pt-2 pb-3 px-3">
+                      
+                      <div className="w-full flex justify-center mb-1.5">
+                        <img src="/logo.png" alt="ICAT" className="h-5 w-auto object-contain bg-white/90 backdrop-blur px-2 py-0.5 rounded-full shadow-sm" />
+                      </div>
+
+                      <div className="w-[22mm] h-[22mm] rounded-full bg-gray-100 border-[3px] border-white shadow-md overflow-hidden flex items-center justify-center shrink-0">
+                        {(beneficiario as any).foto ? (
+                          <img src={(beneficiario as any).foto} alt="Foto" className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-10 h-10 text-gray-300" />
+                        )}
+                      </div>
+                      
+                      <h2 className="font-black text-[11px] text-gray-900 leading-tight uppercase text-center line-clamp-2 mt-2">{beneficiario.name}</h2>
+                      <span className="inline-block bg-icat-yellow text-white text-[7px] font-black uppercase px-2 py-0.5 rounded-full mt-1">BENEFICIÁRIO(A)</span>
+
+                      <div className="w-full text-center mt-2 space-y-0">
+                        <p className="text-[9px] text-gray-700"><span className="font-bold">ID:</span> ICAT-{beneficiario.id.toString().padStart(4, '0')}</p>
+                        <p className="text-[9px] text-gray-700"><span className="font-bold">Bairro:</span> {beneficiario.neighborhood}</p>
+                        <p className="text-[9px] text-gray-700 font-medium truncate">Status: {beneficiario.status}</p>
+                      </div>
+
+                      <div className="flex-1"></div>
+
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className="bg-white p-0.5 rounded border border-gray-200">
+                          <QRCodeSVG value={`icat-access-${beneficiario.id}`} size={36} level="M" />
+                        </div>
+                        <p className="text-[7px] text-gray-400 mt-0.5 uppercase font-bold">Válido até 12/2026</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
