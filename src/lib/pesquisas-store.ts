@@ -1,6 +1,7 @@
 // Global in-memory store for survey responses (simulates real-time backend)
 // Both the public link and the interviewer app write to this store
 // The admin panel reads from this store
+import { supabase } from '@/lib/supabase';
 
 export type Opcao = { nome: string; partido?: string; votos: number };
 
@@ -116,6 +117,16 @@ export function addResposta(pesquisaId: number, resposta: Omit<Resposta, 'id' | 
   pesquisa.respostas.push(novaResposta);
   pesquisas[idx] = pesquisa;
   saveStore(pesquisas);
+
+  // Supabase sync
+  supabase.from('pesquisas_respostas').insert([{
+    pesquisa_id: pesquisaId, entrevistado: resposta.entrevistado,
+    telefone: resposta.telefone, fonte: resposta.fonte,
+    opcoes_selecionadas: resposta.opcaoIdxs, lat: resposta.lat, lng: resposta.lng
+  }]).then(() => {
+    // Also update opcoes JSONB in pesquisas table
+    supabase.from('pesquisas').update({ opcoes: pesquisa.opcoes }).eq('id', pesquisaId);
+  });
 }
 
 export function addPesquisa(p: Omit<Pesquisa, 'id' | 'respostas'>) {
@@ -123,12 +134,20 @@ export function addPesquisa(p: Omit<Pesquisa, 'id' | 'respostas'>) {
   const nova: Pesquisa = { ...p, id: Date.now(), respostas: [] };
   pesquisas.unshift(nova);
   saveStore(pesquisas);
+
+  // Supabase sync
+  supabase.from('pesquisas').insert([{
+    nome: p.nome, tipo: p.tipo, status: p.status, induzida: p.induzida,
+    multi_select: p.multiSelect, meta_diaria: p.metaDiaria, opcoes: p.opcoes
+  }]);
+
   return nova;
 }
 
 export function deletePesquisa(id: number) {
   const pesquisas = loadStore().filter(p => p.id !== id);
   saveStore(pesquisas);
+  supabase.from('pesquisas').delete().eq('id', id);
 }
 
 export function updatePesquisa(id: number, data: Partial<Pesquisa>) {
@@ -137,5 +156,10 @@ export function updatePesquisa(id: number, data: Partial<Pesquisa>) {
   if (idx > -1) {
     pesquisas[idx] = { ...pesquisas[idx], ...data };
     saveStore(pesquisas);
+    supabase.from('pesquisas').update({
+      nome: data.nome, tipo: data.tipo, status: data.status,
+      induzida: data.induzida, multi_select: data.multiSelect, opcoes: data.opcoes
+    }).eq('id', id);
   }
 }
+

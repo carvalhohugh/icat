@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Plus, Search, Package, ArrowDownToLine, ArrowUpFromLine, Settings, Trash2, X, AlertTriangle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 type ItemEstoque = {
   id: number;
@@ -39,11 +40,24 @@ export default function EstoqueAdmin() {
   ]);
 
   useEffect(() => {
-    const savedB = localStorage.getItem('icat_estoque_beneficios');
-    const savedM = localStorage.getItem('icat_estoque_movimentos');
-    if (savedB) setBeneficios(JSON.parse(savedB));
-    if (savedM) setMovimentos(JSON.parse(savedM));
-    setLoaded(true);
+    async function fetchEstoque() {
+      const { data } = await supabase.from('estoque_itens').select('*').order('id');
+      if (data && data.length > 0) {
+        setBeneficios(data.map(d => ({
+          id: d.id, name: d.nome, category: d.categoria, qty: d.quantidade_atual,
+          limitWarning: d.limite_alerta, description: d.descricao || '',
+          packageItems: (d.conteudo_pacote || []).map((p: { qtd: string; item: string }) => `${p.qtd} ${p.item}`)
+        })));
+      } else {
+        // Fallback localStorage
+        const savedB = localStorage.getItem('icat_estoque_beneficios');
+        if (savedB) setBeneficios(JSON.parse(savedB));
+      }
+      const savedM = localStorage.getItem('icat_estoque_movimentos');
+      if (savedM) setMovimentos(JSON.parse(savedM));
+      setLoaded(true);
+    }
+    fetchEstoque();
   }, []);
 
   useEffect(() => {
@@ -57,7 +71,7 @@ export default function EstoqueAdmin() {
   
   const [newItem, setNewItem] = useState({ name: '', category: 'Alimentação', description: '', packageItemsStr: '', limitWarning: 5 });
 
-  const handleSaveMovement = () => {
+  const handleSaveMovement = async () => {
     if (!formData.person) return;
     
     const targetItem = beneficios.find(b => b.id === formData.itemId);
@@ -83,16 +97,22 @@ export default function EstoqueAdmin() {
       return b;
     }));
 
+    // Supabase sync
+    await supabase.from('estoque_movimentacoes').insert([{
+      item_id: formData.itemId, tipo: formData.tipo === 'Saída' ? 'Saída' : 'Entrada',
+      quantidade: formData.qty, responsavel_nome: formData.person
+    }]);
+    await supabase.from('estoque_itens').update({ quantidade_atual: newQty }).eq('id', formData.itemId);
+
     setFormData({ ...formData, person: '', qty: 1 });
     setIsModalOpen(false);
 
-    // Notificação de estoque baixo se for saída e chegou/ficou abaixo do limite
     if (formData.tipo === 'Saída' && newQty <= targetItem.limitWarning) {
       setLowStockAlert({ itemName: targetItem.name, qty: newQty });
     }
   };
 
-  const handleSaveNewItem = () => {
+  const handleSaveNewItem = async () => {
     if (!newItem.name.trim()) return;
     
     const items = newItem.packageItemsStr.split(',').map(s => s.trim()).filter(s => s);
@@ -108,14 +128,23 @@ export default function EstoqueAdmin() {
     
     setBeneficios([...beneficios, added]);
     setFormData({ ...formData, itemId: added.id });
+
+    // Supabase sync
+    await supabase.from('estoque_itens').insert([{
+      nome: newItem.name, categoria: newItem.category, descricao: newItem.description,
+      conteudo_pacote: items.map(i => ({ qtd: '', item: i })),
+      limite_alerta: newItem.limitWarning, quantidade_atual: 0
+    }]);
+
     setNewItem({ name: '', category: 'Alimentação', description: '', packageItemsStr: '', limitWarning: 5 });
     setIsNewItemModal(false);
   };
 
-  const handleDeleteItem = (id: number) => {
+  const handleDeleteItem = async (id: number) => {
     if (confirm('Tem certeza que deseja excluir este item? Essa ação não apaga o histórico de movimentações, mas remove o item da lista de estoque.')) {
       setBeneficios(beneficios.filter(b => b.id !== id));
       setItemConfigId(null);
+      await supabase.from('estoque_itens').delete().eq('id', id);
     }
   };
 

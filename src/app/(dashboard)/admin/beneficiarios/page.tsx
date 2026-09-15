@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Plus, Filter, Edit2, Trash2, Heart, Users, FileText, CheckCircle, Copy, Check, ClipboardEdit, X, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { supabase } from '@/lib/supabase';
 
 export default function BeneficiariosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,6 +34,18 @@ export default function BeneficiariosAdmin() {
   const [novaAnotacao, setNovaAnotacao] = useState('');
   const [tipoAtendimento, setTipoAtendimento] = useState('Assistência Social');
 
+  useEffect(() => {
+    async function fetchBeneficiarios() {
+      const { data } = await supabase.from('beneficiarios').select('*').order('id', { ascending: false });
+      if (data && data.length > 0) {
+        setBeneficiarios(data.map(d => ({
+          id: d.id, name: d.nome, dependents: d.filhos, neighborhood: d.bairro, status: d.status
+        })));
+      }
+    }
+    fetchBeneficiarios();
+  }, []);
+
   const handleCopyLink = () => {
     const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/beneficiario` : 'https://icat.org.br/cadastro/beneficiario';
     navigator.clipboard.writeText(url);
@@ -62,19 +75,21 @@ export default function BeneficiariosAdmin() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if(!formData.name) return;
     const nextId = beneficiarios.length > 0 ? Math.max(...beneficiarios.map(b => b.id)) + 1 : 1001;
+    const depCount = formData.hasChildren === 'Sim' ? childrenList.length : (parseInt(formData.dependents) || 0);
     setBeneficiarios([
       ...beneficiarios,
-      {
-        id: nextId,
-        name: formData.name,
-        dependents: formData.hasChildren === 'Sim' ? childrenList.length : (parseInt(formData.dependents) || 0),
-        neighborhood: formData.bairro || 'Não informado',
-        status: 'Aprovado'
-      }
+      { id: nextId, name: formData.name, dependents: depCount, neighborhood: formData.bairro || 'Não informado', status: 'Aprovado' }
     ]);
+    
+    await supabase.from('beneficiarios').insert([{
+      nome: formData.name, cpf: formData.cpf, bairro: formData.bairro || 'Não informado',
+      filhos: depCount, status: 'Aprovado', renda_estimada: parseFloat(formData.income) || 0,
+      whatsapp: formData.whatsapp
+    }]);
+
     setFormData({ name: '', cpf: '', birthdate: '', dependents: '', income: '', whatsapp: '', cep: '', logradouro: '', bairro: '', cidade: '', uf: '', maritalStatus: 'Solteiro(a)', spouseName: '', spouseBirthdate: '', hasChildren: 'Não' });
     setChildrenList([]);
     setIsModalOpen(false);

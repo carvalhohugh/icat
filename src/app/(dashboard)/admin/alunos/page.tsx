@@ -3,13 +3,16 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Link as LinkIcon, CheckCircle, X, Camera, User } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import Webcam from 'react-webcam';
+import { supabase } from '@/lib/supabase';
+
+type Aluno = { id: number; name: string; course: string; age: number; status: string; whatsapp: string; responsavel: string; foto?: string; nome?: string; curso?: string; idade?: number; foto_url?: string; };
 
 export default function AlunosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   
-  const [alunos, setAlunos] = useState([
+  const [alunos, setAlunos] = useState<Aluno[]>([
     { id: 7001, name: 'Pedro Henrique', course: 'Escolinha de Futebol', age: 12, status: 'Matriculado', whatsapp: '(64) 99900-1111', responsavel: 'Maria Henrique', foto: '' },
     { id: 7002, name: 'Ana Clara', course: 'Ballet Infantil', age: 8, status: 'Pendente', whatsapp: '(64) 99900-2222', responsavel: 'Carlos Clara', foto: '' },
     { id: 7003, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos', foto: '' },
@@ -22,6 +25,17 @@ export default function AlunosAdmin() {
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
   
   useEffect(() => {
+    async function fetchAlunos() {
+      const { data, error } = await supabase.from('alunos').select('*').order('id', { ascending: false });
+      if (data && data.length > 0) {
+        // Map DB fields to UI fields
+        setAlunos(data.map(d => ({
+          id: d.id, name: d.nome, course: d.curso, age: d.idade, status: d.status, whatsapp: d.whatsapp, responsavel: d.responsavel, foto: d.foto_url
+        })));
+      }
+    }
+    fetchAlunos();
+
     try {
       const conf = localStorage.getItem('icat_config_instituicao');
       if (conf) {
@@ -34,11 +48,13 @@ export default function AlunosAdmin() {
   const [isWebcamOpen, setIsWebcamOpen] = useState(false);
   const webcamRef = useRef<Webcam>(null);
 
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc && selectedAlunoId) {
       setAlunos(alunos.map(a => a.id === selectedAlunoId ? {...a, foto: imageSrc} : a));
       setIsWebcamOpen(false);
+      // Salva no banco tbm
+      await supabase.from('alunos').update({ foto_url: imageSrc }).eq('id', selectedAlunoId);
     }
   }, [webcamRef, selectedAlunoId, alunos]);
 
@@ -49,14 +65,23 @@ export default function AlunosAdmin() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name) return;
+    
+    // Optimistic UI update
     const nextId = alunos.length > 0 ? Math.max(...alunos.map(a => a.id)) + 1 : 7001;
     const newAluno = {
       id: nextId, name: formData.name, course: formData.course || 'Sem Curso',
       age: Number(formData.age) || 0, status: 'Matriculado', whatsapp: formData.whatsapp || '', responsavel: formData.responsavel || '', foto: ''
     };
     setAlunos([newAluno, ...alunos]);
+    
+    // Supabase Insert
+    await supabase.from('alunos').insert([{ 
+      nome: formData.name, curso: formData.course || 'Sem Curso', idade: Number(formData.age) || 0, 
+      status: 'Matriculado', whatsapp: formData.whatsapp, responsavel: formData.responsavel 
+    }]);
+
     setFormData({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
     setIsModalOpen(false);
   };
@@ -66,9 +91,13 @@ export default function AlunosAdmin() {
     setIsProfileOpen(true);
   };
 
-  const saveProfile = () => {
+  const saveProfile = async () => {
     setAlunos(alunos.map(a => a.id === editData.id ? { ...a, name: editData.name, course: editData.course, age: Number(editData.age), status: editData.status, whatsapp: editData.whatsapp, responsavel: editData.responsavel } : a));
     setIsProfileOpen(false);
+    await supabase.from('alunos').update({
+      nome: editData.name, curso: editData.course, idade: Number(editData.age),
+      status: editData.status, whatsapp: editData.whatsapp, responsavel: editData.responsavel
+    }).eq('id', editData.id);
   };
 
   const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);

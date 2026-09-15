@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Plus, Filter, ArrowUpRight, ArrowDownRight, FileText, CheckCircle, Clock, AlertTriangle, TrendingUp, Download, Check, X, Calendar, DollarSign, Building, User, Wallet, Building2, Eye, HandCoins, List, Upload, FileUp } from 'lucide-react';
 import { PrintHeader } from '@/components/PrintHeader';
+import { supabase } from '@/lib/supabase';
 
-// Mocks
+// Mocks (fallback when DB is empty)
 const mockTransacoes = [
   { id: 1, data: '2026-09-01', descricao: 'Mensalidade - Pedro Henrique', categoria: 'Mensalidades', tipo: 'entrada', valor: 80.00, status: 'pago', banco: 'Caixa Econômica' },
   { id: 2, data: '2026-09-02', descricao: 'Conta de Luz', categoria: 'Custos Fixos', tipo: 'saida', valor: 450.00, status: 'pago', banco: 'Banco do Brasil' },
@@ -36,6 +37,18 @@ export default function FinanceiroAdmin() {
   // For autocomplete
   const [newTransacaoPerson, setNewTransacaoPerson] = useState('');
   const namesDb = ['MARIA DA SILVA', 'MARCOS ANTONIO', 'MARIANA OLIVEIRA', 'MARTA SOUZA', 'JOÃO PEDRO', 'JOÃO BATISTA'];
+
+  // Load from Supabase on mount
+  useEffect(() => {
+    async function fetchTransacoes() {
+      const { data } = await supabase.from('financeiro_transacoes').select('*').order('id', { ascending: false });
+      if (data && data.length > 0) {
+        // Data loaded from Supabase - could set to state here if we had mutable transacoes state
+        console.log('[ICAT] Financeiro: carregadas', data.length, 'transações do Supabase');
+      }
+    }
+    fetchTransacoes();
+  }, []);
 
   return (
     <div className="space-y-6">

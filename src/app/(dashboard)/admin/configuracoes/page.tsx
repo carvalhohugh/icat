@@ -1,9 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Save, Globe, Building, MessageCircle, Shield, Check } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ConfiguracoesAdmin() {
   const [activeTab, setActiveTab] = useState('instituicao');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     razao: 'Instituto Catalano - ICAT',
@@ -20,15 +23,27 @@ export default function ConfiguracoesAdmin() {
   });
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('icat_config_instituicao');
-      if (saved) setFormData(JSON.parse(saved));
-    } catch(e) {}
+    async function loadConfig() {
+      const { data, error } = await supabase.from('configuracoes_instituicao').select('valor').eq('chave', 'global').single();
+      if (data && data.valor) {
+        setFormData((prev) => ({ ...prev, ...data.valor }));
+      }
+      setIsLoading(false);
+    }
+    loadConfig();
   }, []);
 
-  const handleSave = () => {
-    localStorage.setItem('icat_config_instituicao', JSON.stringify(formData));
-    alert('Configurações salvas com sucesso!');
+  const handleSave = async () => {
+    setIsSaving(true);
+    const { error } = await supabase.from('configuracoes_instituicao').upsert({ chave: 'global', valor: formData });
+    setIsSaving(false);
+    if (!error) {
+      alert('Configurações salvas no Supabase com sucesso!');
+    } else {
+      alert('Aviso: Como o Supabase pode não estar com as chaves reais ainda, os dados não subiram. Configure o .env.local!');
+      // Fallback local for now just so the app doesn't break if they haven't put the keys yet
+      localStorage.setItem('icat_config_instituicao', JSON.stringify(formData));
+    }
   };
 
   return (
@@ -38,9 +53,9 @@ export default function ConfiguracoesAdmin() {
           <h1 className="text-2xl font-bold text-gray-900">Configurações do Sistema</h1>
           <p className="text-gray-500 text-sm mt-1">Gerencie os dados públicos, chaves PIX e informações da instituição.</p>
         </div>
-        <button onClick={handleSave} className="btn-primary flex items-center">
+        <button onClick={handleSave} disabled={isSaving} className="btn-primary flex items-center disabled:opacity-50">
           <Save className="w-5 h-5 mr-2" />
-          Salvar Configurações
+          {isSaving ? 'Salvando Nuvem...' : 'Salvar Configurações'}
         </button>
       </div>
 
