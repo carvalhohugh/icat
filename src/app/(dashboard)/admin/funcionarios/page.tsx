@@ -316,11 +316,10 @@ export default function FuncionariosAdmin() {
                       </div>
                       
                       <h2 className="font-black text-[11px] text-gray-900 leading-tight uppercase text-center line-clamp-2 mt-2">{func.name}</h2>
-                      <span className="inline-block bg-blue-900 text-white text-[7px] font-black uppercase px-2 py-0.5 rounded-full mt-1">COLABORADOR(A)</span>
+                      <span className="inline-block bg-blue-900 text-white text-[7px] font-black uppercase px-2 py-0.5 rounded-full mt-1 line-clamp-1">{func.role}</span>
 
                       <div className="w-full text-center mt-2 space-y-0">
                         <p className="text-[9px] text-gray-700"><span className="font-bold">ID:</span> ICAT-FUNC-{func.id.toString().padStart(4, '0')}</p>
-                        <p className="text-[9px] text-gray-700"><span className="font-bold">Cargo:</span> {func.role}</p>
                         <p className="text-[9px] text-gray-700 font-medium truncate">Setor: {func.department}</p>
                       </div>
 
