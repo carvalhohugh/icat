@@ -117,6 +117,10 @@ export default function DashboardLayout({
                   <ClipboardList className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
                   Pesquisas Urbanas
                 </Link>
+                <Link href="/admin/acesso" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-scan-face mr-3 text-gray-400 group-hover:text-icat-green"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                  Controle de Acesso
+                </Link>
                 <Link href="/admin/configuracoes" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
                   <Settings className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
                   Configurações

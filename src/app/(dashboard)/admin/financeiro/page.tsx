@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  ArrowUpRight, ArrowDownRight, Upload, Search, Filter, 
-  FileText, CheckCircle, Clock, Plus, Building, User, Wallet, FileUp, List, X
-} from 'lucide-react';
+import { Search, Plus, Filter, ArrowUpRight, ArrowDownRight, FileText, CheckCircle, Clock, AlertTriangle, TrendingUp, Download, Check, X, Calendar, DollarSign, Building, User, Wallet, Building2, Eye, HandCoins, List, Upload } from 'lucide-react';
+import { PrintHeader } from '@/components/PrintHeader';
 
 // Mocks
 const mockTransacoes = [
@@ -579,9 +577,10 @@ export default function FinanceiroAdmin() {
               </div>
             </div>
             
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-6 overflow-y-auto space-y-6 print:p-0 print:m-0 print:overflow-visible">
               {activeReport === 'fluxo' && (
-                <div>
+                <div className="print:block">
+                  <PrintHeader title="Relatório de Fluxo de Caixa" />
                   <div className="flex justify-between items-end border-b pb-2 mb-4">
                     <div>
                       <h3 className="font-bold text-gray-900 text-lg">Fluxo de Caixa Mensal</h3>
@@ -616,7 +615,8 @@ export default function FinanceiroAdmin() {
               )}
 
               {activeReport === 'emendas' && (
-                <div>
+                <div className="print:block">
+                  <PrintHeader title="Relatório de Emendas Parlamentares" />
                   <div className="border-b pb-2 mb-4">
                     <h3 className="font-bold text-gray-900 text-lg">Relatório de Emendas Parlamentares</h3>
                     <p className="text-sm text-gray-500">Ano Vigente: 2026</p>

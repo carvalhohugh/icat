@@ -1,11 +1,14 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Heart, Users, Link as LinkIcon, CheckCircle, ClipboardEdit, X } from 'lucide-react';
+import { Search, Plus, Filter, Edit2, Trash2, Heart, Users, FileText, CheckCircle, Copy, Check, ClipboardEdit, X, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function BeneficiariosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProntuarioOpen, setIsProntuarioOpen] = useState(false);
+  const [isCarteirinhaOpen, setIsCarteirinhaOpen] = useState(false);
   const [selectedBenId, setSelectedBenId] = useState<number | null>(null);
+  const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
   
   const [beneficiarios, setBeneficiarios] = useState([
     { id: 1, name: 'Maria da Silva', dependents: 3, neighborhood: 'Vila Margarida', status: 'Aprovado' },
@@ -146,10 +149,13 @@ export default function BeneficiariosAdmin() {
                   <button onClick={() => { setSelectedBenId(b.id); setIsProntuarioOpen(true); }} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Prontuário">
                     <ClipboardEdit className="w-4 h-4" />
                   </button>
+                  <button onClick={() => { setSelectedBenId(b.id); setIsCarteirinhaOpen(true); }} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50" title="Gerar Carteirinha">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-id-card"><path d="M16 10h2"/><path d="M16 14h2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><circle cx="9" cy="11" r="2"/><rect x="2" y="5" width="20" height="14" rx="2"/></svg>
+                  </button>
                   <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50" title="Editar">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-orange-500 transition-colors rounded-lg hover:bg-orange-50" title="Suspender Cadastro">
+                  <button onClick={() => setBeneficiarios(beneficiarios.map(x => x.id === b.id ? { ...x, status: x.status === 'Suspenso' ? 'Aprovado' : 'Suspenso' } : x))} className="p-2 text-gray-400 hover:text-orange-500 transition-colors rounded-lg hover:bg-orange-50" title={b.status === 'Suspenso' ? 'Reativar Cadastro' : 'Suspender Cadastro'}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-ban"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
                   </button>
                   <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={() => setBeneficiarios(beneficiarios.filter(x => x.id !== b.id))} title="Excluir">
@@ -370,6 +376,92 @@ export default function BeneficiariosAdmin() {
                   Adicionar Registro
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CARTEIRINHA */}
+      {isCarteirinhaOpen && selectedBenId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-900">Gerar Carteirinha de Acesso</h2>
+              <button onClick={() => setIsCarteirinhaOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Imagem de Fundo (Opcional)</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (e) => setCarteirinhaBg(e.target?.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+
+              {/* Preview da Carteirinha */}
+              <div className="flex justify-center bg-gray-100 p-4 rounded-xl">
+                <div 
+                  id="carteirinha-card"
+                  className="relative w-80 h-48 rounded-xl shadow-lg overflow-hidden flex flex-col border border-gray-200 bg-white"
+                  style={{
+                    backgroundImage: carteirinhaBg ? `url(${carteirinhaBg})` : 'linear-gradient(to right bottom, #f8fafc, #e2e8f0)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  {/* Overlay for better text readability if there's a background */}
+                  {carteirinhaBg && <div className="absolute inset-0 bg-white/60"></div>}
+                  
+                  <div className="relative z-10 flex flex-col h-full p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <img src="/logo.png" alt="ICAT" className="h-8 w-auto mb-2" />
+                        <h3 className="font-bold text-gray-900 text-sm leading-tight max-w-[140px]">
+                          {beneficiarios.find(b => b.id === selectedBenId)?.name}
+                        </h3>
+                        <p className="text-xs text-gray-700 font-medium mt-1">ID: ICAT-{selectedBenId.toString().padStart(4, '0')}</p>
+                      </div>
+                      <div className="bg-white p-1 rounded-lg shadow-sm">
+                        <QRCodeSVG 
+                          value={`icat-access-${selectedBenId}`}
+                          size={64}
+                          level="M"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-auto flex justify-between items-end">
+                      <span className="text-[10px] font-bold text-icat-green px-2 py-1 bg-green-50 rounded border border-green-100">
+                        ACESSO LIBERADO
+                      </span>
+                      <span className="text-[10px] text-gray-600 font-medium">Válido até 12/2026</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+              <button onClick={() => setIsCarteirinhaOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 text-sm">Fechar</button>
+              <button onClick={() => {
+                alert('Funcionalidade de download será feita na V2.');
+              }} className="btn-primary flex items-center gap-2 text-sm py-2">
+                <Download className="w-4 h-4" />
+                Baixar Imagem
+              </button>
             </div>
           </div>
         </div>
