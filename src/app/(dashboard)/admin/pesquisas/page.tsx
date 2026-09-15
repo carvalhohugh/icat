@@ -95,13 +95,13 @@ export default function PesquisasAdmin() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="print:hidden">
         <h1 className="text-2xl font-bold text-gray-900">Pesquisas Urbanas</h1>
         <p className="text-gray-500 text-sm mt-1">Crie, gerencie e acompanhe pesquisas de opinião e intenção de voto.</p>
       </div>
 
       {/* Abas */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 print:hidden">
         {([
           { key: 'pesquisas' as const, label: 'Pesquisas', icon: <ClipboardList className="w-4 h-4" /> },
           { key: 'entrevistadores' as const, label: 'Entrevistadores', icon: <Users className="w-4 h-4" /> },
@@ -230,7 +230,7 @@ export default function PesquisasAdmin() {
       {/* ═══ ABA RESULTADOS ═══ */}
       {activeTab === 'resultados' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 max-w-2xl mx-auto print:hidden">
             <select value={resultadoPesquisaId || ''} onChange={e => setResultadoPesquisaId(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm font-medium">
               <option value="">Selecione uma pesquisa para ver os resultados...</option>
               {pesquisas.map(p => <option key={p.id} value={p.id}>{p.nome} ({p.opcoes.reduce((s, o) => s + o.votos, 0)} respostas)</option>)}

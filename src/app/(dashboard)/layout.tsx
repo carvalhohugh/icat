@@ -38,7 +38,7 @@ export default function DashboardLayout({
     <div className="flex h-screen bg-icat-gray-light overflow-hidden">
       
       {/* 1. SIDEBAR DESKTOP */}
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col z-20">
+      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col z-20 print:hidden">
         <div className="h-20 flex items-center justify-center border-b border-gray-200">
           <Link href="/admin">
             <img src="/logo.png" alt="ICAT" className="h-14 w-auto object-contain" />
@@ -245,7 +245,7 @@ export default function DashboardLayout({
       <main className="flex-1 flex flex-col overflow-hidden relative">
         
         {/* Top Header */}
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10">
+        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 print:hidden">
           <div className="flex items-center">
             {/* Hamburger (apenas no Mobile) */}
             <button

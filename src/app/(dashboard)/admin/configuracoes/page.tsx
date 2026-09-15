@@ -13,6 +13,7 @@ export default function ConfiguracoesAdmin() {
     whatsapp: '5564999119610',
     contato: '(64) 3441-0000 | (64) 99999-0000',
     email: 'contato@icat.org.br',
+    carteirinhaBg: '',
     instagram: '@icat_catalao',
     facebook: '',
     youtube: ''
@@ -122,6 +123,23 @@ export default function ConfiguracoesAdmin() {
                 <div className="col-span-2 md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email Institucional</label>
                   <input type="text" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                </div>
+                <div className="col-span-2 border-t border-gray-100 pt-4 mt-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Imagem de Fundo Padrão (Carteirinha PVC)</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => setFormData({...formData, carteirinhaBg: ev.target?.result as string});
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                  />
+                  {formData.carteirinhaBg && <div className="mt-2 text-xs text-green-600 font-bold">✓ Imagem carregada (Salve as configurações para aplicar).</div>}
                 </div>
               </div>
             </>

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Link as LinkIcon, CheckCircle, X, Camera, User } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import Webcam from 'react-webcam';
@@ -21,6 +21,16 @@ export default function AlunosAdmin() {
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | null>(null);
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
   
+  useEffect(() => {
+    try {
+      const conf = localStorage.getItem('icat_config_instituicao');
+      if (conf) {
+        const parsed = JSON.parse(conf);
+        if (parsed.carteirinhaBg) setCarteirinhaBg(parsed.carteirinhaBg);
+      }
+    } catch(e) {}
+  }, []);
+
   const [isWebcamOpen, setIsWebcamOpen] = useState(false);
   const webcamRef = useRef<Webcam>(null);
 
@@ -384,22 +394,7 @@ export default function AlunosAdmin() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">2. Imagem de Fundo (Opcional)</label>
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => setCarteirinhaBg(ev.target?.result as string);
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    />
-                  </div>
+                  {/* Removed local background upload, now managed globally in Configurações */}
 
                   <div className="pt-6 border-t border-gray-200">
                     <button 
