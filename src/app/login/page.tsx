@@ -27,6 +27,12 @@ export default function LoginPage() {
       return;
     }
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_URL === 'Sua URL do Supabase Aqui') {
+      setError('Sistema não conectado ao Banco de Dados. Configure o arquivo .env.local com as chaves do Supabase, ou use o login de teste (admin@admin / super123).');
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
