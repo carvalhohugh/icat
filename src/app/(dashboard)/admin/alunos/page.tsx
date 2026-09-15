@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Plus, Search, Edit2, Trash2, Link as LinkIcon, CheckCircle, X, Camera } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function AlunosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,16 +9,16 @@ export default function AlunosAdmin() {
   const [copied, setCopied] = useState(false);
   
   const [alunos, setAlunos] = useState([
-    { id: 1, name: 'Pedro Henrique', course: 'Escolinha de Futebol', age: 12, status: 'Matriculado', whatsapp: '(64) 99900-1111', responsavel: 'Maria Henrique' },
-    { id: 2, name: 'Ana Clara', course: 'Ballet Infantil', age: 8, status: 'Pendente', whatsapp: '(64) 99900-2222', responsavel: 'Carlos Clara' },
-    { id: 3, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos' },
-    { id: 4, name: 'Julia Oliveira', course: 'Ballet Infantil', age: 7, status: 'Matriculado', whatsapp: '(64) 99900-4444', responsavel: 'Amanda Oliveira' },
-    { id: 5, name: 'Gabriel Costa', course: 'Escolinha de Futebol', age: 10, status: 'Pendente', whatsapp: '(64) 99900-5555', responsavel: 'Fernanda Costa' },
-    { id: 6, name: 'Isabela Ramos', course: 'Informática Básica', age: 13, status: 'Pendente', whatsapp: '(64) 99900-6666', responsavel: 'Roberto Ramos' },
+    { id: 7001, name: 'Pedro Henrique', course: 'Escolinha de Futebol', age: 12, status: 'Matriculado', whatsapp: '(64) 99900-1111', responsavel: 'Maria Henrique' },
+    { id: 7002, name: 'Ana Clara', course: 'Ballet Infantil', age: 8, status: 'Pendente', whatsapp: '(64) 99900-2222', responsavel: 'Carlos Clara' },
+    { id: 7003, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos' },
   ]);
 
   const [formData, setFormData] = useState({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
   const [editData, setEditData] = useState({ id: 0, name: '', course: '', age: '', status: '', whatsapp: '', responsavel: '' });
+  const [isCarteirinhaOpen, setIsCarteirinhaOpen] = useState(false);
+  const [selectedAlunoId, setSelectedAlunoId] = useState<number | null>(null);
+  const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
 
   const handleCopyLink = () => {
     const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/aluno` : 'https://icat.org.br/cadastro/aluno';
@@ -28,8 +29,9 @@ export default function AlunosAdmin() {
 
   const handleSave = () => {
     if (!formData.name) return;
+    const nextId = alunos.length > 0 ? Math.max(...alunos.map(a => a.id)) + 1 : 7001;
     const newAluno = {
-      id: Date.now(), name: formData.name, course: formData.course || 'Sem Curso',
+      id: nextId, name: formData.name, course: formData.course || 'Sem Curso',
       age: Number(formData.age) || 0, status: 'Matriculado', whatsapp: formData.whatsapp || '', responsavel: formData.responsavel || ''
     };
     setAlunos([newAluno, ...alunos]);
@@ -59,22 +61,27 @@ export default function AlunosAdmin() {
           <p className="text-gray-500 text-sm mt-1">Gerencie os alunos matriculados nos cursos e turmas.</p>
         </div>
         <div className="flex space-x-3">
-          <button onClick={() => setIsPendingModalOpen(true)} className="btn-secondary flex items-center bg-orange-50 border border-orange-200 text-orange-600 hover:bg-orange-100 transition-colors">
-            <CheckCircle className="w-5 h-5 mr-2" /> Matrículas Pendentes
+          <button onClick={() => setIsPendingModalOpen(true)} className="btn-secondary flex items-center bg-white border border-orange-200 text-orange-600 hover:bg-orange-50">
+             <span className="w-2 h-2 bg-orange-500 rounded-full mr-2 animate-pulse"></span>
+             Matrículas Pendentes ({alunos.filter(a => a.status === 'Pendente').length})
           </button>
-          <button onClick={handleCopyLink} className="btn-secondary flex items-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={handleCopyLink}
+            className="btn-secondary flex items-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+          >
             {copied ? <CheckCircle className="w-5 h-5 mr-2 text-green-500" /> : <LinkIcon className="w-5 h-5 mr-2 text-icat-blue" />}
-            {copied ? 'Link Copiado!' : 'Link de Matrícula'}
+            {copied ? 'Link Copiado!' : 'Link de Cadastro Externo'}
           </button>
           <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center">
-            <Plus className="w-5 h-5 mr-2" /> Novo Aluno
+            <Plus className="w-5 h-5 mr-2" />
+            Nova Matrícula
           </button>
         </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex items-center gap-4 bg-gray-50">
-          <div className="relative w-72">
+        <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50">
+          <div className="relative w-full md:w-72">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input type="text" placeholder="Buscar aluno..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-icat-green outline-none" />
           </div>
@@ -89,6 +96,7 @@ export default function AlunosAdmin() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase bg-white">
+              <th className="p-4 font-semibold text-center">ID</th>
               <th className="p-4 font-semibold text-center">Nome do Aluno</th>
               <th className="p-4 font-semibold text-center">Curso / Turma</th>
               <th className="p-4 font-semibold text-center">Idade</th>
@@ -102,6 +110,7 @@ export default function AlunosAdmin() {
                 className={`transition-colors cursor-pointer ${idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50' : 'bg-blue-50/40 hover:bg-blue-50/70'}`}
                 onClick={() => openProfile(a)}
               >
+                <td className="p-4 text-gray-600 font-bold text-xs text-center">#{a.id}</td>
                 <td className="p-4 font-medium text-gray-900">
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-gradient-to-br from-icat-blue to-icat-green text-white flex items-center justify-center font-bold text-sm shadow-sm">
@@ -113,9 +122,12 @@ export default function AlunosAdmin() {
                     </div>
                   </div>
                 </td>
-                <td className="p-4 text-gray-600 text-sm">{a.course}</td>
-                <td className="p-4 text-gray-600 text-sm">{a.age} anos</td>
+                <td className="p-4 text-gray-600 text-sm text-center">{a.course}</td>
+                <td className="p-4 text-gray-600 text-sm text-center">{a.age} anos</td>
                 <td className="p-4 text-right space-x-2">
+                  <button onClick={(e) => { e.stopPropagation(); setSelectedAlunoId(a.id); setIsCarteirinhaOpen(true); }} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50" title="Gerar Carteirinha">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-id-card"><path d="M16 10h2"/><path d="M16 14h2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><circle cx="9" cy="11" r="2"/><rect x="2" y="5" width="20" height="14" rx="2"/></svg>
+                  </button>
                   <button onClick={(e) => { e.stopPropagation(); openProfile(a); }} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
                     <Edit2 className="w-4 h-4" />
                   </button>
@@ -301,6 +313,83 @@ export default function AlunosAdmin() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL DE CARTEIRINHA */}
+      {isCarteirinhaOpen && selectedAlunoId && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-900">Gerar Carteirinha do Aluno</h2>
+              <button onClick={() => setIsCarteirinhaOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Imagem de Fundo (Opcional)</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (e) => setCarteirinhaBg(e.target?.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+
+              {/* Preview da Carteirinha */}
+              <div className="flex justify-center bg-gray-100 p-4 rounded-xl">
+                <div 
+                  id="carteirinha-card"
+                  className="relative w-80 h-48 rounded-xl shadow-lg overflow-hidden flex flex-col border border-gray-200 bg-white"
+                  style={{
+                    backgroundImage: carteirinhaBg ? `url(${carteirinhaBg})` : 'linear-gradient(to right bottom, #f8fafc, #e2e8f0)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  {carteirinhaBg && <div className="absolute inset-0 bg-white/60"></div>}
+                  <div className="relative z-10 flex flex-col h-full p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <img src="/logo.png" alt="ICAT" className="h-8 w-auto mb-2" />
+                        <h3 className="font-bold text-gray-900 text-sm leading-tight max-w-[140px]">
+                          {alunos.find(b => b.id === selectedAlunoId)?.name}
+                        </h3>
+                        <p className="text-xs text-gray-700 font-medium mt-1">ID: ICAT-{selectedAlunoId.toString().padStart(4, '0')}</p>
+                      </div>
+                      <div className="bg-white p-1 rounded-lg shadow-sm">
+                        <QRCodeSVG 
+                          value={`icat-access-${selectedAlunoId}`}
+                          size={64}
+                          level="M"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-auto flex justify-between items-end">
+                      <span className="text-[10px] font-bold text-icat-green px-2 py-1 bg-green-50 rounded border border-green-100">
+                        ALUNO MATRICULADO
+                      </span>
+                      <span className="text-[10px] text-gray-600 font-medium">Válido até 12/2026</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+              <button onClick={() => setIsCarteirinhaOpen(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900 text-sm">Fechar</button>
             </div>
           </div>
         </div>

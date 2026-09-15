@@ -397,32 +397,52 @@ export default function EstoqueAdmin() {
                     </button>
                   </div>
                   {activeItemConfig.packageItems.length > 0 ? (
-                    <ul className="space-y-2">
-                      {activeItemConfig.packageItems.map((pi, idx) => (
-                        <li key={idx} className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 flex items-center gap-2 group">
-                          <div className="w-1.5 h-1.5 rounded-full bg-icat-green flex-shrink-0"></div> 
-                          <input 
-                            type="text" 
-                            value={pi} 
-                            onChange={(e) => {
-                              const newArr = [...activeItemConfig.packageItems];
-                              newArr[idx] = e.target.value;
-                              setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
-                            }}
-                            className="bg-transparent border-none focus:ring-0 p-0 m-0 flex-1 outline-none font-medium" 
-                          />
-                          <button 
-                            onClick={() => {
-                              const newArr = activeItemConfig.packageItems.filter((_, i) => i !== idx);
-                              setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
-                            }}
-                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="space-y-2">
+                      <div className="flex gap-2 text-xs font-semibold text-gray-500 uppercase px-2 mb-1">
+                        <div className="w-16">Qtd.</div>
+                        <div className="flex-1">Item</div>
+                      </div>
+                      {activeItemConfig.packageItems.map((pi, idx) => {
+                        const parts = pi.includes(';;') ? pi.split(';;') : ['', pi];
+                        const qty = parts[0];
+                        const name = parts[1];
+                        return (
+                          <div key={idx} className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 flex items-center gap-2 group">
+                            <input 
+                              type="text" 
+                              value={qty} 
+                              placeholder="Ex: 2kg"
+                              onChange={(e) => {
+                                const newArr = [...activeItemConfig.packageItems];
+                                newArr[idx] = `${e.target.value};;${name}`;
+                                setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
+                              }}
+                              className="w-16 bg-white border border-gray-200 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-icat-green outline-none text-center font-medium" 
+                            />
+                            <input 
+                              type="text" 
+                              value={name} 
+                              placeholder="Nome do item"
+                              onChange={(e) => {
+                                const newArr = [...activeItemConfig.packageItems];
+                                newArr[idx] = `${qty};;${e.target.value}`;
+                                setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
+                              }}
+                              className="flex-1 bg-white border border-gray-200 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-icat-green outline-none font-medium" 
+                            />
+                            <button 
+                              onClick={() => {
+                                const newArr = activeItemConfig.packageItems.filter((_, i) => i !== idx);
+                                setBeneficios(beneficios.map(b => b.id === activeItemConfig.id ? { ...b, packageItems: newArr } : b));
+                              }}
+                              className="text-red-400 hover:text-red-600 transition-colors p-1"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   ) : (
                     <p className="text-xs text-gray-400">Nenhum item cadastrado no pacote.</p>
                   )}

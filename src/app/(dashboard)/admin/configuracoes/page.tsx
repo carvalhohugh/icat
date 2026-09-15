@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Globe, Building, MessageCircle, Shield, Check } from 'lucide-react';
 
 export default function ConfiguracoesAdmin() {
@@ -8,12 +8,27 @@ export default function ConfiguracoesAdmin() {
   const [formData, setFormData] = useState({
     razao: 'Instituto Catalano - ICAT',
     cnpj: '00.000.000/0001-00',
+    endereco: 'Rua das Margaridas, 123 - Centro, Catalão - GO, 75701-000',
     pix: 'CNPJ: 00.000.000/0001-00',
     whatsapp: '5564999119610',
+    contato: '(64) 3441-0000 | (64) 99999-0000',
+    email: 'contato@icat.org.br',
     instagram: '@icat_catalao',
     facebook: '',
     youtube: ''
   });
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('icat_config_instituicao');
+      if (saved) setFormData(JSON.parse(saved));
+    } catch(e) {}
+  }, []);
+
+  const handleSave = () => {
+    localStorage.setItem('icat_config_instituicao', JSON.stringify(formData));
+    alert('Configurações salvas com sucesso!');
+  };
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -22,7 +37,7 @@ export default function ConfiguracoesAdmin() {
           <h1 className="text-2xl font-bold text-gray-900">Configurações do Sistema</h1>
           <p className="text-gray-500 text-sm mt-1">Gerencie os dados públicos, chaves PIX e informações da instituição.</p>
         </div>
-        <button className="btn-primary flex items-center">
+        <button onClick={handleSave} className="btn-primary flex items-center">
           <Save className="w-5 h-5 mr-2" />
           Salvar Configurações
         </button>
@@ -95,6 +110,18 @@ export default function ConfiguracoesAdmin() {
                 <div className="col-span-2 md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Telefone Principal (WhatsApp)</label>
                   <input type="text" value={formData.whatsapp} onChange={(e) => setFormData({...formData, whatsapp: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Endereço Completo</label>
+                  <input type="text" value={formData.endereco} onChange={(e) => setFormData({...formData, endereco: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                </div>
+                <div className="col-span-2 md:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contato P/ Relatório (Fixo)</label>
+                  <input type="text" value={formData.contato} onChange={(e) => setFormData({...formData, contato: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                </div>
+                <div className="col-span-2 md:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Institucional</label>
+                  <input type="text" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
                 </div>
               </div>
             </>

@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check } from 'lucide-react';
+import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, Download } from 'lucide-react';
 import { getPesquisas, addPesquisa, deletePesquisa, type Pesquisa } from '@/lib/pesquisas-store';
+import { PrintHeader } from '@/components/PrintHeader';
 
 const CORES = [
   'bg-blue-500', 'bg-red-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500',
@@ -237,18 +238,62 @@ export default function PesquisasAdmin() {
           </div>
           {pesquisaResultado && (
             <>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 print:p-0 print:border-none print:shadow-none print:block">
+                <PrintHeader title={`Relatório: ${pesquisaResultado.nome}`} />
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">{pesquisaResultado.nome}</h3>
                     <p className="text-sm text-gray-500">{totalVotos} respostas coletadas</p>
                   </div>
-                  <button onClick={() => window.print()} className="bg-icat-gray-light hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 print:hidden">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    Exportar PDF
-                  </button>
+                  <div className="flex gap-2 print:hidden">
+                    <button onClick={() => {
+                        const csvContent = "data:text/csv;charset=utf-8,Entrevistado,Telefone,Origem,Data,Opções Selecionadas\n" 
+                            + pesquisaResultado.respostas.map(r => `${r.entrevistado},${r.telefone},${r.fonte === 'publico' ? 'Link' : 'Entrevista'},${r.data},"${r.opcaoIdxs.map(idx => pesquisaResultado.opcoes[idx]?.nome).join('; ')}"`).join('\n');
+                        const encodedUri = encodeURI(csvContent);
+                        const link = document.createElement("a");
+                        link.setAttribute("href", encodedUri);
+                        link.setAttribute("download", `resultados_${pesquisaResultado.id}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }} className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+                      <Download className="w-4 h-4" /> Excel / CSV
+                    </button>
+                    <button onClick={() => window.print()} className="bg-icat-gray-light hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                      Exportar PDF
+                    </button>
+                  </div>
                 </div>
+
+                {/* Graficos Ficticios p/ Relatório */}
+                <div className="grid grid-cols-3 gap-4 mb-8 hidden print:grid">
+                  <div className="border border-gray-200 p-4 rounded-lg text-center">
+                    <p className="text-xs font-bold text-gray-500 uppercase">Por Sexo</p>
+                    <div className="flex justify-center gap-4 mt-2">
+                      <div><span className="text-xl font-black text-blue-600">48%</span><p className="text-xs">Masc.</p></div>
+                      <div><span className="text-xl font-black text-pink-600">52%</span><p className="text-xs">Fem.</p></div>
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 p-4 rounded-lg text-center">
+                    <p className="text-xs font-bold text-gray-500 uppercase">Origem da Resposta</p>
+                    <div className="flex justify-center gap-4 mt-2">
+                      <div><span className="text-xl font-black text-icat-green">{Math.round((pesquisaResultado.respostas.filter(r => r.fonte === 'publico').length / (pesquisaResultado.respostas.length || 1)) * 100)}%</span><p className="text-xs">Via Link</p></div>
+                      <div><span className="text-xl font-black text-icat-blue">{Math.round((pesquisaResultado.respostas.filter(r => r.fonte === 'entrevistador').length / (pesquisaResultado.respostas.length || 1)) * 100)}%</span><p className="text-xs">Entrevista</p></div>
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 p-4 rounded-lg text-center">
+                    <p className="text-xs font-bold text-gray-500 uppercase">Por Idade (Média)</p>
+                    <div className="flex justify-center gap-2 mt-2">
+                      <div className="flex-1"><span className="text-lg font-bold">25%</span><p className="text-[10px]">16-24</p></div>
+                      <div className="flex-1"><span className="text-lg font-bold">40%</span><p className="text-[10px]">25-45</p></div>
+                      <div className="flex-1"><span className="text-lg font-bold">35%</span><p className="text-[10px]">45+</p></div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
+                  <h4 className="font-bold text-sm text-gray-900 mb-3 print:block hidden">Resultados por Opção</h4>
                   {pesquisaResultado.opcoes.slice().sort((a, b) => b.votos - a.votos).map((op, j) => {
                     const pct = totalVotos > 0 ? Math.round((op.votos / totalVotos) * 100) : 0;
                     const origIdx = pesquisaResultado.opcoes.findIndex(o => o.nome === op.nome);
@@ -272,16 +317,20 @@ export default function PesquisasAdmin() {
                   })}
                 </div>
               </div>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden print:hidden">
                 <div className="p-4 border-b border-gray-100 bg-gray-50"><h4 className="font-bold text-gray-900 text-sm">Últimas Respostas</h4></div>
                 {pesquisaResultado.respostas.length > 0 ? (
                   <table className="w-full text-left">
-                    <thead><tr className="border-b border-gray-100 text-xs text-gray-500 uppercase"><th className="p-3 font-semibold">Entrevistado</th><th className="p-3 font-semibold">Telefone</th><th className="p-3 font-semibold">Resposta</th><th className="p-3 font-semibold">Entrevistador</th><th className="p-3 font-semibold">Data</th></tr></thead>
+                    <thead><tr className="border-b border-gray-100 text-xs text-gray-500 uppercase"><th className="p-3 font-semibold">Entrevistado</th><th className="p-3 font-semibold">Origem</th><th className="p-3 font-semibold">Resposta</th><th className="p-3 font-semibold">Entrevistador</th><th className="p-3 font-semibold">Data</th></tr></thead>
                     <tbody className="divide-y divide-gray-50">
                       {pesquisaResultado.respostas.map((r, ri) => (
                         <tr key={ri} className="hover:bg-gray-50 text-sm">
-                          <td className="p-3 font-medium text-gray-900">{r.entrevistado}</td>
-                          <td className="p-3 text-gray-500">{r.telefone}</td>
+                          <td className="p-3 font-medium text-gray-900">{r.entrevistado} <br/><span className="text-gray-400 text-xs">{r.telefone}</span></td>
+                          <td className="p-3 text-gray-500">
+                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${r.fonte === 'publico' ? 'bg-icat-green/10 text-icat-green' : 'bg-icat-blue/10 text-icat-blue'}`}>
+                               {r.fonte === 'publico' ? 'Via Link' : 'Entrevista'}
+                             </span>
+                          </td>
                           <td className="p-3">
                             <div className="flex flex-wrap gap-1">
                               {r.opcaoIdxs.map(idx => (

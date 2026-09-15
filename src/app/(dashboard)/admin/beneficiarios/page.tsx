@@ -11,8 +11,8 @@ export default function BeneficiariosAdmin() {
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
   
   const [beneficiarios, setBeneficiarios] = useState([
-    { id: 1, name: 'Maria da Silva', dependents: 3, neighborhood: 'Vila Margarida', status: 'Aprovado' },
-    { id: 2, name: 'João Santos', dependents: 5, neighborhood: 'Centro', status: 'Em Análise' },
+    { id: 1001, name: 'Maria da Silva', dependents: 3, neighborhood: 'Vila Margarida', status: 'Aprovado' },
+    { id: 1002, name: 'João Oliveira', dependents: 1, neighborhood: 'Centro', status: 'Pendente' }
   ]);
 
   const [formData, setFormData] = useState({
@@ -26,8 +26,8 @@ export default function BeneficiariosAdmin() {
   const [copied, setCopied] = useState(false);
 
   const [prontuario, setProntuario] = useState([
-    { id: 1, benId: 1, date: '05/09/2026', type: 'Assistência Social', note: 'Visita domiciliar realizada. Família em situação de vulnerabilidade, necessita de cesta básica com urgência.', assistant: 'Amanda Oliveira' },
-    { id: 2, benId: 1, date: '10/08/2026', type: 'Assistência Social', note: 'Cadastro inicial aprovado.', assistant: 'Carlos Silva' }
+    { id: 1, benId: 1001, date: '05/09/2026', type: 'Assistência Social', note: 'Visita domiciliar realizada. Família em situação de vulnerabilidade, necessita de cesta básica com urgência.', assistant: 'Amanda Oliveira' },
+    { id: 2, benId: 1001, date: '10/08/2026', type: 'Assistência Social', note: 'Cadastro inicial aprovado.', assistant: 'Carlos Silva' }
   ]);
   
   const [novaAnotacao, setNovaAnotacao] = useState('');
@@ -63,15 +63,18 @@ export default function BeneficiariosAdmin() {
   };
 
   const handleSave = () => {
-    if (!formData.name) return;
-    const newBen = {
-      id: Date.now(),
-      name: formData.name,
-      dependents: childrenList.length + (formData.maritalStatus === 'Casado(a)' ? 1 : 0),
-      neighborhood: formData.bairro || 'Sem Bairro',
-      status: 'Aprovado'
-    };
-    setBeneficiarios([newBen, ...beneficiarios]);
+    if(!formData.name) return;
+    const nextId = beneficiarios.length > 0 ? Math.max(...beneficiarios.map(b => b.id)) + 1 : 1001;
+    setBeneficiarios([
+      ...beneficiarios,
+      {
+        id: nextId,
+        name: formData.name,
+        dependents: formData.hasChildren === 'Sim' ? childrenList.length : (parseInt(formData.dependents) || 0),
+        neighborhood: formData.bairro || 'Não informado',
+        status: 'Aprovado'
+      }
+    ]);
     setFormData({ name: '', cpf: '', birthdate: '', dependents: '', income: '', whatsapp: '', cep: '', logradouro: '', bairro: '', cidade: '', uf: '', maritalStatus: 'Solteiro(a)', spouseName: '', spouseBirthdate: '', hasChildren: 'Não' });
     setChildrenList([]);
     setIsModalOpen(false);
@@ -86,41 +89,37 @@ export default function BeneficiariosAdmin() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Famílias Beneficiadas</h1>
-          <p className="text-gray-500 text-sm mt-1">Cadastro e aprovação de famílias para recebimento de doações.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Beneficiários</h1>
+          <p className="text-gray-500 text-sm mt-1">Gestão de famílias e acompanhamento social.</p>
         </div>
-        <div className="flex space-x-3">
-          <button 
-            onClick={handleCopyLink}
-            className="btn-secondary flex items-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
-            {copied ? <CheckCircle className="w-5 h-5 mr-2 text-green-500" /> : <LinkIcon className="w-5 h-5 mr-2 text-icat-blue" />}
-            {copied ? 'Link Copiado!' : 'Link de Cadastro Externo'}
+        <div className="flex gap-3">
+          <button onClick={handleCopyLink} className="btn-secondary flex items-center gap-2">
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            {copied ? 'Link Copiado!' : 'Copiar Link de Cadastro'}
           </button>
-          <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center">
-            <Plus className="w-5 h-5 mr-2" />
-            Novo Cadastro
+          <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Novo Beneficiário
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-          <div className="relative w-72">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Buscar família..." 
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-icat-green outline-none"
-            />
-          </div>
+      <div className="flex gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input type="text" placeholder="Buscar por nome, CPF ou bairro..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
         </div>
+        <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 font-medium">
+          <Filter className="w-4 h-4" /> Filtros
+        </button>
+      </div>
 
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase bg-white">
+              <th className="p-4 font-semibold">ID</th>
               <th className="p-4 font-semibold">Responsável Familiar</th>
               <th className="p-4 font-semibold">Dependentes</th>
               <th className="p-4 font-semibold">Bairro</th>
@@ -131,6 +130,7 @@ export default function BeneficiariosAdmin() {
           <tbody className="divide-y divide-gray-100">
             {beneficiarios.map(b => (
               <tr key={b.id} className="hover:bg-gray-50 transition-colors">
+                <td className="p-4 text-gray-600 font-bold text-xs">#{b.id}</td>
                 <td className="p-4 font-medium text-gray-900">
                   <div className="flex items-center gap-2">
                     <Heart className="w-4 h-4 text-icat-yellow" /> {b.name}
