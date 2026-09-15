@@ -378,6 +378,14 @@ export default function AlunosAdmin() {
             <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsCarteirinhaOpen(false)}></div>
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[800px]">
               
+              <style>{`
+                @media print {
+                  @page {
+                    size: 54mm 86mm;
+                    margin: 0;
+                  }
+                }
+              `}</style>
               {/* Lado Esquerdo: Configurações e WebCam */}
               <div className="w-full md:w-1/2 p-6 border-b md:border-b-0 md:border-r border-gray-100 bg-gray-50 overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">

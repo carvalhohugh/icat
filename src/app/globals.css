@@ -37,9 +37,4 @@ body {
   }
 }
 
-@media print {
-  @page {
-    size: 54mm 86mm;
-    margin: 0;
-  }
-}
+
