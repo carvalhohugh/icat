@@ -451,7 +451,7 @@ export default function FinanceiroAdmin() {
 
       {/* Modal Nova Transação com Autocomplete */}
       {isNovaTransacaoOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsNovaTransacaoOpen(false)}></div>
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Registrar Transação</h2>
@@ -513,7 +513,7 @@ export default function FinanceiroAdmin() {
 
       {/* Modal Visualizar Extrato (Card Bank) */}
       {isExtratoOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsExtratoOpen(false)}></div>
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col p-6">
             <div className="flex justify-between items-center mb-6">
@@ -546,7 +546,7 @@ export default function FinanceiroAdmin() {
 
       {/* Modal Central de Relatórios */}
       {isRelatoriosOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsRelatoriosOpen(false)}></div>
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col p-6">
             <div className="flex justify-between items-center mb-6">
@@ -554,19 +554,19 @@ export default function FinanceiroAdmin() {
               <button onClick={() => setIsRelatoriosOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6"/></button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div onClick={() => setActiveReport('fluxo')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => { setActiveReport('fluxo'); setIsRelatoriosOpen(false); }} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><List className="w-4 h-4"/> Fluxo de Caixa Mensal</h4>
                   <p className="text-xs text-gray-500 mt-1">Exportação das entradas e saídas detalhadas do período selecionado.</p>
                </div>
-               <div onClick={() => setActiveReport('emendas')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => { setActiveReport('emendas'); setIsRelatoriosOpen(false); }} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><Building className="w-4 h-4"/> Relatório de Emendas</h4>
                   <p className="text-xs text-gray-500 mt-1">Evolução e prestação de contas de emendas parlamentares ativas.</p>
                </div>
-               <div onClick={() => setActiveReport('inadimplencia')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => { setActiveReport('inadimplencia'); setIsRelatoriosOpen(false); }} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><User className="w-4 h-4"/> Inadimplência</h4>
                   <p className="text-xs text-gray-500 mt-1">Lista de alunos e beneficiários com mensalidades pendentes ou atrasadas.</p>
                </div>
-               <div onClick={() => setActiveReport('demonstrativo')} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
+               <div onClick={() => { setActiveReport('demonstrativo'); setIsRelatoriosOpen(false); }} className="border border-gray-100 rounded-xl p-4 hover:border-icat-green cursor-pointer group transition-colors">
                   <h4 className="font-bold text-gray-900 group-hover:text-icat-green flex items-center gap-2"><FileText className="w-4 h-4"/> Demonstrativo de Resultados</h4>
                   <p className="text-xs text-gray-500 mt-1">Resumo consolidado anual para apresentações em assembleia.</p>
                </div>
