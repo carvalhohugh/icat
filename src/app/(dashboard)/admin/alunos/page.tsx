@@ -44,7 +44,7 @@ export default function AlunosAdmin() {
     const nextId = alunos.length > 0 ? Math.max(...alunos.map(a => a.id)) + 1 : 7001;
     const newAluno = {
       id: nextId, name: formData.name, course: formData.course || 'Sem Curso',
-      age: Number(formData.age) || 0, status: 'Matriculado', whatsapp: formData.whatsapp || '', responsavel: formData.responsavel || ''
+      age: Number(formData.age) || 0, status: 'Matriculado', whatsapp: formData.whatsapp || '', responsavel: formData.responsavel || '', foto: ''
     };
     setAlunos([newAluno, ...alunos]);
     setFormData({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
