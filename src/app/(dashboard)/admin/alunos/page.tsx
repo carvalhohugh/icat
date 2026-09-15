@@ -425,21 +425,63 @@ export default function AlunosAdmin() {
 
                   {/* Removed local background upload, now managed globally in Configurações */}
 
-                  <div className="pt-6 border-t border-gray-200">
+                  <div className="pt-6 border-t border-gray-200 space-y-3">
+                    {/* Botão 1: Baixar PNG 300 DPI */}
                     <button 
-                      onClick={() => {
-                        const printContent = document.getElementById('carteirinha-print-area');
-                        if (printContent) {
-                          const originalContents = document.body.innerHTML;
-                          document.body.innerHTML = printContent.innerHTML;
-                          window.print();
-                          window.location.reload();
+                      onClick={async () => {
+                        const { toPng } = await import('html-to-image');
+                        const node = document.getElementById('carteirinha-pvc-card');
+                        if (!node) return;
+                        const dataUrl = await toPng(node, { 
+                          pixelRatio: 4, // ~300 DPI em tela padrão
+                          backgroundColor: '#ffffff',
+                        });
+                        const link = document.createElement('a');
+                        link.download = `carteirinha-ICAT-${aluno.id}.png`;
+                        link.href = dataUrl;
+                        link.click();
+                      }}
+                      className="w-full bg-icat-blue hover:bg-blue-700 text-white py-3 rounded-lg flex justify-center items-center gap-2 text-sm font-bold transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                      Baixar PNG (300 DPI)
+                    </button>
+
+                    {/* Botão 2: Enviar para Impressora PVC */}
+                    <button 
+                      onClick={async () => {
+                        const { toPng } = await import('html-to-image');
+                        const node = document.getElementById('carteirinha-pvc-card');
+                        if (!node) return;
+                        const dataUrl = await toPng(node, { pixelRatio: 4, backgroundColor: '#ffffff' });
+                        
+                        const res = await fetch('/api/printer', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            imageBase64: dataUrl, 
+                            printerName: 'default',
+                            copies: 1,
+                            cardType: 'CR80'
+                          }),
+                        });
+                        const result = await res.json();
+                        if (result.success) {
+                          alert(`✅ Job criado: ${result.job.id}\n\nPara imprimir de verdade, conecte sua impressora PVC (Evolis, Zebra, etc) e configure no driver.`);
                         }
                       }}
-                      className="w-full btn-primary py-3 flex justify-center items-center gap-2 text-lg"
+                      className="w-full btn-primary py-3 flex justify-center items-center gap-2 text-sm"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                      Imprimir Cartão
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                      Enviar p/ Impressora PVC
+                    </button>
+
+                    {/* Botão 3: Imprimir via Navegador (fallback) */}
+                    <button 
+                      onClick={() => window.print()}
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded-lg flex justify-center items-center gap-2 text-xs font-medium transition-colors"
+                    >
+                      Imprimir pelo Navegador (Ctrl+P)
                     </button>
                   </div>
                 </div>
@@ -456,6 +498,7 @@ export default function AlunosAdmin() {
                 <div id="carteirinha-print-area" className="flex justify-center items-center">
                   {/* Cartão PVC (Proporção CR80) */}
                   <div 
+                    id="carteirinha-pvc-card"
                     className="relative bg-white shadow-2xl overflow-hidden print:shadow-none print:m-0"
                     style={{
                       width: '54mm',
