@@ -1,0 +1,16 @@
+{
+  "name": "ICAT - Instituto Catalano",
+  "short_name": "ICAT App",
+  "description": "Portal Oficial do Instituto Catalano",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2A8CFF",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

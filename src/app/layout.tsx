@@ -5,8 +5,9 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Instituto Catalano — ICAT | Transformando vidas',
-  description: 'O Instituto Catalano promove educação, esporte, cultura, assistência social e oportunidades para transformar vidas.',
+  title: 'ICAT - Instituto Catalano',
+  description: 'Sistema de Gestão Integrada do Instituto Catalano',
+  manifest: '/manifest.json',
   openGraph: {
     title: 'Instituto Catalano — ICAT',
     description: 'O Instituto Catalano promove educação, esporte, cultura, assistência social e oportunidades para transformar vidas.',
