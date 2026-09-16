@@ -24,11 +24,14 @@ export default function AlunosAdmin() {
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | null>(null);
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
   
+  const [filtroTurma, setFiltroTurma] = useState('');
+  const [filtroCurso, setFiltroCurso] = useState('');
+  const [buscaNome, setBuscaNome] = useState('');
+  
   useEffect(() => {
     async function fetchAlunos() {
-      const { data, error } = await supabase.from('alunos').select('*').order('id', { ascending: false });
+      const { data, error } = await supabase.from('alunos').select('*').order('nome', { ascending: true });
       if (data && data.length > 0) {
-        // Map DB fields to UI fields
         setAlunos(data.map(d => ({
           id: d.id, name: d.nome, course: d.curso, age: d.idade, status: d.status, whatsapp: d.whatsapp, responsavel: d.responsavel, foto: d.foto_url
         })));
@@ -101,8 +104,6 @@ export default function AlunosAdmin() {
   };
 
   const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
-  const [filtroTurma, setFiltroTurma] = useState('');
-  const [filtroCurso, setFiltroCurso] = useState('');
 
   return (
     <div className="space-y-6">
@@ -134,13 +135,19 @@ export default function AlunosAdmin() {
         <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50">
           <div className="relative w-full md:w-72">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="Buscar aluno..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-icat-green outline-none" />
+            <input 
+              type="text" 
+              placeholder="Buscar aluno por nome..." 
+              value={buscaNome}
+              onChange={e => setBuscaNome(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-icat-green outline-none" 
+            />
           </div>
           <select value={filtroCurso} onChange={e => setFiltroCurso(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm">
             <option value="">Todos os Cursos / Turmas</option>
-            <option value="Escolinha de Futebol">Escolinha de Futebol</option>
-            <option value="Ballet Infantil">Ballet Infantil</option>
-            <option value="Informática Básica">Informática Básica</option>
+            {Array.from(new Set(alunos.map(a => a.course))).filter(Boolean).sort().map(curso => (
+              <option key={curso} value={curso}>{curso}</option>
+            ))}
           </select>
         </div>
 
@@ -155,7 +162,11 @@ export default function AlunosAdmin() {
             </tr>
           </thead>
           <tbody>
-            {alunos.filter(a => a.status === 'Matriculado' && (!filtroCurso || a.course === filtroCurso)).map((a, idx) => (
+            {alunos.filter(a => 
+              a.status === 'Matriculado' && 
+              (!filtroCurso || a.course === filtroCurso) &&
+              (!buscaNome || a.name.toLowerCase().includes(buscaNome.toLowerCase()))
+            ).map((a, idx) => (
               <tr 
                 key={a.id} 
                 className={`transition-colors cursor-pointer ${idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50' : 'bg-blue-50/40 hover:bg-blue-50/70'}`}
