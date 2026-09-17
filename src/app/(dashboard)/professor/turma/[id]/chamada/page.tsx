@@ -176,7 +176,7 @@ export default function ChamadaPage({ params }: { params: { id: string } }) {
           <p className="text-gray-500 mb-8">Alunos devem utilizar o aplicativo ou a Área do Aluno para registrar presença.</p>
           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-6">
             <QRCodeSVG 
-              value={`https://icat.org.br/aluno/presenca?token=${token}`}
+              value={`https://institutocatalano.com.br/aluno/presenca?token=${token}`}
               size={280}
               level="H"
               includeMargin={true}

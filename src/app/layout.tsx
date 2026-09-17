@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Instituto Catalano — ICAT',
     description: 'O Instituto Catalano promove educação, esporte, cultura, assistência social e oportunidades para transformar vidas.',
-    url: 'https://icat.org.br',
+    url: 'https://institutocatalano.com.br',
     siteName: 'Instituto Catalano — ICAT',
     locale: 'pt_BR',
     type: 'website',

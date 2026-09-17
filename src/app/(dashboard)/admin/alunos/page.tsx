@@ -62,7 +62,7 @@ export default function AlunosAdmin() {
   }, [webcamRef, selectedAlunoId, alunos]);
 
   const handleCopyLink = () => {
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/aluno` : 'https://icat.org.br/cadastro/aluno';
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/aluno` : 'https://institutocatalano.com.br/cadastro/aluno';
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

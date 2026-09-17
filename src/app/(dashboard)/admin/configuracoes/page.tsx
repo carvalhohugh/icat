@@ -15,7 +15,7 @@ export default function ConfiguracoesAdmin() {
     pix: 'CNPJ: 00.000.000/0001-00',
     whatsapp: '5564999119610',
     contato: '(64) 3441-0000 | (64) 99999-0000',
-    email: 'contato@icat.org.br',
+    email: 'contato@institutocatalano.com.br',
     carteirinhaBg: '',
     instagram: '@icat_catalao',
     facebook: '',
@@ -279,9 +279,9 @@ export default function ConfiguracoesAdmin() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {[
-                      { nome: 'Hugo Carvalho', email: 'hugo@icat.org.br', usuario: 'hugo.admin', perfil: 'Administrador' },
+                      { nome: 'Hugo Carvalho', email: 'hugo@institutocatalano.com.br', usuario: 'hugo.admin', perfil: 'Administrador' },
                       { nome: 'Maria Silva', email: 'maria@gmail.com', usuario: 'maria.silva', perfil: 'Beneficiários' },
-                      { nome: 'João Pedro', email: 'joao.prof@icat.org.br', usuario: 'joao.prof', perfil: 'Professores' },
+                      { nome: 'João Pedro', email: 'joao.prof@institutocatalano.com.br', usuario: 'joao.prof', perfil: 'Professores' },
                     ].map((u, i) => (
                       <tr key={i} className={`hover:bg-blue-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         <td className="p-3 font-medium text-gray-900">{u.nome}</td>

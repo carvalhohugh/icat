@@ -6,7 +6,7 @@ export function PrintHeader({ title }: { title: string }) {
     cnpj: '00.000.000/0001-00',
     endereco: 'Rua das Margaridas, 123 - Centro, Catalão - GO, 75701-000',
     contato: '(64) 3441-0000 | (64) 99999-0000',
-    email: 'contato@icat.org.br'
+    email: 'contato@institutocatalano.com.br'
   });
 
   useEffect(() => {

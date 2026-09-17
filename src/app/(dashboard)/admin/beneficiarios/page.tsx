@@ -47,7 +47,7 @@ export default function BeneficiariosAdmin() {
   }, []);
 
   const handleCopyLink = () => {
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/beneficiario` : 'https://icat.org.br/cadastro/beneficiario';
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/beneficiario` : 'https://institutocatalano.com.br/cadastro/beneficiario';
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

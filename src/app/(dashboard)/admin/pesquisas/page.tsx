@@ -44,10 +44,10 @@ export default function PesquisasAdmin() {
   }, []);
 
   const [entrevistadores, setEntrevistadores] = useState<Entrevistador[]>([
-    { id: 1, nome: 'Carlos Silva', cpf: '111.111.111-11', telefone: '(64) 99900-1111', email: 'carlos@icat.org.br', senha: '123' },
-    { id: 2, nome: 'Amanda Oliveira', cpf: '222.222.222-22', telefone: '(64) 99900-2222', email: 'amanda@icat.org.br', senha: '123' },
-    { id: 3, nome: 'Roberto Santos', cpf: '333.333.333-33', telefone: '(64) 99900-3333', email: 'roberto@icat.org.br', senha: '123' },
-    { id: 4, nome: 'Fernanda Lima', cpf: '444.444.444-44', telefone: '(64) 99900-4444', email: 'fernanda@icat.org.br', senha: '123' },
+    { id: 1, nome: 'Carlos Silva', cpf: '111.111.111-11', telefone: '(64) 99900-1111', email: 'carlos@institutocatalano.com.br', senha: '123' },
+    { id: 2, nome: 'Amanda Oliveira', cpf: '222.222.222-22', telefone: '(64) 99900-2222', email: 'amanda@institutocatalano.com.br', senha: '123' },
+    { id: 3, nome: 'Roberto Santos', cpf: '333.333.333-33', telefone: '(64) 99900-3333', email: 'roberto@institutocatalano.com.br', senha: '123' },
+    { id: 4, nome: 'Fernanda Lima', cpf: '444.444.444-44', telefone: '(64) 99900-4444', email: 'fernanda@institutocatalano.com.br', senha: '123' },
   ]);
 
   const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50 });

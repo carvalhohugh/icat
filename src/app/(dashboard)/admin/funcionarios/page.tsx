@@ -18,7 +18,7 @@ export default function FuncionariosAdmin() {
   const [formData, setFormData] = useState({ name: '', role: '', department: '', perfil: '', cpf: '', whatsapp: '', address: '', foto: '' });
 
   const handleCopyLink = () => {
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/professor` : 'https://icat.org.br/cadastro/professor';
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/cadastro/professor` : 'https://institutocatalano.com.br/cadastro/professor';
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

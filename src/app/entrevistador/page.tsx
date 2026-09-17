@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { ClipboardList, LogIn } from 'lucide-react';
 
 const MOCK_ENTREVISTADORES = [
-  { id: 1, nome: 'Carlos Silva', email: 'carlos@icat.org.br', senha: '123' },
-  { id: 2, nome: 'Amanda Oliveira', email: 'amanda@icat.org.br', senha: '123' },
-  { id: 3, nome: 'Roberto Santos', email: 'roberto@icat.org.br', senha: '123' },
-  { id: 4, nome: 'Fernanda Lima', email: 'fernanda@icat.org.br', senha: '123' },
+  { id: 1, nome: 'Carlos Silva', email: 'carlos@institutocatalano.com.br', senha: '123' },
+  { id: 2, nome: 'Amanda Oliveira', email: 'amanda@institutocatalano.com.br', senha: '123' },
+  { id: 3, nome: 'Roberto Santos', email: 'roberto@institutocatalano.com.br', senha: '123' },
+  { id: 4, nome: 'Fernanda Lima', email: 'fernanda@institutocatalano.com.br', senha: '123' },
 ];
 
 export default function EntrevistadorLogin() {

@@ -31,7 +31,7 @@ export default function EventosAdmin() {
   const [copiedEventId, setCopiedEventId] = useState<number | null>(null);
 
   const handleCopyLink = (id: number) => {
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/evento/${id}` : `https://icat.org.br/evento/${id}`;
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/evento/${id}` : `https://institutocatalano.com.br/evento/${id}`;
     navigator.clipboard.writeText(url);
     setCopiedEventId(id);
     setTimeout(() => setCopiedEventId(null), 2000);

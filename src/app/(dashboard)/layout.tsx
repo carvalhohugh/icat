@@ -388,7 +388,7 @@ export default function DashboardLayout({
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-gray-700 mb-1">E-mail</label>
-                          <input type="email" defaultValue="admin@icat.org.br" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" />
+                          <input type="email" defaultValue="admin@institutocatalano.com.br" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" />
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-gray-700 mb-1">Nova Senha</label>
