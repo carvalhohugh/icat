@@ -7,12 +7,14 @@ export default function CursosAdmin() {
   
   // Estado interativo para a lista
   const [cursos, setCursos] = useState([
-    { id: 1, title: 'Escolinha de Vôlei', cost: 0, vacancies: 30, status: 'Ativo' },
-    { id: 2, title: 'Escola de Futebol', cost: 0, vacancies: 45, status: 'Ativo' },
-    { id: 3, title: 'Escola de Desenho e Pintura', cost: 0, vacancies: 20, status: 'Ativo' },
-    { id: 4, title: 'Escola de Música - Violão', cost: 0, vacancies: 15, status: 'Ativo' },
-    { id: 5, title: 'Escola de Música - Teclado', cost: 0, vacancies: 10, status: 'Ativo' },
-    { id: 6, title: 'Aula de Canto', cost: 0, vacancies: 20, status: 'Ativo' },
+    { id: 1, title: 'Inclusão Digital para Jovens e Adultos', cost: 0, vacancies: 30, status: 'Ativo' },
+    { id: 2, title: 'Informática para Comunidades Rurais', cost: 0, vacancies: 25, status: 'Ativo' },
+    { id: 3, title: 'Informática Kids / Educação Tecnológica', cost: 0, vacancies: 20, status: 'Ativo' },
+    { id: 4, title: 'Laboratório de Robótica Maker', cost: 0, vacancies: 15, status: 'Ativo' },
+    { id: 5, title: 'Escolinha de Vôlei', cost: 0, vacancies: 30, status: 'Ativo' },
+    { id: 6, title: 'Escola de Futebol', cost: 0, vacancies: 45, status: 'Ativo' },
+    { id: 7, title: 'Escola de Desenho e Pintura', cost: 0, vacancies: 20, status: 'Ativo' },
+    { id: 8, title: 'Escola de Música - Violão', cost: 0, vacancies: 15, status: 'Ativo' },
   ]);
 
   // Estado do formulário
