@@ -6,8 +6,11 @@ export default function ProjetosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [projetos, setProjetos] = useState([
-    { id: 1, title: 'Atleta do Futuro', area: 'Esporte', status: 'Ativo' },
-    { id: 2, title: 'Cesta Solidária', area: 'Assistência Social', status: 'Ativo' },
+    { id: 1, title: 'Aula de reforço para ensino fundamental', area: 'Educação e Formação', status: 'Ativo' },
+    { id: 2, title: 'ENEM EM FOCO (Ensino médio / UF)', area: 'Educação e Formação', status: 'Ativo' },
+    { id: 3, title: 'Escola de Filosofia para a Vida', area: 'Educação e Formação', status: 'Ativo' },
+    { id: 4, title: 'Atleta do Futuro', area: 'Esporte e Inclusão', status: 'Ativo' },
+    { id: 5, title: 'Cesta Solidária', area: 'Assistência Social', status: 'Ativo' },
   ]);
 
   const [formData, setFormData] = useState({ title: '', area: '', desc: '' });

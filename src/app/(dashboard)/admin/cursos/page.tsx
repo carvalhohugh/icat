@@ -7,8 +7,12 @@ export default function CursosAdmin() {
   
   // Estado interativo para a lista
   const [cursos, setCursos] = useState([
-    { id: 1, title: 'Ballet Infantil', cost: 0, vacancies: 30, status: 'Ativo' },
-    { id: 2, title: 'Escolinha de Futebol', cost: 50, vacancies: 45, status: 'Ativo' },
+    { id: 1, title: 'Escolinha de Vôlei', cost: 0, vacancies: 30, status: 'Ativo' },
+    { id: 2, title: 'Escola de Futebol', cost: 0, vacancies: 45, status: 'Ativo' },
+    { id: 3, title: 'Escola de Desenho e Pintura', cost: 0, vacancies: 20, status: 'Ativo' },
+    { id: 4, title: 'Escola de Música - Violão', cost: 0, vacancies: 15, status: 'Ativo' },
+    { id: 5, title: 'Escola de Música - Teclado', cost: 0, vacancies: 10, status: 'Ativo' },
+    { id: 6, title: 'Aula de Canto', cost: 0, vacancies: 20, status: 'Ativo' },
   ]);
 
   // Estado do formulário
