@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye, FileText } from 'lucide-react';
 
 export default function EventosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
