@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building, DollarSign, ClipboardList } from 'lucide-react';
+import { Users, BookOpen, Settings, LogOut, Package, Heart, LayoutDashboard, Bell, Menu, X, Check, AlertTriangle, Info, Building, DollarSign, ClipboardList, CalendarDays } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -54,10 +54,16 @@ export default function DashboardLayout({
               </Link>
             )}
             {['admin', 'professor'].includes(currentRole) && (
-              <Link href="/admin/projetos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
-                <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-                Projetos
-              </Link>
+              <>
+                <Link href="/admin/projetos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <BookOpen className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Projetos
+                </Link>
+                <Link href="/admin/eventos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
+                  <CalendarDays className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
+                  Eventos e Galerias
+                </Link>
+              </>
             )}
             {['admin', 'professor', 'secretaria'].includes(currentRole) && (
               <Link href="/admin/cursos" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
@@ -172,9 +178,14 @@ export default function DashboardLayout({
                   </Link>
                 )}
                 {['admin', 'professor'].includes(currentRole) && (
-                  <Link href="/admin/projetos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                    <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Projetos
-                  </Link>
+                  <>
+                    <Link href="/admin/projetos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <BookOpen className="mr-3 h-5 w-5 text-gray-400" /> Projetos
+                    </Link>
+                    <Link href="/admin/eventos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
+                      <CalendarDays className="mr-3 h-5 w-5 text-gray-400" /> Eventos e Galerias
+                    </Link>
+                  </>
                 )}
                 {['admin', 'professor', 'secretaria'].includes(currentRole) && (
                   <Link href="/admin/cursos" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">

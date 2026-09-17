@@ -20,7 +20,7 @@ export default function BeneficiariosAdmin() {
     name: '', cpf: '', birthdate: '', dependents: '', income: '', whatsapp: '',
     cep: '', logradouro: '', bairro: '', cidade: '', uf: '',
     maritalStatus: 'Solteiro(a)', spouseName: '', spouseBirthdate: '',
-    hasChildren: 'Não'
+    hasChildren: 'Não', foto: ''
   });
 
   const [childrenList, setChildrenList] = useState<{name: string, birthdate: string}[]>([]);
@@ -81,7 +81,7 @@ export default function BeneficiariosAdmin() {
     const depCount = formData.hasChildren === 'Sim' ? childrenList.length : (parseInt(formData.dependents) || 0);
     setBeneficiarios([
       ...beneficiarios,
-      { id: nextId, name: formData.name, dependents: depCount, neighborhood: formData.bairro || 'Não informado', status: 'Aprovado' }
+      { id: nextId, name: formData.name, dependents: depCount, neighborhood: formData.bairro || 'Não informado', status: 'Aprovado', foto: formData.foto }
     ]);
     
     await supabase.from('beneficiarios').insert([{
@@ -90,7 +90,7 @@ export default function BeneficiariosAdmin() {
       whatsapp: formData.whatsapp
     }]);
 
-    setFormData({ name: '', cpf: '', birthdate: '', dependents: '', income: '', whatsapp: '', cep: '', logradouro: '', bairro: '', cidade: '', uf: '', maritalStatus: 'Solteiro(a)', spouseName: '', spouseBirthdate: '', hasChildren: 'Não' });
+    setFormData({ name: '', cpf: '', birthdate: '', dependents: '', income: '', whatsapp: '', cep: '', logradouro: '', bairro: '', cidade: '', uf: '', maritalStatus: 'Solteiro(a)', spouseName: '', spouseBirthdate: '', hasChildren: 'Não', foto: '' });
     setChildrenList([]);
     setIsModalOpen(false);
   };
@@ -195,15 +195,44 @@ export default function BeneficiariosAdmin() {
             <div className="p-6 overflow-y-auto space-y-4 max-h-[70vh]">
               
               <h3 className="font-semibold text-gray-800 border-b pb-2 mb-4">Dados Pessoais</h3>
+              <div className="flex flex-col md:flex-row gap-6 mb-4">
+                <div className="w-32 h-32 bg-gray-100 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all relative overflow-hidden group shrink-0 mx-auto md:mx-0">
+                  {formData.foto ? (
+                    <img src={formData.foto} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <Camera className="w-6 h-6 mb-1 group-hover:text-icat-green" />
+                      <span className="text-xs text-center px-2">Adicionar<br/>Foto</span>
+                    </>
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    capture="user" 
+                    className="absolute inset-0 opacity-0 cursor-pointer" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => setFormData({...formData, foto: e.target?.result as string});
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </div>
+                
+                <div className="flex-1 grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Responsável</label>
+                    <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento <span className="text-gray-400 font-normal">{calculateAge(formData.birthdate)}</span></label>
+                    <input type="date" value={formData.birthdate} onChange={e => setFormData({...formData, birthdate: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  </div>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Responsável</label>
-                  <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
-                </div>
-                <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento <span className="text-gray-400 font-normal">{calculateAge(formData.birthdate)}</span></label>
-                  <input type="date" value={formData.birthdate} onChange={e => setFormData({...formData, birthdate: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
-                </div>
                 <div className="col-span-2 md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">CPF</label>
                   <input type="text" value={formData.cpf} onChange={e => setFormData({...formData, cpf: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="000.000.000-00" />
