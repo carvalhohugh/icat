@@ -59,7 +59,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-gray-900 mb-2">Nossa Missão</h4>
-                    <p className="text-gray-600 leading-relaxed">Promover cidadania, dignidade e inclusão social através de ações que fortaleçam famílias e territórios, ampliando oportunidades.</p>
+                    <p className="text-gray-600 leading-relaxed text-justify">Promover cidadania, dignidade e inclusão social através de ações que fortaleçam famílias e territórios, ampliando oportunidades.</p>
                   </div>
                 </div>
                 
@@ -69,7 +69,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-gray-900 mb-2">Nossa Visão</h4>
-                    <p className="text-gray-600 leading-relaxed">Ser referência no Sudeste Goiano na promoção da cidadania e desenvolvimento, garantindo que as pessoas tenham acesso a condições para transformar suas histórias.</p>
+                    <p className="text-gray-600 leading-relaxed text-justify">Ser referência no Sudeste Goiano na promoção da cidadania e desenvolvimento, garantindo que as pessoas tenham acesso a condições para transformar suas histórias.</p>
                   </div>
                 </div>
               </div>

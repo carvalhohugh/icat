@@ -164,22 +164,22 @@ export default function EventosAdmin() {
                 <div className="flex-1 space-y-4">
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">Foto da Capa (Thumbnail)</label>
-                    <div className="h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all relative overflow-hidden group w-48">
+                    <div className="h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all relative overflow-hidden group w-48 text-center p-2">
                       {formData.cover ? (
                         <img src={formData.cover} className="w-full h-full object-cover" />
                       ) : (
-                        <><ImageIcon className="w-8 h-8 mb-2 group-hover:text-icat-green" /><span className="text-xs font-semibold">Upload Capa</span></>
+                        <><ImageIcon className="w-8 h-8 mb-2 group-hover:text-icat-green" /><span className="text-xs font-semibold">Upload Capa<br/>(800x800px)</span></>
                       )}
                       <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handlePhotoUpload(e, 'cover')} />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">Banner do Evento (Largo)</label>
-                    <div className="h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all relative overflow-hidden group w-full">
+                    <div className="h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:border-icat-green transition-all relative overflow-hidden group w-full text-center p-2">
                       {formData.banner ? (
                         <img src={formData.banner} className="w-full h-full object-cover" />
                       ) : (
-                        <><ImageIcon className="w-8 h-8 mb-2 group-hover:text-icat-green" /><span className="text-xs font-semibold">Upload Banner</span></>
+                        <><ImageIcon className="w-8 h-8 mb-2 group-hover:text-icat-green" /><span className="text-xs font-semibold">Upload Banner<br/>(1920x1080px)</span></>
                       )}
                       <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handlePhotoUpload(e, 'banner')} />
                     </div>

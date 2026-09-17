@@ -106,11 +106,16 @@ export default function ClubeVantagensAdmin() {
                 <div className="flex-1 space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Selecione a Empresa Parceira</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
-                      <option value="">Selecione...</option>
-                      <option value="1">Farmácia Preço Baixo</option>
-                      <option value="2">Supermercado Bretas</option>
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
+                        <option>Farmácia Preço Baixo</option>
+                        <option>Supermercado Bretas</option>
+                        <option>Papelaria Central</option>
+                      </select>
+                      <button className="p-2 bg-gray-100 hover:bg-icat-green hover:text-white text-gray-600 rounded-lg transition-colors" title="Cadastrar nova empresa" onClick={() => alert('Abrir modal de Nova Empresa (Atalho)')}>
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Título do Desconto</label>

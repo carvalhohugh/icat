@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { Heart, Package, MessageCircle, Edit2, Plus, Users, CheckCircle2, Clock, X, Trash2, DollarSign, CreditCard, LogOut, Home, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Heart, Package, MessageCircle, Edit2, Plus, Users, CheckCircle2, Clock, X, Trash2, DollarSign, CreditCard, LogOut, Home, FileText, Briefcase, Building2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 function validarCPF(cpf: string) {
@@ -41,6 +41,20 @@ export default function BeneficiarioDashboard() {
     { name: 'Cesta Básica', status: 'Liberado', next: 'Retirar até 15/09' },
     { name: 'Kit Material Escolar', status: 'Pendente', next: 'Aguardando análise' },
   ];
+
+  const [oportunidades, setOportunidades] = useState<any[]>([]);
+
+  // Carregar oportunidades do Mural SINE
+  useEffect(() => {
+    fetch('/api/oportunidades/sync')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.vagas) {
+          setOportunidades(data.vagas);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const calcAge = (d: string) => {
     if (!d) return '';
@@ -166,6 +180,38 @@ export default function BeneficiarioDashboard() {
                 <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full mt-1 inline-block">Pago</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Mural de Oportunidades (Projeto Recomeço) */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-gray-900 flex items-center gap-2"><Briefcase className="w-5 h-5 text-icat-yellow" /> Mural de Oportunidades (Projeto Recomeço)</h2>
+            <span className="text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Atualizado do SINE Catalão</span>
+          </div>
+          
+          <div className="space-y-4">
+            {oportunidades.map((vaga, i) => (
+              <div key={i} className="border border-gray-100 rounded-lg p-4 bg-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-gray-900">{vaga.titulo}</h3>
+                    <span className="bg-green-100 text-green-700 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">{vaga.tipo}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 flex items-center gap-1"><Building2 className="w-3.5 h-3.5" /> {vaga.empresa} • {vaga.local}</p>
+                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> Requisitos: {vaga.requisitos}</p>
+                </div>
+                <div className="shrink-0 text-center">
+                  <span className="block text-[10px] text-green-600 font-bold mb-1">✓ PERFIL COMPATÍVEL</span>
+                  <button className="bg-icat-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors">
+                    Demonstrar Interesse
+                  </button>
+                </div>
+              </div>
+            ))}
+            {oportunidades.length === 0 && (
+              <div className="text-center py-6 text-gray-400">Nenhuma oportunidade disponível no momento.</div>
+            )}
           </div>
         </div>
 

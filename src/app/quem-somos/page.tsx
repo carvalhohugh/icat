@@ -12,6 +12,7 @@ export default function QuemSomos() {
     { title: 'Solidariedade', desc: 'Fortalecer vínculos entre pessoas, famílias e comunidades.' },
     { title: 'Desenvolvimento Comunitário', desc: 'Estimular iniciativas capazes de melhorar os territórios em Catalão.' },
     { title: 'Diversidade e Respeito', desc: 'Valorizar as diferenças, a convivência e o respeito entre pessoas.' },
+    { title: 'Inovação Social', desc: 'Buscar novas formas, métodos e parcerias para ampliar o impacto positivo na comunidade.' }
   ];
 
   return (
@@ -25,7 +26,7 @@ export default function QuemSomos() {
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-8 leading-tight">
             Uma associação civil que existe para gerar oportunidades
           </h1>
-          <div className="prose prose-lg text-gray-600">
+          <div className="prose prose-lg text-gray-600 text-justify">
             <p className="mb-6">
               O <strong>Instituto Catalano (ICAT)</strong> é uma associação privada sem fins lucrativos, sediada no Sudeste Goiano (Catalão), que desenvolve ações de interesse social, assistencial, educacional, cultural, esportivo e comunitário.
             </p>
@@ -42,7 +43,7 @@ export default function QuemSomos() {
               <Target className="w-7 h-7 text-icat-blue" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Missão</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed text-justify">
               Promover cidadania, dignidade e inclusão social por meio de ações socioassistenciais, educacionais, culturais, esportivas e comunitárias que fortaleçam pessoas, famílias e territórios, ampliando oportunidades e contribuindo para uma sociedade mais justa, participativa e solidária em Catalão e região.
             </p>
           </div>
@@ -52,7 +53,7 @@ export default function QuemSomos() {
               <Sun className="w-7 h-7 text-icat-yellow" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Visão</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed text-justify">
               Ser reconhecido como uma organização social de referência na promoção da cidadania, da inclusão e do desenvolvimento comunitário, contribuindo para que pessoas em diferentes fases da vida tenham acesso a oportunidades, direitos e condições para transformar suas próprias histórias.
             </p>
           </div>
