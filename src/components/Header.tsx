@@ -19,6 +19,7 @@ export function Header() {
             <Link href="/quem-somos" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">QUEM SOMOS</Link>
             <Link href="/areas-de-atuacao" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">ÁREAS DE ATUAÇÃO</Link>
             <Link href="/cursos" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">CURSOS</Link>
+            <Link href="/oportunidades" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">VAGAS</Link>
             <Link href="/#projetos" className="text-gray-600 hover:text-icat-green font-medium text-sm tracking-wide">PROJETOS</Link>
             <Link href="/clube-de-vantagens" className="text-gray-600 hover:text-icat-yellow font-medium text-sm tracking-wide">CLUBE</Link>
             <Link href="/#enquetes" className="text-icat-blue hover:text-blue-700 font-bold text-sm tracking-wide">ENQUETES</Link>
@@ -49,6 +50,7 @@ export function Header() {
             <Link onClick={() => setIsOpen(false)} href="/quem-somos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">QUEM SOMOS</Link>
             <Link onClick={() => setIsOpen(false)} href="/areas-de-atuacao" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">ÁREAS DE ATUAÇÃO</Link>
             <Link onClick={() => setIsOpen(false)} href="/cursos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">CURSOS</Link>
+            <Link onClick={() => setIsOpen(false)} href="/oportunidades" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">VAGAS</Link>
             <Link onClick={() => setIsOpen(false)} href="/#projetos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-green hover:bg-gray-50">PROJETOS</Link>
             <Link onClick={() => setIsOpen(false)} href="/clube-de-vantagens" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-icat-yellow hover:bg-gray-50">CLUBE</Link>
             <Link onClick={() => setIsOpen(false)} href="/#enquetes" className="block px-3 py-2 rounded-md text-base font-bold text-icat-blue hover:text-blue-700 hover:bg-blue-50">ENQUETES</Link>
