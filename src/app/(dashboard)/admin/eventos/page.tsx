@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check } from 'lucide-react';
 
 export default function EventosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +24,15 @@ export default function EventosAdmin() {
   const [formData, setFormData] = useState({
     title: '', date: '', time: '', location: '', speakers: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: ''
   });
+
+  const [copiedEventId, setCopiedEventId] = useState<number | null>(null);
+
+  const handleCopyLink = (id: number) => {
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/evento/${id}` : `https://icat.org.br/evento/${id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedEventId(id);
+    setTimeout(() => setCopiedEventId(null), 2000);
+  };
 
   const [galleryMode, setGalleryMode] = useState<{isOpen: boolean, eventId: number | null}>({ isOpen: false, eventId: null });
   const [selectedGalleryFiles, setSelectedGalleryFiles] = useState<{url: string, type: 'image'|'video', title: string}[]>([]);
@@ -119,7 +128,10 @@ export default function EventosAdmin() {
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${ev.status === 'Realizado' ? 'bg-green-50 text-icat-green' : 'bg-blue-50 text-icat-blue'}`}>{ev.status}</span>
                 </td>
-                <td className="p-4 text-right space-x-2">
+                <td className="p-4 text-right space-x-1">
+                  <button onClick={() => handleCopyLink(ev.id)} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Copiar Link Público">
+                    {copiedEventId === ev.id ? <Check className="w-4 h-4 text-icat-green" /> : <LinkIcon className="w-4 h-4" />}
+                  </button>
                   <button onClick={() => openGallery(ev.id)} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Gerenciar Galeria (Mídia)">
                     <ImageIcon className="w-4 h-4" />
                   </button>

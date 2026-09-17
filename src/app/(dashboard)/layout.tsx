@@ -91,9 +91,13 @@ export default function DashboardLayout({
             )}
             {['admin', 'assistencia'].includes(currentRole) && (
               <>
+                <Link href="/admin/recomeco" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group bg-green-50 border border-green-100 mb-1">
+                  <Heart className="mr-3 h-5 w-5 text-icat-green group-hover:text-icat-green" />
+                  <span className="font-semibold text-icat-green">Projeto Recomeço</span>
+                </Link>
                 <Link href="/admin/beneficiarios" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
                   <Heart className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
-                  Assistência Social
+                  Assistência (Cestas)
                 </Link>
                 <Link href="/admin/estoque" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green group">
                   <Package className="mr-3 h-5 w-5 text-gray-400 group-hover:text-icat-green" />
@@ -209,8 +213,11 @@ export default function DashboardLayout({
                 )}
                 {['admin', 'assistencia'].includes(currentRole) && (
                   <>
+                    <Link href="/admin/recomeco" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-icat-green font-semibold bg-green-50 border border-green-100 rounded-md mb-1">
+                      <Heart className="mr-3 h-5 w-5 text-icat-green" /> Projeto Recomeço
+                    </Link>
                     <Link href="/admin/beneficiarios" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
-                      <Heart className="mr-3 h-5 w-5 text-gray-400" /> Assistência Social
+                      <Heart className="mr-3 h-5 w-5 text-gray-400" /> Assistência (Cestas)
                     </Link>
                     <Link href="/admin/estoque" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-icat-gray-light hover:text-icat-green">
                       <Package className="mr-3 h-5 w-5 text-gray-400" /> Benefícios e Estoque
