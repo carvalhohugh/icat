@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Search, Plus, Filter, Edit2, Trash2, Heart, Users, FileText, CheckCircle, Copy, Check, ClipboardEdit, X, Download } from 'lucide-react';
+import { Search, Plus, Filter, Edit2, Trash2, Heart, Users, FileText, CheckCircle, Copy, Check, ClipboardEdit, X, Download, Camera } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase';
 

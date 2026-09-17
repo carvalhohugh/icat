@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye } from 'lucide-react';
 
 export default function EventosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,19 +11,22 @@ export default function EventosAdmin() {
       date: '2026-06-20',
       time: '08:00',
       location: 'Praça Central',
-      speakers: 'Dr. Marcos (Palestrante Principal)',
+      speakers: [{ name: 'Dr. Marcos', role: 'Palestrante Principal', photo: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=200&auto=format&fit=crop' }],
       participants: '300+',
       sponsors: 'Supermercado ABC, Farmácia Central',
       status: 'Realizado',
       cover: '',
       banner: '',
-      gallery: []
+      gallery: [],
+      views: 1245,
+      registrations: 312
     }
   ]);
 
   const [formData, setFormData] = useState({
-    title: '', date: '', time: '', location: '', speakers: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: ''
+    title: '', date: '', time: '', location: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: ''
   });
+  const [formSpeakers, setFormSpeakers] = useState<{name: string, role: string, photo: string}[]>([{name: '', role: '', photo: ''}]);
 
   const [copiedEventId, setCopiedEventId] = useState<number | null>(null);
 
@@ -40,9 +43,10 @@ export default function EventosAdmin() {
   const handleSave = () => {
     if (!formData.title) return;
     const nextId = eventos.length > 0 ? Math.max(...eventos.map(e => e.id)) + 1 : 1;
-    const newEvent = { ...formData, id: nextId, gallery: [] };
+    const newEvent = { ...formData, speakers: formSpeakers, id: nextId, gallery: [], views: 0, registrations: 0 };
     setEventos([newEvent, ...eventos]);
-    setFormData({ title: '', date: '', time: '', location: '', speakers: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: '' });
+    setFormData({ title: '', date: '', time: '', location: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: '' });
+    setFormSpeakers([{name: '', role: '', photo: ''}]);
     setIsModalOpen(false);
   };
 
@@ -101,6 +105,8 @@ export default function EventosAdmin() {
             <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase bg-white">
               <th className="p-4 font-semibold">Evento / Capa</th>
               <th className="p-4 font-semibold">Data e Hora</th>
+              <th className="p-4 font-semibold">Palestrantes</th>
+              <th className="p-4 font-semibold">Métricas (Participantes)</th>
               <th className="p-4 font-semibold">Patrocinadores</th>
               <th className="p-4 font-semibold">Status</th>
               <th className="p-4 font-semibold text-right">Ações</th>
@@ -122,13 +128,32 @@ export default function EventosAdmin() {
                 </td>
                 <td className="p-4">
                   <p className="text-gray-900 font-medium flex items-center gap-1"><CalendarDays className="w-4 h-4 text-gray-400"/> {ev.date.split('-').reverse().join('/')}</p>
-                  <p className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3"/> {ev.time}</p>
+                  <p className="text-gray-500 text-sm flex items-center gap-1"><Clock className="w-4 h-4 text-gray-400"/> {ev.time}</p>
+                </td>
+                <td className="p-4">
+                  <div className="flex items-center gap-1.5 flex-wrap max-w-xs">
+                    {ev.speakers && typeof ev.speakers === 'object' ? ev.speakers.map((s: any, idx: number) => (
+                      <span key={idx} className="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-md flex items-center gap-1">
+                        {s.photo && <img src={s.photo} className="w-4 h-4 rounded-full object-cover" />}
+                        {s.name}
+                      </span>
+                    )) : <span className="text-gray-500 text-sm">Sem palestrantes</span>}
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-gray-900"><Users className="w-4 h-4 inline text-icat-blue mr-1"/> {ev.registrations} <span className="text-gray-400 text-xs">inscritos</span></span>
+                    <span className="text-sm font-medium text-gray-900"><Eye className="w-4 h-4 inline text-gray-400 mr-1"/> {ev.views} <span className="text-gray-400 text-xs">views</span></span>
+                  </div>
                 </td>
                 <td className="p-4 text-gray-600 text-sm">{ev.sponsors || '-'}</td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${ev.status === 'Realizado' ? 'bg-green-50 text-icat-green' : 'bg-blue-50 text-icat-blue'}`}>{ev.status}</span>
                 </td>
                 <td className="p-4 text-right space-x-1">
+                  <button onClick={() => alert(`Relatório do Evento:\nVisualizações: ${ev.views}\nInscritos: ${ev.registrations}`)} className="p-2 text-gray-400 hover:text-icat-yellow transition-colors rounded-lg hover:bg-yellow-50" title="Ver Relatório de Desempenho">
+                    <FileText className="w-4 h-4" />
+                  </button>
                   <button onClick={() => handleCopyLink(ev.id)} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Copiar Link Público">
                     {copiedEventId === ev.id ? <Check className="w-4 h-4 text-icat-green" /> : <LinkIcon className="w-4 h-4" />}
                   </button>
@@ -203,9 +228,36 @@ export default function EventosAdmin() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Local</label>
                     <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Praça Central, Sede do ICAT..." />
                   </div>
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Palestrantes / Convidados</label>
-                    <input type="text" value={formData.speakers} onChange={e => setFormData({...formData, speakers: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Palestrantes / Convidados</label>
+                    <div className="space-y-3">
+                      {formSpeakers.map((speaker, i) => (
+                        <div key={i} className="flex gap-2 items-start bg-gray-50 p-3 rounded-lg border border-gray-100">
+                          <div className="w-16 h-16 rounded-full bg-gray-200 shrink-0 overflow-hidden relative cursor-pointer border border-gray-300">
+                            {speaker.photo ? <img src={speaker.photo} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon className="w-6 h-6"/></div>}
+                            <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if(file) {
+                                const url = URL.createObjectURL(file);
+                                const newS = [...formSpeakers];
+                                newS[i].photo = url;
+                                setFormSpeakers(newS);
+                              }
+                            }} />
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <input type="text" value={speaker.name} onChange={e => { const newS = [...formSpeakers]; newS[i].name = e.target.value; setFormSpeakers(newS); }} className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Nome do Palestrante" />
+                            <input type="text" value={speaker.role} onChange={e => { const newS = [...formSpeakers]; newS[i].role = e.target.value; setFormSpeakers(newS); }} className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Cargo ou Título (Ex: Especialista em RH)" />
+                          </div>
+                          {formSpeakers.length > 1 && (
+                            <button onClick={() => setFormSpeakers(formSpeakers.filter((_, idx) => idx !== i))} className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50">
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button onClick={() => setFormSpeakers([...formSpeakers, {name: '', role: '', photo: ''}])} className="text-sm font-semibold text-icat-green flex items-center gap-1 hover:underline"><Plus className="w-4 h-4"/> Adicionar Palestrante</button>
+                    </div>
                   </div>
                   <div className="col-span-2 md:col-span-1">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Público Estimado (Participantes)</label>
