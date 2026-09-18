@@ -22,20 +22,36 @@ export default function ProjetosAdmin() {
   }, []);
 
   const [formData, setFormData] = useState({ title: '', area: '', desc: '' });
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const handleSave = () => {
     if (!formData.title) return;
-    const newProj = {
-      id: Date.now(),
-      title: formData.title,
-      area: formData.area || 'Geral',
-      desc: formData.desc || 'Descrição do projeto.',
-    };
-    const updated = [newProj, ...projetos];
+    
+    let updated;
+    if (editingId) {
+      updated = projetos.map(p => p.id === editingId ? { ...p, title: formData.title, area: formData.area || 'Geral', desc: formData.desc || 'Descrição do projeto.' } : p);
+    } else {
+      const newProj = {
+        id: Date.now(),
+        title: formData.title,
+        area: formData.area || 'Geral',
+        desc: formData.desc || 'Descrição do projeto.',
+        status: 'Ativo'
+      };
+      updated = [newProj, ...projetos];
+    }
+    
     setProjetos(updated);
     localStorage.setItem('icat_projetos', JSON.stringify(updated));
     setFormData({ title: '', area: '', desc: '' });
+    setEditingId(null);
     setIsModalOpen(false);
+  };
+
+  const handleOpenEdit = (p: any) => {
+    setFormData({ title: p.title, area: p.area, desc: p.desc || '' });
+    setEditingId(p.id);
+    setIsModalOpen(true);
   };
 
   return (
@@ -45,7 +61,11 @@ export default function ProjetosAdmin() {
           <h1 className="text-2xl font-bold text-gray-900">Gestão de Projetos</h1>
           <p className="text-gray-500 text-sm mt-1">Crie e gerencie os grandes projetos do ICAT.</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center">
+        <button onClick={() => {
+          setEditingId(null);
+          setFormData({ title: '', area: '', desc: '' });
+          setIsModalOpen(true);
+        }} className="btn-primary flex items-center">
           <Plus className="w-5 h-5 mr-2" />
           Novo Projeto
         </button>
@@ -69,7 +89,7 @@ export default function ProjetosAdmin() {
               <th className="p-4 font-semibold">Nome do Projeto</th>
               <th className="p-4 font-semibold">Área de Atuação</th>
               <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold text-right">Ações</th>
+              <th className="p-4 font-semibold text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -82,25 +102,27 @@ export default function ProjetosAdmin() {
                 <td className="p-4">
                   <span className={`${p.status === 'Ativo' ? 'bg-green-50 text-icat-green' : 'bg-red-50 text-red-600'} px-2 py-1 rounded-full text-xs font-semibold`}>{p.status}</span>
                 </td>
-                <td className="p-4 text-right space-x-2">
-                  {p.status === 'Ativo' ? (
-                    <button onClick={() => setProjetos(projetos.map(x => x.id === p.id ? { ...x, status: 'Suspenso' } : x))} className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50" title="Suspender">
-                      <span className="text-xs font-bold mr-1">Suspender</span>
+                <td className="p-4">
+                  <div className="flex items-center justify-center space-x-2">
+                    {p.status === 'Ativo' ? (
+                      <button onClick={() => setProjetos(projetos.map(x => x.id === p.id ? { ...x, status: 'Suspenso' } : x))} className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50" title="Suspender">
+                        <span className="text-xs font-bold mr-1">Suspender</span>
+                      </button>
+                    ) : (
+                      <button onClick={() => setProjetos(projetos.map(x => x.id === p.id ? { ...x, status: 'Ativo' } : x))} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Ativar">
+                        <span className="text-xs font-bold mr-1">Ativar</span>
+                      </button>
+                    )}
+                    <a href={`/cadastro/aluno?curso=${p.id}`} target="_blank" rel="noreferrer" className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50 inline-block" title="Link de Inscrição">
+                      <span className="text-xs font-bold">Link Inscrição</span>
+                    </a>
+                    <button onClick={() => handleOpenEdit(p)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
+                      <Edit2 className="w-4 h-4" />
                     </button>
-                  ) : (
-                    <button onClick={() => setProjetos(projetos.map(x => x.id === p.id ? { ...x, status: 'Ativo' } : x))} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Ativar">
-                      <span className="text-xs font-bold mr-1">Ativar</span>
+                    <button onClick={() => setProjetos(projetos.filter(x => x.id !== p.id))} className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                      <Trash2 className="w-4 h-4" />
                     </button>
-                  )}
-                  <a href={`/cadastro/aluno?curso=${p.id}`} target="_blank" rel="noreferrer" className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50 inline-block" title="Link de Inscrição">
-                    <span className="text-xs font-bold">Link Inscrição</span>
-                  </a>
-                  <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setProjetos(projetos.filter(x => x.id !== p.id))} className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -113,7 +135,7 @@ export default function ProjetosAdmin() {
           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">Cadastrar Projeto</h2>
+              <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Editar Projeto' : 'Cadastrar Projeto'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">&times;</button>
             </div>
             
