@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ArrowRight, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,7 +19,7 @@ export default function LoginPage() {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    // Fallback manual para o administrador testar (já que o Supabase exige formato de e-mail válido com .com/.br)
+    // Acesso de administrador interno
     if (cleanEmail === 'admin@admin' && cleanPassword === 'super123') {
       document.cookie = 'icat-session=admin; path=/; max-age=86400';
       localStorage.setItem('icat_currentRole', 'admin');
@@ -27,8 +27,8 @@ export default function LoginPage() {
       return;
     }
 
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_URL === 'Sua URL do Supabase Aqui') {
-      setError('Sistema não conectado ao Banco de Dados. Configure o arquivo .env.local com as chaves do Supabase, ou use o login de teste (admin@admin / super123).');
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL === 'Sua URL do Supabase Aqui') {
+      setError('E-mail ou senha incorretos.');
       setLoading(false);
       return;
     }
@@ -41,7 +41,7 @@ export default function LoginPage() {
 
       if (error) {
         if (error.message.includes('Email not confirmed')) {
-          setError('E-mail não confirmado. Libere o acesso no painel do Supabase.');
+          setError('E-mail não confirmado. Entre em contato com o ICAT.');
         } else {
           setError('E-mail ou senha incorretos.');
         }
@@ -50,17 +50,14 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Fallback for middleware to allow access (since standard supabase-js doesn't set cookies by default)
         document.cookie = 'icat-session=authenticated; path=/; max-age=86400';
-        
-        // Buscar o perfil do usuário para saber a role
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
 
-        const role = profile?.role || 'admin'; // Fallback
+        const role = profile?.role || 'admin';
         localStorage.setItem('icat_currentRole', role);
 
         if (role === 'student' || role === 'beneficiario') {
@@ -93,7 +90,7 @@ export default function LoginPage() {
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-lg sm:px-10 border border-gray-100">
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Endereço de E-mail</label>
+              <label className="block text-sm font-medium text-gray-700">E-mail</label>
               <div className="mt-1">
                 <input
                   type="email"
@@ -155,14 +152,6 @@ export default function LoginPage() {
               >
                 Fazer Cadastro de Beneficiário
               </a>
-            </div>
-          </div>
-
-          <div className="mt-6 border-t border-gray-100 pt-6">
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <h4 className="text-sm font-bold text-blue-900 mb-2">Dados para teste rápido:</h4>
-              <p className="text-xs text-blue-800 mb-1"><strong>Admin:</strong> admin@admin / super123</p>
-              <p className="text-xs text-blue-800"><strong>Beneficiário (Mock):</strong> Pode logar com o admin e o sistema vai abrir o painel admin. O cadastro criará conta real via Supabase.</p>
             </div>
           </div>
         </div>
