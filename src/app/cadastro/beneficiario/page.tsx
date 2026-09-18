@@ -65,8 +65,23 @@ export default function BeneficiarioCadastro() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      // Inserir no Supabase como Pendente
+      const { supabase } = await import('@/lib/supabase');
+      await supabase.from('beneficiarios').insert([{
+        nome: formData.nome,
+        cpf: formData.cpf,
+        bairro: formData.bairro || 'Não informado',
+        filhos: filhos.length || 0,
+        status: 'Pendente',
+        renda_estimada: parseFloat(formData.rendaFamiliar) || 0,
+        whatsapp: formData.whatsapp
+      }]);
+    } catch (err) {
+      console.error(err);
+    }
     setIsSubmitted(true);
   };
 
@@ -76,8 +91,10 @@ export default function BeneficiarioCadastro() {
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
           <CheckCircle2 className="w-16 h-16 text-icat-green mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Cadastro recebido!</h2>
-          <p className="text-gray-600 mb-6">Nossa equipe de assistência social entrará em contato pelo WhatsApp.</p>
-          <Link href="/" className="text-icat-blue hover:underline font-medium">Voltar ao site</Link>
+          <p className="text-gray-600 mb-6">Seu cadastro foi para a fila de avaliação. Enquanto isso, você já pode acessar o painel restrito para ver as vagas de emprego do mural!</p>
+          <Link href="/login" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-icat-blue hover:bg-blue-700 focus:outline-none transition-colors">
+            Acessar meu painel
+          </Link>
         </div>
       </div>
     );

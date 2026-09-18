@@ -131,16 +131,40 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-icat-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-icat-green disabled:opacity-50"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-icat-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-icat-blue transition-colors disabled:opacity-50"
               >
-                {loading ? 'Entrando...' : (
-                  <>
-                    Entrar no Painel <ArrowRight className="ml-2 w-4 h-4 mt-0.5" />
-                  </>
-                )}
+                {loading ? 'Entrando...' : 'Entrar no Sistema'}
               </button>
             </div>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Acesso pela primeira vez?</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <a
+                href="/cadastro/beneficiario"
+                className="w-full flex justify-center py-2.5 px-4 border border-icat-green rounded-md shadow-sm text-sm font-medium text-icat-green bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-icat-green transition-colors"
+              >
+                Fazer Cadastro de Beneficiário
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-gray-100 pt-6">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h4 className="text-sm font-bold text-blue-900 mb-2">Dados para teste rápido:</h4>
+              <p className="text-xs text-blue-800 mb-1"><strong>Admin:</strong> admin@admin / super123</p>
+              <p className="text-xs text-blue-800"><strong>Beneficiário (Mock):</strong> Pode logar com o admin e o sistema vai abrir o painel admin. O cadastro criará conta real via Supabase.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,17 +1,25 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, Folder } from 'lucide-react';
 
 export default function ProjetosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [projetos, setProjetos] = useState([
-    { id: 1, title: 'Aula de reforço para ensino fundamental', area: 'Educação e Formação', status: 'Ativo' },
-    { id: 2, title: 'ENEM EM FOCO (Ensino médio / UF)', area: 'Educação e Formação', status: 'Ativo' },
-    { id: 3, title: 'Escola de Filosofia para a Vida', area: 'Educação e Formação', status: 'Ativo' },
-    { id: 4, title: 'Atleta do Futuro', area: 'Esporte e Inclusão', status: 'Ativo' },
-    { id: 5, title: 'Cesta Solidária', area: 'Assistência Social', status: 'Ativo' },
+    { id: 1, title: 'Aula de reforço para ensino fundamental', area: 'Educação e Formação', desc: 'Reforço escolar focado no ensino fundamental para alunos da rede pública.' },
+    { id: 2, title: 'ENEM EM FOCO (Ensino médio / UF)', area: 'Educação e Formação', desc: 'Aulas preparatórias intensivas para o ENEM e vestibulares de universidades federais.' },
+    { id: 4, title: 'Atleta do Futuro', area: 'Esporte e Inclusão', desc: 'Escolinha de esportes focado em crianças e adolescentes, promovendo disciplina, trabalho em equipe e saúde física, além de tirá-los das ruas no contraturno escolar.' },
+    { id: 5, title: 'Cesta Solidária', area: 'Assistência Social', desc: 'Entrega mensal de cestas básicas para famílias em situação de extrema vulnerabilidade, cadastradas e acompanhadas por nossa equipe de assistência social.' },
   ]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('icat_projetos');
+    if (saved) {
+      setProjetos(JSON.parse(saved));
+    } else {
+      localStorage.setItem('icat_projetos', JSON.stringify(projetos));
+    }
+  }, []);
 
   const [formData, setFormData] = useState({ title: '', area: '', desc: '' });
 
@@ -21,9 +29,11 @@ export default function ProjetosAdmin() {
       id: Date.now(),
       title: formData.title,
       area: formData.area || 'Geral',
-      status: 'Ativo'
+      desc: formData.desc || 'Descrição do projeto.',
     };
-    setProjetos([newProj, ...projetos]);
+    const updated = [newProj, ...projetos];
+    setProjetos(updated);
+    localStorage.setItem('icat_projetos', JSON.stringify(updated));
     setFormData({ title: '', area: '', desc: '' });
     setIsModalOpen(false);
   };

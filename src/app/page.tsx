@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Target, ShieldCheck, Sun, ArrowUpRight } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { EnquetesSection } from '@/components/EnquetesSection';
+import { DynamicProjetos } from '@/components/DynamicProjetos';
 
 export default function Home() {
   return (
@@ -183,20 +184,7 @@ export default function Home() {
               Iniciativas estruturadas que transformam vidas e comunidades.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Cesta Solidária</h3>
-              <p className="text-gray-600 mb-4">Entrega mensal de cestas básicas para famílias em situação de extrema vulnerabilidade, cadastradas e acompanhadas por nossa equipe de assistência social.</p>
-            </div>
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Atleta do Futuro</h3>
-              <p className="text-gray-600 mb-4">Escolinha de esportes focado em crianças e adolescentes, promovendo disciplina, trabalho em equipe e saúde física, além de tirá-los das ruas no contraturno escolar.</p>
-            </div>
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Qualifica Jovem</h3>
-              <p className="text-gray-600 mb-4">Cursos de qualificação profissional básica (Informática, Atendimento, Rotinas Administrativas) para jovens em busca do primeiro emprego.</p>
-            </div>
-          </div>
+          <DynamicProjetos />
         </div>
       </section>
 

@@ -120,6 +120,25 @@ export default function BeneficiariosAdmin() {
         </div>
       </div>
 
+      {/* Novos Cadastros via formulário público */}
+      {beneficiarios.filter(b => b.status === 'Pendente').length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
+          <div className="bg-amber-400 w-2 h-10 rounded-full shrink-0"></div>
+          <div className="flex-1">
+            <p className="font-bold text-amber-900">
+              {beneficiarios.filter(b => b.status === 'Pendente').length} novo(s) cadastro(s) aguardando análise
+            </p>
+            <p className="text-sm text-amber-700">Feitos pelo formulário público. Revise e aprove ou rejeite.</p>
+          </div>
+          <button
+            onClick={() => {}}
+            className="text-sm font-bold text-amber-700 border border-amber-300 px-4 py-2 rounded-lg hover:bg-amber-100 transition-colors"
+          >
+            Ver Pendentes
+          </button>
+        </div>
+      )}
+
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -158,9 +177,29 @@ export default function BeneficiariosAdmin() {
                 </td>
                 <td className="p-4 text-gray-600">{b.neighborhood}</td>
                 <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.status === 'Aprovado' ? 'bg-green-50 text-icat-green' : b.status === 'Suspenso' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>{b.status}</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.status === 'Aprovado' ? 'bg-green-50 text-icat-green' : b.status === 'Suspenso' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                    {b.status === 'Pendente' ? '⏳ Pendente' : b.status}
+                  </span>
                 </td>
                 <td className="p-4 text-right space-x-1">
+                  {b.status === 'Pendente' && (
+                    <>
+                      <button
+                        onClick={() => setBeneficiarios(beneficiarios.map(x => x.id === b.id ? { ...x, status: 'Aprovado' } : x))}
+                        className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50 text-xs font-bold"
+                        title="Aprovar"
+                      >
+                        ✓ Aprovar
+                      </button>
+                      <button
+                        onClick={() => setBeneficiarios(beneficiarios.filter(x => x.id !== b.id))}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 text-xs font-bold"
+                        title="Rejeitar"
+                      >
+                        ✕ Rejeitar
+                      </button>
+                    </>
+                  )}
                   <button onClick={() => { setSelectedBenId(b.id); setIsProntuarioOpen(true); }} className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50" title="Prontuário">
                     <ClipboardEdit className="w-4 h-4" />
                   </button>

@@ -17,6 +17,15 @@ export default function CursosAdmin() {
     { id: 8, title: 'Escola de Música - Violão', cost: 0, vacancies: 15, status: 'Ativo' },
   ]);
 
+  useEffect(() => {
+    const saved = localStorage.getItem('icat_cursos');
+    if (saved) {
+      setCursos(JSON.parse(saved));
+    } else {
+      localStorage.setItem('icat_cursos', JSON.stringify(cursos));
+    }
+  }, []);
+
   // Estado do formulário
   const [formData, setFormData] = useState({ title: '', cost: '', vacancies: '' });
   const [horarios, setHorarios] = useState<{dia: string, inicio: string, fim: string}[]>([{ dia: 'Segunda', inicio: '14:00', fim: '16:00' }]);
@@ -32,7 +41,9 @@ export default function CursosAdmin() {
       status: 'Ativo'
     };
 
-    setCursos([newCourse, ...cursos]);
+    const updated = [newCourse, ...cursos];
+    setCursos(updated);
+    localStorage.setItem('icat_cursos', JSON.stringify(updated));
     setFormData({ title: '', cost: '', vacancies: '' });
     setIsModalOpen(false);
   };
