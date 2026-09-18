@@ -13,7 +13,7 @@ export function DynamicProjetos() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.length > 0) {
-        setProjetos(parsed.slice(0, 3));
+        setProjetos(parsed.slice(0, 6));
       }
     }
   }, []);

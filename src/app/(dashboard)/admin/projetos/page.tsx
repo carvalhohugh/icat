@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, Folder } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Folder, Wand2 } from 'lucide-react';
 
 export default function ProjetosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -133,7 +133,20 @@ export default function ProjetosAdmin() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <div className="flex justify-between items-end mb-1">
+                  <label className="block text-sm font-medium text-gray-700">Descrição</label>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      if(!formData.title) return alert('Digite o título primeiro para a IA entender o contexto.');
+                      const mockAI = `O projeto "${formData.title}" é uma iniciativa transformadora do ICAT, desenvolvida para promover acolhimento, desenvolvimento e novas oportunidades para as famílias da nossa comunidade.`;
+                      setFormData({...formData, desc: mockAI});
+                    }}
+                    className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md"
+                  >
+                    <Wand2 className="w-3 h-3" /> Gerar com IA
+                  </button>
+                </div>
                 <textarea rows={3} value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Detalhes do projeto..."></textarea>
               </div>
               <div className="flex items-center gap-2">
