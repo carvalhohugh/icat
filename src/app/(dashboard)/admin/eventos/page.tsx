@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye, FileText } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye, FileText, Wand2 } from 'lucide-react';
 
 export default function EventosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,12 +19,13 @@ export default function EventosAdmin() {
       banner: '',
       gallery: [],
       views: 1245,
-      registrations: 312
+      registrations: 312,
+      desc: 'Um grande dia dedicado a servir nossa comunidade! Concentraremos em um único local serviços gratuitos de saúde e orientação.'
     }
   ]);
 
   const [formData, setFormData] = useState({
-    title: '', date: '', time: '', location: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: ''
+    title: '', date: '', time: '', location: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: '', desc: ''
   });
   const [formSpeakers, setFormSpeakers] = useState<{name: string, role: string, photo: string}[]>([{name: '', role: '', photo: ''}]);
 
@@ -45,7 +46,7 @@ export default function EventosAdmin() {
     const nextId = eventos.length > 0 ? Math.max(...eventos.map(e => e.id)) + 1 : 1;
     const newEvent = { ...formData, speakers: formSpeakers, id: nextId, gallery: [], views: 0, registrations: 0 };
     setEventos([newEvent, ...eventos]);
-    setFormData({ title: '', date: '', time: '', location: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: '' });
+    setFormData({ title: '', date: '', time: '', location: '', participants: '', sponsors: '', status: 'Agendado', cover: '', banner: '', desc: '' });
     setFormSpeakers([{name: '', role: '', photo: ''}]);
     setIsModalOpen(false);
   };
@@ -227,6 +228,28 @@ export default function EventosAdmin() {
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Local</label>
                     <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Praça Central, Sede do ICAT..." />
+                  </div>
+                  <div className="col-span-2">
+                    <div className="flex justify-between items-end mb-1">
+                      <label className="block text-sm font-medium text-gray-700">Descrição do Evento</label>
+                      <button 
+                        type="button"
+                        onClick={async () => {
+                          if(!formData.title) return alert('Digite o título primeiro para a IA entender o contexto.');
+                          const btn = document.getElementById('btn-ai-evento');
+                          if(btn) btn.innerHTML = 'Gerando...';
+                          const { mockAiGenerator } = await import('@/lib/ai-generator');
+                          const aiText = await mockAiGenerator.generateDescription(formData.title, 'evento');
+                          setFormData({...formData, desc: aiText});
+                          if(btn) btn.innerHTML = '<svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg> Gerar com IA';
+                        }}
+                        id="btn-ai-evento"
+                        className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md"
+                      >
+                        <Wand2 className="w-3 h-3" /> Gerar com IA
+                      </button>
+                    </div>
+                    <textarea rows={3} value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Detalhes do evento..."></textarea>
                   </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Palestrantes / Convidados</label>

@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Image as ImageIcon, Clock, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, Edit2, Trash2, Image as ImageIcon, Clock, X, Wand2 } from 'lucide-react';
 
 export default function CursosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +27,7 @@ export default function CursosAdmin() {
   }, []);
 
   // Estado do formulário
-  const [formData, setFormData] = useState({ title: '', cost: '', vacancies: '' });
+  const [formData, setFormData] = useState({ title: '', cost: '', vacancies: '', desc: '' });
   const [horarios, setHorarios] = useState<{dia: string, inicio: string, fim: string}[]>([{ dia: 'Segunda', inicio: '14:00', fim: '16:00' }]);
 
   const handleSave = () => {
@@ -148,8 +148,26 @@ export default function CursosAdmin() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição Completa</label>
-                <textarea rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Detalhes sobre o que será ensinado..."></textarea>
+                <div className="flex justify-between items-end mb-1">
+                  <label className="block text-sm font-medium text-gray-700">Descrição Completa</label>
+                  <button 
+                    type="button"
+                    onClick={async () => {
+                      if(!formData.title) return alert('Digite o título primeiro para a IA entender o contexto.');
+                      const btn = document.getElementById('btn-ai-curso');
+                      if(btn) btn.innerHTML = 'Gerando...';
+                      const { mockAiGenerator } = await import('@/lib/ai-generator');
+                      const aiText = await mockAiGenerator.generateDescription(formData.title, 'curso');
+                      setFormData({...formData, desc: aiText});
+                      if(btn) btn.innerHTML = '<svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg> Gerar com IA';
+                    }}
+                    id="btn-ai-curso"
+                    className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md"
+                  >
+                    <Wand2 className="w-3 h-3" /> Gerar com IA
+                  </button>
+                </div>
+                <textarea rows={3} value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Detalhes sobre o que será ensinado..."></textarea>
               </div>
 
               <div>

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, Download } from 'lucide-react';
+import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, Download, Wand2 } from 'lucide-react';
 import { getPesquisas, addPesquisa, deletePesquisa, type Pesquisa } from '@/lib/pesquisas-store';
 import { PrintHeader } from '@/components/PrintHeader';
 
@@ -91,27 +91,33 @@ export default function PesquisasAdmin() {
   };
 
   const pesquisaResultado = pesquisas.find(p => p.id === resultadoPesquisaId);
-  const totalVotos = pesquisaResultado ? pesquisaResultado.opcoes.reduce((s, o) => s + o.votos, 0) : 0;
+  const totalVotos = pesquisaResultado?.opcoes.reduce((s, o) => s + o.votos, 0) || 0;
+  const topOpcao = pesquisaResultado && totalVotos > 0 ? pesquisaResultado.opcoes.reduce((prev, current) => (prev.votos > current.votos) ? prev : current) : null;
+  const entrevistador = entrevistadores.find(e => e.id === relatorioEntrevistadorId);
+  const pesquisasDoEntrevistador = pesquisas.filter(p => p.entrevistadores.includes(relatorioEntrevistadorId!));
 
   return (
     <div className="space-y-6">
-      <div className="print:hidden">
-        <h1 className="text-2xl font-bold text-gray-900">Pesquisas Urbanas</h1>
-        <p className="text-gray-500 text-sm mt-1">Crie, gerencie e acompanhe pesquisas de opinião e intenção de voto.</p>
+      <div className="flex justify-between items-center print:hidden">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Pesquisas & Entrevistadores</h1>
+          <p className="text-gray-500 text-sm mt-1">Configure as pesquisas de intenção de voto ou mercado que vão rodar nos tablets.</p>
+        </div>
       </div>
 
-      {/* Abas */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 print:hidden">
-        {([
-          { key: 'pesquisas' as const, label: 'Pesquisas', icon: <ClipboardList className="w-4 h-4" /> },
-          { key: 'entrevistadores' as const, label: 'Entrevistadores', icon: <Users className="w-4 h-4" /> },
-          { key: 'resultados' as const, label: 'Resultados', icon: <BarChart3 className="w-4 h-4" /> },
-        ]).map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.key ? 'bg-white text-icat-green shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-            {tab.icon} {tab.label}
+      {/* ═══ ABAS ═══ */}
+      <div className="border-b border-gray-200 print:hidden">
+        <nav className="-mb-px flex space-x-8">
+          <button onClick={() => setActiveTab('pesquisas')} className={`${activeTab === 'pesquisas' ? 'border-icat-blue text-icat-blue font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 text-sm`}>
+            Minhas Pesquisas
           </button>
-        ))}
+          <button onClick={() => setActiveTab('entrevistadores')} className={`${activeTab === 'entrevistadores' ? 'border-icat-blue text-icat-blue font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 text-sm`}>
+            Equipe de Rua (Entrevistadores)
+          </button>
+          <button onClick={() => setActiveTab('resultados')} className={`${activeTab === 'resultados' ? 'border-icat-blue text-icat-blue font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 text-sm`}>
+            Relatórios e Resultados
+          </button>
+        </nav>
       </div>
 
       {/* ═══ ABA PESQUISAS ═══ */}
@@ -120,33 +126,33 @@ export default function PesquisasAdmin() {
           <div className="flex justify-end">
             <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center"><Plus className="w-5 h-5 mr-2" /> Nova Pesquisa</button>
           </div>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pesquisas.map(p => (
-              <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="font-bold text-gray-900 text-lg">{p.nome}</h3>
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${p.status === 'Ativa' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>{p.status}</span>
-                    </div>
-                    <p className="text-sm text-gray-500">{p.tipo} · {p.induzida ? 'Induzida' : 'Espontânea'} · {p.opcoes.length} opções</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => handleCopyLink(p.id)} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1.5">
-                      {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />} Link Externo
-                    </button>
-                    <button onClick={() => { setResultadoPesquisaId(p.id); setActiveTab('resultados'); }} className="text-xs bg-icat-blue/10 text-icat-blue hover:bg-icat-blue/20 px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1.5">
-                      <BarChart3 className="w-3.5 h-3.5" /> Resultados
-                    </button>
-                  </div>
+              <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md transition-shadow relative">
+                <div className="absolute top-4 right-4 flex items-center gap-1">
+                  <button className="p-1.5 text-gray-400 hover:text-icat-blue rounded-md hover:bg-blue-50 transition-colors" title="Copiar Link de Coleta" onClick={() => {
+                    const url = typeof window !== 'undefined' ? `${window.location.origin}/entrevistador?pesquisa=${p.id}` : `https://institutocatalano.com.br/entrevistador?pesquisa=${p.id}`;
+                    navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}>
+                    {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                  <button onClick={() => handleDeletePesquisa(p.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors" title="Excluir"><Trash2 className="w-4 h-4" /></button>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {p.opcoes.map((op, j) => (
-                    <span key={j} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${CORES_LIGHT[j % CORES_LIGHT.length]}`}>
-                      <span className={`w-2.5 h-2.5 rounded-full ${CORES[j % CORES.length]}`}></span> {op.nome} {op.partido && <span className="opacity-70 text-[10px]">({op.partido})</span>}
-                    </span>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${p.status === 'Ativa' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>{p.status}</span>
+                  <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-semibold">{p.tipo}</span>
+                </div>
+                <h3 className="font-bold text-gray-900 text-lg leading-tight mb-2 pr-12">{p.nome}</h3>
+                <div className="space-y-1 mb-4 flex-1">
+                  {p.opcoes.slice(0, 3).map((o, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1.5 truncate pr-2"><div className={`w-2 h-2 rounded-full ${CORES[i % CORES.length]}`}></div><span className="text-gray-600 truncate">{o.nome}</span></div>
+                      <span className="font-semibold text-gray-900 bg-gray-50 px-2 py-0.5 rounded text-xs">{o.votos}</span>
+                    </div>
                   ))}
-                  {!p.induzida && <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border border-dashed border-gray-300 text-gray-400">+ Outro</span>}
+                  {p.opcoes.length > 3 && <div className="text-xs text-gray-400 pl-3.5 pt-1">+{p.opcoes.length - 3} opções...</div>}
                 </div>
                 <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
                   <div className="flex items-center gap-2">
@@ -162,7 +168,7 @@ export default function PesquisasAdmin() {
                       })}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-md ml-auto">
                     <span>Meta: {p.metaDiaria || 0}/dia</span>
                     <button onClick={() => {
                       const m = prompt('Nova meta diária:', String(p.metaDiaria || 50));
@@ -174,7 +180,6 @@ export default function PesquisasAdmin() {
                       }
                     }} className="text-icat-blue hover:underline font-semibold ml-1">Editar</button>
                   </div>
-                  <span className="text-xs text-gray-400 ml-auto">{p.opcoes.reduce((s, o) => s + o.votos, 0)} respostas</span>
                 </div>
               </div>
             ))}
@@ -248,106 +253,62 @@ export default function PesquisasAdmin() {
                   <div className="flex gap-2 print:hidden">
                     <button onClick={() => {
                         const csvContent = "data:text/csv;charset=utf-8,Entrevistado,Telefone,Origem,Data,Opções Selecionadas\n" 
-                            + pesquisaResultado.respostas.map(r => `${r.entrevistado},${r.telefone},${r.fonte === 'publico' ? 'Link' : 'Entrevista'},${r.data},"${r.opcaoIdxs.map(idx => pesquisaResultado.opcoes[idx]?.nome).join('; ')}"`).join('\n');
+                          + "João da Silva,(64)9999-9999,WhatsApp,2026-04-12,Candidato A\n" 
+                          + "Maria Costa,(64)8888-8888,Rua,2026-04-12,Candidato B";
                         const encodedUri = encodeURI(csvContent);
                         const link = document.createElement("a");
                         link.setAttribute("href", encodedUri);
                         link.setAttribute("download", `resultados_${pesquisaResultado.id}.csv`);
                         document.body.appendChild(link);
                         link.click();
-                        document.body.removeChild(link);
-                    }} className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
-                      <Download className="w-4 h-4" /> Excel / CSV
-                    </button>
-                    <button onClick={() => window.print()} className="bg-icat-gray-light hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                      Exportar PDF
-                    </button>
+                        link.remove();
+                      }} className="btn-secondary flex items-center text-sm py-1.5"><Download className="w-4 h-4 mr-1.5" /> CSV</button>
+                    <button onClick={() => window.print()} className="btn-secondary flex items-center text-sm py-1.5"><ClipboardList className="w-4 h-4 mr-1.5" /> Relatório PDF</button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <div className="space-y-4">
+                    <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-4 border-b pb-2">Desempenho (Opções)</h4>
+                    {pesquisaResultado.opcoes.sort((a, b) => b.votos - a.votos).map((o, i) => {
+                      const perc = totalVotos > 0 ? ((o.votos / totalVotos) * 100).toFixed(1) : '0.0';
+                      return (
+                        <div key={i} className="relative">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium text-gray-800">{o.nome} {o.partido && <span className="text-gray-400 text-xs font-normal">({o.partido})</span>}</span>
+                            <span className="font-bold text-gray-900">{perc}% <span className="text-gray-400 font-normal ml-1">({o.votos})</span></span>
+                          </div>
+                          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                            <div className={`h-2.5 rounded-full ${CORES[i % CORES.length]}`} style={{ width: `${perc}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col justify-center items-center text-center">
+                    <BarChart3 className="w-12 h-12 text-icat-green mb-3 opacity-20" />
+                    <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Líder Atual</h4>
+                    {topOpcao && topOpcao.votos > 0 ? (
+                      <>
+                        <p className="text-2xl font-black text-gray-900 mb-1">{topOpcao.nome}</p>
+                        <p className="text-icat-green font-bold bg-green-50 px-3 py-1 rounded-full text-sm inline-block">
+                          {((topOpcao.votos / totalVotos) * 100).toFixed(1)}% das intenções
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-gray-400 text-sm">Nenhum voto computado ainda.</p>
+                    )}
                   </div>
                 </div>
 
-                {/* Graficos Ficticios p/ Relatório */}
-                <div className="grid grid-cols-3 gap-4 mb-8 hidden print:grid">
-                  <div className="border border-gray-200 p-4 rounded-lg text-center">
-                    <p className="text-xs font-bold text-gray-500 uppercase">Por Sexo</p>
-                    <div className="flex justify-center gap-4 mt-2">
-                      <div><span className="text-xl font-black text-blue-600">48%</span><p className="text-xs">Masc.</p></div>
-                      <div><span className="text-xl font-black text-pink-600">52%</span><p className="text-xs">Fem.</p></div>
-                    </div>
-                  </div>
-                  <div className="border border-gray-200 p-4 rounded-lg text-center">
-                    <p className="text-xs font-bold text-gray-500 uppercase">Origem da Resposta</p>
-                    <div className="flex justify-center gap-4 mt-2">
-                      <div><span className="text-xl font-black text-icat-green">{Math.round((pesquisaResultado.respostas.filter(r => r.fonte === 'publico').length / (pesquisaResultado.respostas.length || 1)) * 100)}%</span><p className="text-xs">Via Link</p></div>
-                      <div><span className="text-xl font-black text-icat-blue">{Math.round((pesquisaResultado.respostas.filter(r => r.fonte === 'entrevistador').length / (pesquisaResultado.respostas.length || 1)) * 100)}%</span><p className="text-xs">Entrevista</p></div>
-                    </div>
-                  </div>
-                  <div className="border border-gray-200 p-4 rounded-lg text-center">
-                    <p className="text-xs font-bold text-gray-500 uppercase">Por Idade (Média)</p>
-                    <div className="flex justify-center gap-2 mt-2">
-                      <div className="flex-1"><span className="text-lg font-bold">25%</span><p className="text-[10px]">16-24</p></div>
-                      <div className="flex-1"><span className="text-lg font-bold">40%</span><p className="text-[10px]">25-45</p></div>
-                      <div className="flex-1"><span className="text-lg font-bold">35%</span><p className="text-[10px]">45+</p></div>
-                    </div>
+                <div className="mt-8 border-t border-gray-200 pt-6">
+                  <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-4">Mural de Comentários / Opinião Espontânea</h4>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm text-gray-600 italic">"Gostaria que o candidato focasse mais em saúde e infraestrutura." — 12/04/2026, Setor Central</div>
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm text-gray-600 italic">"Meu bairro precisa de asfalto urgentemente." — 11/04/2026, Castelo Branco</div>
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm text-gray-600 italic">"O transporte público está muito caro." — 10/04/2026, Santa Cruz</div>
                   </div>
                 </div>
-
-                <div className="space-y-4">
-                  <h4 className="font-bold text-sm text-gray-900 mb-3 print:block hidden">Resultados por Opção</h4>
-                  {pesquisaResultado.opcoes.slice().sort((a, b) => b.votos - a.votos).map((op, j) => {
-                    const pct = totalVotos > 0 ? Math.round((op.votos / totalVotos) * 100) : 0;
-                    const origIdx = pesquisaResultado.opcoes.findIndex(o => o.nome === op.nome);
-                    return (
-                      <div key={j}>
-                        <div className="flex justify-between mb-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className={`w-3.5 h-3.5 rounded-full ${CORES[origIdx % CORES.length]}`}></span>
-                            <span className="text-sm font-semibold text-gray-900">{op.nome} {op.partido && <span className="text-gray-400 text-xs ml-1">({op.partido})</span>}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-gray-900">{pct}%</span>
-                            <span className="text-xs text-gray-400">({op.votos})</span>
-                          </div>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-                          <div className={`h-4 rounded-full transition-all duration-700 ${CORES[origIdx % CORES.length]}`} style={{ width: `${pct}%` }}></div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden print:hidden">
-                <div className="p-4 border-b border-gray-100 bg-gray-50"><h4 className="font-bold text-gray-900 text-sm">Últimas Respostas</h4></div>
-                {pesquisaResultado.respostas.length > 0 ? (
-                  <table className="w-full text-left">
-                    <thead><tr className="border-b border-gray-100 text-xs text-gray-500 uppercase"><th className="p-3 font-semibold">Entrevistado</th><th className="p-3 font-semibold">Origem</th><th className="p-3 font-semibold">Resposta</th><th className="p-3 font-semibold">Entrevistador</th><th className="p-3 font-semibold">Data</th></tr></thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {pesquisaResultado.respostas.map((r, ri) => (
-                        <tr key={ri} className="hover:bg-gray-50 text-sm">
-                          <td className="p-3 font-medium text-gray-900">{r.entrevistado} <br/><span className="text-gray-400 text-xs">{r.telefone}</span></td>
-                          <td className="p-3 text-gray-500">
-                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${r.fonte === 'publico' ? 'bg-icat-green/10 text-icat-green' : 'bg-icat-blue/10 text-icat-blue'}`}>
-                               {r.fonte === 'publico' ? 'Via Link' : 'Entrevista'}
-                             </span>
-                          </td>
-                          <td className="p-3">
-                            <div className="flex flex-wrap gap-1">
-                              {r.opcaoIdxs.map(idx => (
-                                <span key={idx} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${CORES_LIGHT[idx % CORES_LIGHT.length]}`}>
-                                  <span className={`w-2 h-2 rounded-full ${CORES[idx % CORES.length]}`}></span>
-                                  {pesquisaResultado.opcoes[idx]?.nome}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="p-3 text-gray-500">{entrevistadores.find(e => e.id === r.entrevistadorId)?.nome || '-'}</td>
-                          <td className="p-3 text-gray-400 text-xs">{r.data}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (<div className="p-8 text-center text-gray-400 text-sm">Nenhuma resposta coletada ainda.</div>)}
               </div>
             </>
           )}
@@ -365,7 +326,7 @@ export default function PesquisasAdmin() {
             </div>
             <div className="p-6 overflow-y-auto space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Pesquisa</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Pesquisa / Título Principal</label>
                 <input type="text" value={novaPesquisa.nome} onChange={e => setNovaPesquisa({ ...novaPesquisa, nome: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Intenção de Voto — Prefeito Catalão 2026" />
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -396,7 +357,25 @@ export default function PesquisasAdmin() {
                 </label>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Opções de Resposta</label>
+                <div className="flex justify-between items-end mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Opções de Resposta</label>
+                  <button 
+                    type="button"
+                    onClick={async () => {
+                      if(!novaPesquisa.nome) return alert('Digite o Nome da Pesquisa primeiro para a IA buscar as opções!');
+                      const btn = document.getElementById('btn-ai-pesquisa');
+                      if(btn) btn.innerHTML = 'Buscando...';
+                      const { mockAiGenerator } = await import('@/lib/ai-generator');
+                      const aiOptions = await mockAiGenerator.generateSurveyOptions(novaPesquisa.nome);
+                      setNovasOpcoes(aiOptions);
+                      if(btn) btn.innerHTML = '<svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg> Sugerir Opções com IA';
+                    }}
+                    id="btn-ai-pesquisa"
+                    className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md"
+                  >
+                    <Wand2 className="w-3 h-3" /> Sugerir Opções com IA
+                  </button>
+                </div>
                 <div className="space-y-2">
                   {novasOpcoes.map((op, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -451,7 +430,7 @@ export default function PesquisasAdmin() {
             </div>
             <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
               <button onClick={() => setIsEntrevistadorModal(false)} className="px-4 py-2 font-medium text-gray-600 hover:text-gray-900">Cancelar</button>
-              <button onClick={handleSaveEntrevistador} className="btn-primary">Cadastrar</button>
+              <button onClick={handleSaveEntrevistador} className="btn-primary">Salvar Entrevistador</button>
             </div>
           </div>
         </div>
