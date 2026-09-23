@@ -52,14 +52,28 @@ export default function PesquisasAdmin() {
   ]);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('icat_entrevistadores');
-      if (saved) {
-        setEntrevistadores(JSON.parse(saved));
-      } else {
-        localStorage.setItem('icat_entrevistadores', JSON.stringify(entrevistadores));
-      }
-    } catch(e) {}
+    const loadEntrevistadores = () => {
+      try {
+        const saved = localStorage.getItem('icat_entrevistadores');
+        if (saved) {
+          setEntrevistadores(JSON.parse(saved));
+        } else {
+          localStorage.setItem('icat_entrevistadores', JSON.stringify(entrevistadores));
+        }
+      } catch(e) {}
+    };
+
+    loadEntrevistadores();
+    
+    // Listen for changes from other tabs
+    window.addEventListener('storage', loadEntrevistadores);
+    // Poll to ensure updates within the same window or across tabs are caught
+    const interval = setInterval(loadEntrevistadores, 5000);
+
+    return () => {
+      window.removeEventListener('storage', loadEntrevistadores);
+      clearInterval(interval);
+    };
   }, []);
 
   const updateEntrevistadores = (newLista: Entrevistador[]) => {
