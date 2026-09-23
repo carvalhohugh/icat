@@ -22,6 +22,7 @@ export default function EntrevistadorLogin() {
         { id: 2, nome: 'Amanda Oliveira', email: 'amanda@institutocatalano.com.br', senha: '123' },
         { id: 3, nome: 'Roberto Santos', email: 'roberto@institutocatalano.com.br', senha: '123' },
         { id: 4, nome: 'Fernanda Lima', email: 'fernanda@institutocatalano.com.br', senha: '123' },
+        { id: 5, nome: 'José Carlos', email: 'josecarlos@icat.com.br', senha: '123456' },
       ];
       setEntrevistadores(MOCK_ENTREVISTADORES);
       localStorage.setItem('icat_entrevistadores', JSON.stringify(MOCK_ENTREVISTADORES));
@@ -30,9 +31,19 @@ export default function EntrevistadorLogin() {
 
   const handleLogin = () => {
     if (!login || !senha) { setError('Preencha e-mail e senha.'); return; }
-    const found = entrevistadores.find(
-      e => e.email === login.trim().toLowerCase() && e.senha === senha
+    
+    // Fallback locally just in case they cleared cache but still want to login as josecarlos
+    let currentList = entrevistadores;
+    if (!currentList.some(e => e.email === 'josecarlos@icat.com.br')) {
+      currentList = [...currentList, { id: 5, nome: 'José Carlos', email: 'josecarlos@icat.com.br', senha: '123456' }];
+      setEntrevistadores(currentList);
+      localStorage.setItem('icat_entrevistadores', JSON.stringify(currentList));
+    }
+
+    const found = currentList.find(
+      e => e.email?.trim().toLowerCase() === login.trim().toLowerCase() && (e.senha || '123456') === senha
     );
+    
     if (!found) { setError('E-mail ou senha incorretos.'); return; }
 
     if (found.senha === '123' || found.senha === '123456') {

@@ -95,7 +95,8 @@ export default function PesquisasAdmin() {
 
   const handleSaveEntrevistador = () => {
     if (!novoEntrevistador.nome || !novoEntrevistador.email) return;
-    updateEntrevistadores([{ id: Date.now(), ...novoEntrevistador }, ...entrevistadores]);
+    const senhaFinal = novoEntrevistador.senha.trim() || '123456';
+    updateEntrevistadores([{ id: Date.now(), ...novoEntrevistador, senha: senhaFinal }, ...entrevistadores]);
     setNovoEntrevistador({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
     setIsEntrevistadorModal(false);
   };
