@@ -32,7 +32,10 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
 
   const [step, setStep] = useState(0); // 0=dados, 1=pergunta, 2=confirma, 3=sucesso
   const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [nascimento, setNascimento] = useState('');
+  const [idade, setIdade] = useState<number | undefined>(undefined);
   const [selecionados, setSelecionados] = useState<number[]>([]);
   const [outroNome, setOutroNome] = useState('');
 
@@ -44,7 +47,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
   }, [params.id]);
 
   const reset = () => {
-    setStep(0); setNome(''); setTelefone(''); setSelecionados([]); setOutroNome('');
+    setStep(0); setNome(''); setCpf(''); setTelefone(''); setNascimento(''); setIdade(undefined); setSelecionados([]); setOutroNome('');
   };
 
   if (!pesquisa) return (
@@ -88,7 +91,9 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
   const submitResposta = (lat?: number, lng?: number) => {
     addResposta(pesquisa.id, {
       entrevistado: nome || 'Sem nome',
+      cpf,
       telefone,
+      idade,
       opcaoIdxs: selecionados.filter(i => i < pesquisa.opcoes.length),
       entrevistadorId: entrevistador?.id,
       fonte: 'entrevistador',
@@ -133,10 +138,29 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
                   placeholder="Nome completo (opcional)" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Telefone / WhatsApp</label>
-                <input type="tel" value={telefone} onChange={e => setTelefone(e.target.value)}
+                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">CPF</label>
+                <input type="text" value={cpf} onChange={e => setCpf(e.target.value)}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-icat-green focus:ring-4 focus:ring-icat-green/10 outline-none text-sm font-medium"
-                  placeholder="(64) 99000-0000" />
+                  placeholder="000.000.000-00 (opcional)" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nascimento</label>
+                  <input type="date" value={nascimento} onChange={e => {
+                    setNascimento(e.target.value);
+                    if (e.target.value) {
+                      const age = Math.abs(new Date(Date.now() - new Date(e.target.value).getTime()).getUTCFullYear() - 1970);
+                      setIdade(age);
+                    } else setIdade(undefined);
+                  }}
+                    className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl focus:border-icat-green outline-none text-sm font-medium" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">WhatsApp</label>
+                  <input type="tel" value={telefone} onChange={e => setTelefone(e.target.value)}
+                    className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl focus:border-icat-green outline-none text-sm font-medium"
+                    placeholder="(64) 99000-0000" />
+                </div>
               </div>
               <button onClick={() => setStep(1)}
                 className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mt-4">
@@ -229,6 +253,18 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
                   <div className="flex justify-between items-center py-1.5 border-b border-gray-100">
                     <span className="text-xs text-gray-500">Entrevistado</span>
                     <span className="text-sm font-bold text-gray-900">{nome}</span>
+                  </div>
+                )}
+                {cpf && (
+                  <div className="flex justify-between items-center py-1.5 border-b border-gray-100">
+                    <span className="text-xs text-gray-500">CPF</span>
+                    <span className="text-sm font-bold text-gray-900">{cpf}</span>
+                  </div>
+                )}
+                {idade !== undefined && (
+                  <div className="flex justify-between items-center py-1.5 border-b border-gray-100">
+                    <span className="text-xs text-gray-500">Idade</span>
+                    <span className="text-sm font-bold text-gray-900">{idade} anos</span>
                   </div>
                 )}
                 {telefone && (

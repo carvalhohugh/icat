@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, Download, Wand2 } from 'lucide-react';
+import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, Download, Wand2, Eye, Link2 } from 'lucide-react';
 import { getPesquisas, addPesquisa, deletePesquisa, type Pesquisa } from '@/lib/pesquisas-store';
 import { PrintHeader } from '@/components/PrintHeader';
 
@@ -23,6 +23,7 @@ export default function PesquisasAdmin() {
   const [activeTab, setActiveTab] = useState<'pesquisas' | 'entrevistadores' | 'resultados'>('pesquisas');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEntrevistadorModal, setIsEntrevistadorModal] = useState(false);
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<number, boolean>>({});
   const [resultadoPesquisaId, setResultadoPesquisaId] = useState<number | null>(null);
   const [relatorioEntrevistadorId, setRelatorioEntrevistadorId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
@@ -146,7 +147,14 @@ export default function PesquisasAdmin() {
             {pesquisas.map(p => (
               <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md transition-shadow relative">
                 <div className="absolute top-4 right-4 flex items-center gap-1">
-                  <button className="p-1.5 text-gray-400 hover:text-icat-blue rounded-md hover:bg-blue-50 transition-colors" title="Copiar Link de Coleta" onClick={() => {
+                  <button className="p-1.5 text-gray-400 hover:text-icat-green rounded-md hover:bg-green-50 transition-colors" title="Copiar Link Público (Aberto)" onClick={() => {
+                    const url = typeof window !== 'undefined' ? `${window.location.origin}/pesquisa/${p.id}` : `https://institutocatalano.com.br/pesquisa/${p.id}`;
+                    navigator.clipboard.writeText(url);
+                    alert("Link público da pesquisa copiado! Envie pelo WhatsApp para coletas anônimas.");
+                  }}>
+                    <Link2 className="w-4 h-4" />
+                  </button>
+                  <button className="p-1.5 text-gray-400 hover:text-icat-blue rounded-md hover:bg-blue-50 transition-colors" title="Copiar Link do Entrevistador" onClick={() => {
                     const url = typeof window !== 'undefined' ? `${window.location.origin}/entrevistador?pesquisa=${p.id}` : `https://institutocatalano.com.br/entrevistador?pesquisa=${p.id}`;
                     navigator.clipboard.writeText(url);
                     setCopied(true);
@@ -217,6 +225,7 @@ export default function PesquisasAdmin() {
                   <th className="p-4 font-semibold text-center">CPF</th>
                   <th className="p-4 font-semibold text-center">Telefone</th>
                   <th className="p-4 font-semibold text-center">E-mail (Login)</th>
+                  <th className="p-4 font-semibold text-center">Senha</th>
                   <th className="p-4 font-semibold text-center">Pesquisas</th>
                   <th className="p-4 font-semibold text-center">Ações</th>
                 </tr>
@@ -235,6 +244,16 @@ export default function PesquisasAdmin() {
                     <td className="p-4 text-gray-600 text-sm text-center">{e.cpf}</td>
                     <td className="p-4 text-gray-600 text-sm text-center">{e.telefone}</td>
                     <td className="p-4 text-center"><code className="text-xs bg-gray-100 px-2 py-1 rounded">{e.email}</code></td>
+                    <td className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <code className="text-xs bg-gray-100 px-2 py-1 rounded w-20 text-center">
+                          {visiblePasswords[e.id] ? e.senha : '******'}
+                        </code>
+                        <button onClick={() => setVisiblePasswords(prev => ({ ...prev, [e.id]: !prev[e.id] }))} className="text-gray-400 hover:text-icat-blue" title="Visualizar Senha">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
                     <td className="p-4 text-center"><span className="text-xs font-bold text-icat-blue">{pesquisas.filter(p => p.entrevistadores.includes(e.id)).length}</span></td>
                     <td className="p-4 text-center space-x-2">
                       <button onClick={() => { updateEntrevistadores(entrevistadores.map(x => x.id === e.id ? { ...x, senha: '123' } : x)); alert('Senha resetada para 123'); }} className="p-2 text-gray-400 hover:text-icat-blue rounded-lg hover:bg-blue-50 transition-colors" title="Resetar Senha"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
