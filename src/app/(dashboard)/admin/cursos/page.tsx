@@ -44,7 +44,7 @@ export default function CursosAdmin() {
     const updated = [newCourse, ...cursos];
     setCursos(updated);
     localStorage.setItem('icat_cursos', JSON.stringify(updated));
-    setFormData({ title: '', cost: '', vacancies: '' });
+    setFormData({ title: '', cost: '', vacancies: '', desc: '' });
     setIsModalOpen(false);
   };
 
@@ -92,7 +92,7 @@ export default function CursosAdmin() {
                 key={c.id} 
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
                 onClick={() => {
-                  setFormData({ title: c.title, vacancies: c.vacancies.toString(), cost: c.cost.toString() });
+                  setFormData({ title: c.title, vacancies: c.vacancies.toString(), cost: c.cost.toString(), desc: (c as any).desc || '' });
                   setIsModalOpen(true);
                 }}
               >

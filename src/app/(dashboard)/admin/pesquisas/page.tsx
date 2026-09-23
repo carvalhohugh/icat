@@ -50,6 +50,22 @@ export default function PesquisasAdmin() {
     { id: 4, nome: 'Fernanda Lima', cpf: '444.444.444-44', telefone: '(64) 99900-4444', email: 'fernanda@institutocatalano.com.br', senha: '123' },
   ]);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('icat_entrevistadores');
+      if (saved) {
+        setEntrevistadores(JSON.parse(saved));
+      } else {
+        localStorage.setItem('icat_entrevistadores', JSON.stringify(entrevistadores));
+      }
+    } catch(e) {}
+  }, []);
+
+  const updateEntrevistadores = (newLista: Entrevistador[]) => {
+    setEntrevistadores(newLista);
+    localStorage.setItem('icat_entrevistadores', JSON.stringify(newLista));
+  };
+
   const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50 });
   const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string}[]>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
   const [entrevSelecionados, setEntrevSelecionados] = useState<number[]>([]);
@@ -78,7 +94,7 @@ export default function PesquisasAdmin() {
 
   const handleSaveEntrevistador = () => {
     if (!novoEntrevistador.nome || !novoEntrevistador.email) return;
-    setEntrevistadores([{ id: Date.now(), ...novoEntrevistador }, ...entrevistadores]);
+    updateEntrevistadores([{ id: Date.now(), ...novoEntrevistador }, ...entrevistadores]);
     setNovoEntrevistador({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
     setIsEntrevistadorModal(false);
   };
@@ -221,8 +237,8 @@ export default function PesquisasAdmin() {
                     <td className="p-4 text-center"><code className="text-xs bg-gray-100 px-2 py-1 rounded">{e.email}</code></td>
                     <td className="p-4 text-center"><span className="text-xs font-bold text-icat-blue">{pesquisas.filter(p => p.entrevistadores.includes(e.id)).length}</span></td>
                     <td className="p-4 text-center space-x-2">
-                      <button onClick={() => { setEntrevistadores(entrevistadores.map(x => x.id === e.id ? { ...x, senha: '123' } : x)); alert('Senha resetada para 123'); }} className="p-2 text-gray-400 hover:text-icat-blue rounded-lg hover:bg-blue-50 transition-colors" title="Resetar Senha"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
-                      <button onClick={() => setEntrevistadores(entrevistadores.filter(x => x.id !== e.id))} className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => { updateEntrevistadores(entrevistadores.map(x => x.id === e.id ? { ...x, senha: '123' } : x)); alert('Senha resetada para 123'); }} className="p-2 text-gray-400 hover:text-icat-blue rounded-lg hover:bg-blue-50 transition-colors" title="Resetar Senha"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg></button>
+                      <button onClick={() => updateEntrevistadores(entrevistadores.filter(x => x.id !== e.id))} className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"><Trash2 className="w-4 h-4" /></button>
                     </td>
                   </tr>
                 ))}
@@ -250,11 +266,43 @@ export default function PesquisasAdmin() {
                     <h3 className="font-bold text-gray-900 mb-1">{pesquisaResultado.nome}</h3>
                     <p className="text-sm text-gray-500">{totalVotos} respostas coletadas</p>
                   </div>
-                  <div className="flex gap-2 print:hidden">
+                  <div className="flex flex-wrap justify-end gap-2 print:hidden">
+                    {pesquisaResultado.tipo === 'Intenção de Voto' && pesquisaResultado.opcoes.length > 2 && (
+                      <button onClick={() => {
+                        const candidatos = [...pesquisaResultado.opcoes]
+                          .filter(o => o.nome.toLowerCase() !== 'branco/nulo' && o.nome.toLowerCase() !== 'não sabe' && o.nome.toLowerCase() !== 'indeciso')
+                          .sort((a, b) => b.votos - a.votos);
+                        if (candidatos.length >= 2) {
+                          const c1 = candidatos[0];
+                          const c2 = candidatos[1];
+                          addPesquisa({
+                            nome: `${pesquisaResultado.nome} — Simulação 2º Turno`,
+                            tipo: 'Intenção de Voto',
+                            status: 'Ativa',
+                            induzida: true,
+                            multiSelect: false,
+                            metaDiaria: 50,
+                            opcoes: [
+                              { nome: c1.nome, partido: c1.partido, votos: 0 },
+                              { nome: c2.nome, partido: c2.partido, votos: 0 },
+                              { nome: 'Branco/Nulo', partido: '', votos: 0 },
+                              { nome: 'Não Sabe', partido: '', votos: 0 }
+                            ],
+                            entrevistadores: pesquisaResultado.entrevistadores
+                          });
+                          alert(`Simulação de 2º Turno criada com sucesso entre ${c1.nome} e ${c2.nome}!`);
+                          setActiveTab('pesquisas');
+                        } else {
+                          alert('Não há candidatos suficientes para simular 2º Turno.');
+                        }
+                      }} className="btn-secondary flex items-center text-sm py-1.5 border-icat-blue text-icat-blue bg-blue-50 hover:bg-blue-100">
+                        <Wand2 className="w-4 h-4 mr-1.5" /> Simular 2º Turno
+                      </button>
+                    )}
                     <button onClick={() => {
-                        const csvContent = "data:text/csv;charset=utf-8,Entrevistado,Telefone,Origem,Data,Opções Selecionadas\n" 
-                          + "João da Silva,(64)9999-9999,WhatsApp,2026-04-12,Candidato A\n" 
-                          + "Maria Costa,(64)8888-8888,Rua,2026-04-12,Candidato B";
+                        const csvContent = "data:text/csv;charset=utf-8,Entrevistado,Telefone,Idade,Origem,Data,Opções Selecionadas\n" 
+                          + "João da Silva,(64)9999-9999,34,WhatsApp,2026-04-12,Candidato A\n" 
+                          + "Maria Costa,(64)8888-8888,50,Rua,2026-04-12,Candidato B";
                         const encodedUri = encodeURI(csvContent);
                         const link = document.createElement("a");
                         link.setAttribute("href", encodedUri);
@@ -288,18 +336,108 @@ export default function PesquisasAdmin() {
                   <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col justify-center items-center text-center">
                     <BarChart3 className="w-12 h-12 text-icat-green mb-3 opacity-20" />
                     <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Líder Atual</h4>
-                    {topOpcao && topOpcao.votos > 0 ? (
-                      <>
-                        <p className="text-2xl font-black text-gray-900 mb-1">{topOpcao.nome}</p>
-                        <p className="text-icat-green font-bold bg-green-50 px-3 py-1 rounded-full text-sm inline-block">
-                          {((topOpcao.votos / totalVotos) * 100).toFixed(1)}% das intenções
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-gray-400 text-sm">Nenhum voto computado ainda.</p>
-                    )}
+                    {(() => {
+                      const validVotes = pesquisaResultado.opcoes.filter(o => o.nome.toLowerCase() !== 'branco/nulo' && o.nome.toLowerCase() !== 'não sabe' && o.nome.toLowerCase() !== 'indeciso').reduce((sum, o) => sum + o.votos, 0);
+                      const isTopOpcaoValid = topOpcao && topOpcao.nome.toLowerCase() !== 'branco/nulo' && topOpcao.nome.toLowerCase() !== 'não sabe' && topOpcao.nome.toLowerCase() !== 'indeciso';
+                      
+                      return topOpcao && topOpcao.votos > 0 && isTopOpcaoValid ? (
+                        <>
+                          <p className="text-2xl font-black text-gray-900 mb-1">{topOpcao.nome}</p>
+                          <div className="flex flex-col gap-1 items-center">
+                            <span className="text-icat-green font-bold bg-green-50 px-3 py-1 rounded-full text-sm inline-block">
+                              {((topOpcao.votos / totalVotos) * 100).toFixed(1)}% (Total)
+                            </span>
+                            {validVotes > 0 && (
+                              <span className="text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full text-sm inline-block">
+                                {((topOpcao.votos / validVotes) * 100).toFixed(1)}% dos Votos Válidos
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-gray-400 text-sm">Nenhum voto computado para candidatos ainda.</p>
+                      );
+                    })()}
                   </div>
                 </div>
+
+                {pesquisaResultado.respostas.length > 0 && (
+                  <div className="mt-8 border-t border-gray-200 pt-6">
+                    <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-4">Análise Demográfica (Idade x Intenção de Voto)</h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Faixa Etária Geral */}
+                      <div className="space-y-3">
+                        <h5 className="font-semibold text-gray-700 text-sm mb-3">Distribuição por Faixa Etária</h5>
+                        {(() => {
+                          const faixas = [
+                            { label: '16 a 24 anos', min: 16, max: 24 },
+                            { label: '25 a 34 anos', min: 25, max: 34 },
+                            { label: '35 a 44 anos', min: 35, max: 44 },
+                            { label: '45 a 59 anos', min: 45, max: 59 },
+                            { label: '60+ anos', min: 60, max: 200 }
+                          ];
+                          
+                          const totalComIdade = pesquisaResultado.respostas.filter(r => r.idade !== undefined).length;
+                          
+                          return faixas.map(faixa => {
+                            const count = pesquisaResultado.respostas.filter(r => r.idade !== undefined && r.idade >= faixa.min && r.idade <= faixa.max).length;
+                            const perc = totalComIdade > 0 ? ((count / totalComIdade) * 100).toFixed(1) : '0.0';
+                            
+                            return (
+                              <div key={faixa.label} className="relative">
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="font-medium text-gray-600">{faixa.label}</span>
+                                  <span className="font-bold text-gray-800">{perc}% <span className="text-gray-400 font-normal">({count})</span></span>
+                                </div>
+                                <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                                  <div className="h-2 rounded-full bg-icat-blue" style={{ width: `${perc}%` }}></div>
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                      
+                      {/* Líder por Faixa Etária */}
+                      <div className="space-y-3">
+                        <h5 className="font-semibold text-gray-700 text-sm mb-3">Líder por Faixa Etária</h5>
+                        {(() => {
+                          const faixas = [
+                            { label: 'Jovens (16 a 24)', min: 16, max: 24 },
+                            { label: 'Adultos (25 a 44)', min: 25, max: 44 },
+                            { label: 'Sênior (45+)', min: 45, max: 200 }
+                          ];
+                          
+                          return faixas.map(faixa => {
+                            const votosNaFaixa = pesquisaResultado.respostas.filter(r => r.idade !== undefined && r.idade >= faixa.min && r.idade <= faixa.max);
+                            if (votosNaFaixa.length === 0) return <div key={faixa.label} className="text-xs text-gray-400 mb-2">{faixa.label}: Sem dados</div>;
+                            
+                            // Agrupa votos por opção na faixa
+                            const contagem = {} as Record<number, number>;
+                            votosNaFaixa.forEach(r => {
+                              r.opcaoIdxs.forEach(idx => contagem[idx] = (contagem[idx] || 0) + 1);
+                            });
+                            
+                            // Acha vencedor
+                            const vencedorIdx = Object.keys(contagem).reduce((a, b) => contagem[Number(a)] > contagem[Number(b)] ? a : b, Object.keys(contagem)[0]);
+                            const vencedorNome = pesquisaResultado.opcoes[Number(vencedorIdx)]?.nome || 'N/A';
+                            const perc = ((contagem[Number(vencedorIdx)] / votosNaFaixa.length) * 100).toFixed(1);
+                            
+                            return (
+                              <div key={faixa.label} className="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100 mb-2">
+                                <span className="text-xs font-semibold text-gray-600">{faixa.label}</span>
+                                <div className="text-right">
+                                  <span className="text-xs font-bold text-gray-900">{vencedorNome}</span>
+                                  <span className="text-xs text-icat-green font-bold ml-2">{perc}%</span>
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-8 border-t border-gray-200 pt-6">
                   <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-4">Mural de Comentários / Opinião Espontânea</h4>

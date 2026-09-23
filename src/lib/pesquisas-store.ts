@@ -10,6 +10,7 @@ export type Resposta = {
   entrevistado: string;
   cpf?: string;
   telefone?: string;
+  idade?: number;
   opcaoIdxs: number[];  // supports multi-select
   entrevistadorId?: number;
   fonte: 'entrevistador' | 'publico';
@@ -45,12 +46,16 @@ const INICIAL: Pesquisa[] = [
       { nome: 'Renato Ribeiro', partido: 'PL', votos: 142 },
       { nome: 'Velomar Rios', partido: 'MDB', votos: 98 },
       { nome: 'Adilson Cardoso', partido: 'PT', votos: 67 },
+      { nome: 'Branco/Nulo', partido: '', votos: 25 },
+      { nome: 'Não Sabe', partido: '', votos: 40 },
     ],
     entrevistadores: [1, 2],
     respostas: [
-      { id: 'r1', entrevistado: 'José da Silva', telefone: '(64) 99900-0001', opcaoIdxs: [0], entrevistadorId: 1, fonte: 'entrevistador', data: '09/09/2026 14:22' },
-      { id: 'r2', entrevistado: 'Maria Santos', telefone: '(64) 99900-0002', opcaoIdxs: [1], entrevistadorId: 2, fonte: 'entrevistador', data: '09/09/2026 14:35' },
-      { id: 'r3', entrevistado: 'Carlos Pereira', telefone: '(64) 99900-0003', opcaoIdxs: [0], entrevistadorId: 1, fonte: 'entrevistador', data: '09/09/2026 15:01' },
+      { id: 'r1', entrevistado: 'José da Silva', telefone: '(64) 99900-0001', idade: 45, opcaoIdxs: [0], entrevistadorId: 1, fonte: 'entrevistador', data: '09/09/2026 14:22' },
+      { id: 'r2', entrevistado: 'Maria Santos', telefone: '(64) 99900-0002', idade: 22, opcaoIdxs: [1], entrevistadorId: 2, fonte: 'entrevistador', data: '09/09/2026 14:35' },
+      { id: 'r3', entrevistado: 'Carlos Pereira', telefone: '(64) 99900-0003', idade: 60, opcaoIdxs: [0], entrevistadorId: 1, fonte: 'entrevistador', data: '09/09/2026 15:01' },
+      { id: 'r4', entrevistado: 'Ana Julia', telefone: '(64) 99900-0004', idade: 19, opcaoIdxs: [2], entrevistadorId: 1, fonte: 'entrevistador', data: '09/09/2026 15:10' },
+      { id: 'r5', entrevistado: 'Marcos Paulo', telefone: '(64) 99900-0005', idade: 35, opcaoIdxs: [3], entrevistadorId: 2, fonte: 'entrevistador', data: '09/09/2026 15:20' },
     ],
   },
   {
@@ -122,7 +127,8 @@ export function addResposta(pesquisaId: number, resposta: Omit<Resposta, 'id' | 
   supabase.from('pesquisas_respostas').insert([{
     pesquisa_id: pesquisaId, entrevistado: resposta.entrevistado,
     telefone: resposta.telefone, fonte: resposta.fonte,
-    opcoes_selecionadas: resposta.opcaoIdxs, lat: resposta.lat, lng: resposta.lng
+    opcoes_selecionadas: resposta.opcaoIdxs, lat: resposta.lat, lng: resposta.lng,
+    idade: resposta.idade
   }]).then(() => {
     // Also update opcoes JSONB in pesquisas table
     supabase.from('pesquisas').update({ opcoes: pesquisa.opcoes }).eq('id', pesquisaId);

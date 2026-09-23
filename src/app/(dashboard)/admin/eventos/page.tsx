@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye, FileText, Wand2 } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, CalendarDays, Clock, MapPin, Users, Image as ImageIcon, Video, Building2, CheckCircle, Link as LinkIcon, Check, Eye, FileText, Wand2, X } from 'lucide-react';
 
 export default function EventosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [eventos, setEventos] = useState([
+  type Evento = { id: number; title: string; date: string; time: string; location: string; speakers: { name: string; role: string; photo: string }[]; participants: string; sponsors: string; status: string; cover: string; banner: string; gallery: { url: string; type: "video" | "image"; title: string; }[]; views: number; registrations: number; desc: string };
+  const [eventos, setEventos] = useState<Evento[]>([
     {
       id: 1,
       title: 'Ação Social de Inverno',

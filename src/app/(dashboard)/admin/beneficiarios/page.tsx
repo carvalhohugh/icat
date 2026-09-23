@@ -11,7 +11,8 @@ export default function BeneficiariosAdmin() {
   const [selectedBenId, setSelectedBenId] = useState<number | null>(null);
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
   
-  const [beneficiarios, setBeneficiarios] = useState([
+  type Beneficiario = { id: number; name: string; dependents: number; neighborhood: string; status: string; foto?: string };
+  const [beneficiarios, setBeneficiarios] = useState<Beneficiario[]>([
     { id: 1001, name: 'Maria da Silva', dependents: 3, neighborhood: 'Vila Margarida', status: 'Aprovado' },
     { id: 1002, name: 'João Oliveira', dependents: 1, neighborhood: 'Centro', status: 'Pendente' }
   ]);
@@ -185,14 +186,20 @@ export default function BeneficiariosAdmin() {
                   {b.status === 'Pendente' && (
                     <>
                       <button
-                        onClick={() => setBeneficiarios(beneficiarios.map(x => x.id === b.id ? { ...x, status: 'Aprovado' } : x))}
+                        onClick={async () => {
+                          setBeneficiarios(beneficiarios.map(x => x.id === b.id ? { ...x, status: 'Aprovado' } : x));
+                          await supabase.from('beneficiarios').update({ status: 'Aprovado' }).eq('id', b.id);
+                        }}
                         className="p-2 text-gray-400 hover:text-icat-green transition-colors rounded-lg hover:bg-green-50 text-xs font-bold"
                         title="Aprovar"
                       >
                         ✓ Aprovar
                       </button>
                       <button
-                        onClick={() => setBeneficiarios(beneficiarios.filter(x => x.id !== b.id))}
+                        onClick={async () => {
+                          setBeneficiarios(beneficiarios.filter(x => x.id !== b.id));
+                          await supabase.from('beneficiarios').delete().eq('id', b.id);
+                        }}
                         className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 text-xs font-bold"
                         title="Rejeitar"
                       >
@@ -209,10 +216,17 @@ export default function BeneficiariosAdmin() {
                   <button onClick={() => setIsModalOpen(true)} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50" title="Editar">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => setBeneficiarios(beneficiarios.map(x => x.id === b.id ? { ...x, status: x.status === 'Suspenso' ? 'Aprovado' : 'Suspenso' } : x))} className="p-2 text-gray-400 hover:text-orange-500 transition-colors rounded-lg hover:bg-orange-50" title={b.status === 'Suspenso' ? 'Reativar Cadastro' : 'Suspender Cadastro'}>
+                  <button onClick={async () => {
+                    const newStatus = b.status === 'Suspenso' ? 'Aprovado' : 'Suspenso';
+                    setBeneficiarios(beneficiarios.map(x => x.id === b.id ? { ...x, status: newStatus } : x));
+                    await supabase.from('beneficiarios').update({ status: newStatus }).eq('id', b.id);
+                  }} className="p-2 text-gray-400 hover:text-orange-500 transition-colors rounded-lg hover:bg-orange-50" title={b.status === 'Suspenso' ? 'Reativar Cadastro' : 'Suspender Cadastro'}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-ban"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={() => setBeneficiarios(beneficiarios.filter(x => x.id !== b.id))} title="Excluir">
+                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={async () => {
+                    setBeneficiarios(beneficiarios.filter(x => x.id !== b.id));
+                    await supabase.from('beneficiarios').delete().eq('id', b.id);
+                  }} title="Excluir">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>

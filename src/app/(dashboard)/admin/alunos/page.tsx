@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import Webcam from 'react-webcam';
 import { supabase } from '@/lib/supabase';
 
-type Aluno = { id: number; name: string; course: string; age: number; status: string; whatsapp: string; responsavel: string; foto?: string; nome?: string; curso?: string; idade?: number; foto_url?: string; };
+type Aluno = { id: number; name: string; course: string; age: number; birthdate?: string; status: string; whatsapp: string; responsavel: string; foto?: string; nome?: string; curso?: string; idade?: number; foto_url?: string; data_nascimento?: string; };
 
 export default function AlunosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,8 +18,8 @@ export default function AlunosAdmin() {
     { id: 7003, name: 'Lucas Santos', course: 'Informática Básica', age: 15, status: 'Matriculado', whatsapp: '(64) 99900-3333', responsavel: 'João Santos', foto: '' },
   ]);
 
-  const [formData, setFormData] = useState({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
-  const [editData, setEditData] = useState({ id: 0, name: '', course: '', age: '', status: '', whatsapp: '', responsavel: '' });
+  const [formData, setFormData] = useState({ name: '', course: '', age: '', birthdate: '', whatsapp: '', responsavel: '' });
+  const [editData, setEditData] = useState({ id: 0, name: '', course: '', age: '', birthdate: '', status: '', whatsapp: '', responsavel: '' });
   const [isCarteirinhaOpen, setIsCarteirinhaOpen] = useState(false);
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | null>(null);
   const [carteirinhaBg, setCarteirinhaBg] = useState<string>('');
@@ -33,7 +33,7 @@ export default function AlunosAdmin() {
       const { data, error } = await supabase.from('alunos').select('*').order('nome', { ascending: true });
       if (data && data.length > 0) {
         setAlunos(data.map(d => ({
-          id: d.id, name: d.nome, course: d.curso, age: d.idade, status: d.status, whatsapp: d.whatsapp, responsavel: d.responsavel, foto: d.foto_url
+          id: d.id, name: d.nome, course: d.curso, age: d.idade, birthdate: d.data_nascimento, status: d.status, whatsapp: d.whatsapp, responsavel: d.responsavel, foto: d.foto_url
         })));
       }
     }
@@ -75,30 +75,30 @@ export default function AlunosAdmin() {
     const nextId = alunos.length > 0 ? Math.max(...alunos.map(a => a.id)) + 1 : 7001;
     const newAluno = {
       id: nextId, name: formData.name, course: formData.course || 'Sem Curso',
-      age: Number(formData.age) || 0, status: 'Matriculado', whatsapp: formData.whatsapp || '', responsavel: formData.responsavel || '', foto: ''
+      age: Number(formData.age) || 0, birthdate: formData.birthdate, status: 'Matriculado', whatsapp: formData.whatsapp || '', responsavel: formData.responsavel || '', foto: ''
     };
     setAlunos([newAluno, ...alunos]);
     
     // Supabase Insert
     await supabase.from('alunos').insert([{ 
-      nome: formData.name, curso: formData.course || 'Sem Curso', idade: Number(formData.age) || 0, 
+      nome: formData.name, curso: formData.course || 'Sem Curso', idade: Number(formData.age) || 0, data_nascimento: formData.birthdate,
       status: 'Matriculado', whatsapp: formData.whatsapp, responsavel: formData.responsavel 
     }]);
 
-    setFormData({ name: '', course: '', age: '', whatsapp: '', responsavel: '' });
+    setFormData({ name: '', course: '', age: '', birthdate: '', whatsapp: '', responsavel: '' });
     setIsModalOpen(false);
   };
 
   const openProfile = (a: typeof alunos[0]) => {
-    setEditData({ id: a.id, name: a.name, course: a.course, age: a.age.toString(), status: a.status, whatsapp: a.whatsapp, responsavel: a.responsavel });
+    setEditData({ id: a.id, name: a.name, course: a.course, age: a.age.toString(), birthdate: a.birthdate || '', status: a.status, whatsapp: a.whatsapp, responsavel: a.responsavel });
     setIsProfileOpen(true);
   };
 
   const saveProfile = async () => {
-    setAlunos(alunos.map(a => a.id === editData.id ? { ...a, name: editData.name, course: editData.course, age: Number(editData.age), status: editData.status, whatsapp: editData.whatsapp, responsavel: editData.responsavel } : a));
+    setAlunos(alunos.map(a => a.id === editData.id ? { ...a, name: editData.name, course: editData.course, age: Number(editData.age), birthdate: editData.birthdate, status: editData.status, whatsapp: editData.whatsapp, responsavel: editData.responsavel } : a));
     setIsProfileOpen(false);
     await supabase.from('alunos').update({
-      nome: editData.name, curso: editData.course, idade: Number(editData.age),
+      nome: editData.name, curso: editData.course, idade: Number(editData.age), data_nascimento: editData.birthdate,
       status: editData.status, whatsapp: editData.whatsapp, responsavel: editData.responsavel
     }).eq('id', editData.id);
   };
@@ -193,7 +193,11 @@ export default function AlunosAdmin() {
                   <button onClick={(e) => { e.stopPropagation(); openProfile(a); }} className="p-2 text-gray-400 hover:text-icat-blue transition-colors rounded-lg hover:bg-blue-50">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={(e) => { e.stopPropagation(); setAlunos(alunos.filter(x => x.id !== a.id)); }}>
+                  <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50" onClick={async (e) => { 
+                    e.stopPropagation(); 
+                    setAlunos(alunos.filter(x => x.id !== a.id)); 
+                    await supabase.from('alunos').delete().eq('id', a.id);
+                  }}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>
@@ -226,8 +230,19 @@ export default function AlunosAdmin() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Idade</label>
-                  <input type="number" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+                  <input type="date" value={formData.birthdate || ''} onChange={e => {
+                    const dob = e.target.value;
+                    let calculatedAge = '';
+                    if (dob) {
+                      const diff = Date.now() - new Date(dob).getTime();
+                      const ageDate = new Date(diff); 
+                      const years = Math.abs(ageDate.getUTCFullYear() - 1970);
+                      calculatedAge = years.toString();
+                    }
+                    setFormData({...formData, birthdate: dob, age: calculatedAge});
+                  }} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  {formData.age && <p className="text-xs text-gray-500 mt-1">Idade calculada: {formData.age} anos</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
@@ -284,8 +299,19 @@ export default function AlunosAdmin() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Idade</label>
-                  <input type="number" value={editData.age} onChange={e => setEditData({...editData, age: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+                  <input type="date" value={editData.birthdate || ''} onChange={e => {
+                    const dob = e.target.value;
+                    let calculatedAge = '';
+                    if (dob) {
+                      const diff = Date.now() - new Date(dob).getTime();
+                      const ageDate = new Date(diff);
+                      const years = Math.abs(ageDate.getUTCFullYear() - 1970);
+                      calculatedAge = years.toString();
+                    }
+                    setEditData({...editData, birthdate: dob, age: calculatedAge});
+                  }} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
+                  {editData.age && <p className="text-xs text-gray-500 mt-1">Idade calculada: {editData.age} anos</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -363,8 +389,14 @@ export default function AlunosAdmin() {
                       <td className="p-4 text-sm text-gray-600">{a.age} anos</td>
                       <td className="p-4 text-sm text-gray-600">{a.course}</td>
                       <td className="p-4 text-right space-x-2">
-                        <button onClick={() => setAlunos(alunos.map(x => x.id === a.id ? {...x, status: 'Matriculado'} : x))} className="px-3 py-1 bg-green-50 text-icat-green hover:bg-green-100 rounded-md text-xs font-bold transition-colors">Aprovar</button>
-                        <button onClick={() => setAlunos(alunos.filter(x => x.id !== a.id))} className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs font-bold transition-colors">Rejeitar</button>
+                        <button onClick={async () => {
+                          setAlunos(alunos.map(x => x.id === a.id ? {...x, status: 'Matriculado'} : x));
+                          await supabase.from('alunos').update({ status: 'Matriculado' }).eq('id', a.id);
+                        }} className="px-3 py-1 bg-green-50 text-icat-green hover:bg-green-100 rounded-md text-xs font-bold transition-colors">Aprovar</button>
+                        <button onClick={async () => {
+                          setAlunos(alunos.filter(x => x.id !== a.id));
+                          await supabase.from('alunos').delete().eq('id', a.id);
+                        }} className="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs font-bold transition-colors">Rejeitar</button>
                       </td>
                     </tr>
                   ))}

@@ -5,11 +5,12 @@ import { Plus, Search, Edit2, Trash2, Folder, Wand2 } from 'lucide-react';
 export default function ProjetosAdmin() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  const [projetos, setProjetos] = useState([
-    { id: 1, title: 'Aula de reforço para ensino fundamental', area: 'Educação e Formação', desc: 'Reforço escolar focado no ensino fundamental para alunos da rede pública.' },
-    { id: 2, title: 'ENEM EM FOCO (Ensino médio / UF)', area: 'Educação e Formação', desc: 'Aulas preparatórias intensivas para o ENEM e vestibulares de universidades federais.' },
-    { id: 4, title: 'Atleta do Futuro', area: 'Esporte e Inclusão', desc: 'Escolinha de esportes focado em crianças e adolescentes, promovendo disciplina, trabalho em equipe e saúde física, além de tirá-los das ruas no contraturno escolar.' },
-    { id: 5, title: 'Cesta Solidária', area: 'Assistência Social', desc: 'Entrega mensal de cestas básicas para famílias em situação de extrema vulnerabilidade, cadastradas e acompanhadas por nossa equipe de assistência social.' },
+  type Projeto = { id: number; title: string; area: string; desc: string; status?: string };
+  const [projetos, setProjetos] = useState<Projeto[]>([
+    { id: 1, title: 'Aula de reforço para ensino fundamental', area: 'Educação e Formação', desc: 'Reforço escolar focado no ensino fundamental para alunos da rede pública.', status: 'Ativo' },
+    { id: 2, title: 'ENEM EM FOCO (Ensino médio / UF)', area: 'Educação e Formação', desc: 'Aulas preparatórias intensivas para o ENEM e vestibulares de universidades federais.', status: 'Ativo' },
+    { id: 4, title: 'Atleta do Futuro', area: 'Esporte e Inclusão', desc: 'Escolinha de esportes focado em crianças e adolescentes, promovendo disciplina, trabalho em equipe e saúde física, além de tirá-los das ruas no contraturno escolar.', status: 'Ativo' },
+    { id: 5, title: 'Cesta Solidária', area: 'Assistência Social', desc: 'Entrega mensal de cestas básicas para famílias em situação de extrema vulnerabilidade, cadastradas e acompanhadas por nossa equipe de assistência social.', status: 'Ativo' },
   ]);
 
   useEffect(() => {
