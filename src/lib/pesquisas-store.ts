@@ -36,6 +36,7 @@ export type Pesquisa = {
   entrevistadores: number[];
   respostas: Resposta[];
   metaDiaria?: number;
+  metaEntrevistas?: number;
 };
 
 const STORAGE_KEY = 'icat_pesquisas_v1';
@@ -168,7 +169,7 @@ export function addPesquisa(p: Omit<Pesquisa, 'id' | 'respostas'>) {
   // Supabase sync
   supabase.from('pesquisas').insert([{
     nome: p.nome, tipo: p.tipo, status: p.status, induzida: p.induzida,
-    multi_select: p.multiSelect, meta_diaria: p.metaDiaria, opcoes: p.opcoes
+    multi_select: p.multiSelect, meta_diaria: p.metaDiaria, meta_entrevistas: p.metaEntrevistas, opcoes: p.opcoes
   }]);
 
   return nova;
@@ -188,7 +189,7 @@ export function updatePesquisa(id: number, data: Partial<Pesquisa>) {
     saveStore(pesquisas);
     supabase.from('pesquisas').update({
       nome: data.nome, tipo: data.tipo, status: data.status,
-      induzida: data.induzida, multi_select: data.multiSelect, opcoes: data.opcoes
+      induzida: data.induzida, multi_select: data.multiSelect, meta_entrevistas: data.metaEntrevistas, opcoes: data.opcoes
     }).eq('id', id);
   }
 }

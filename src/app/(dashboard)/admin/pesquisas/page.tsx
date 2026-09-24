@@ -179,7 +179,22 @@ export default function PesquisasAdmin() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pesquisas.map(p => (
-              <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md transition-shadow relative">
+              <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md transition-shadow relative cursor-pointer" onClick={(e) => {
+    // ignore clicks on the action buttons area
+    if (e.target.closest('button')) return;
+    setEditandoId(p.id);
+    setNome(p.nome);
+    setTipo(p.tipo);
+    setStatus(p.status);
+    setInduzida(p.induzida);
+    setMultiSelect(p.multiSelect || false);
+    setExigeMorador(p.exigeMorador || false);
+    setIdadeMinima(p.idadeMinima?.toString() || '');
+    setMetaDiaria(p.metaDiaria || 50);
+    setMetaEntrevistas(p.metaEntrevistas || 1000);
+    setOpcoes([...p.opcoes]);
+    setIsModalOpen(true);
+  }}>
                 <div className="absolute top-4 right-4 flex items-center gap-1">
                   <button className="p-1.5 text-gray-400 hover:text-icat-green rounded-md hover:bg-green-50 transition-colors" title="Copiar Link Público (Aberto)" onClick={() => {
                     const url = typeof window !== 'undefined' ? `${window.location.origin}/pesquisa/${p.id}` : `https://institutocatalano.com.br/pesquisa/${p.id}`;
@@ -317,7 +332,7 @@ export default function PesquisasAdmin() {
                   <PrintHeader title={`Relatório: ${pesquisaResultado.nome}`} />
                   
                   {/* Dashboard de Gestão Geral da Pesquisa */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 print:hidden">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 print:hidden">
                     <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-center gap-4">
                       <div className="bg-blue-500 text-white p-3 rounded-lg"><Users className="w-6 h-6" /></div>
                       <div>
@@ -345,6 +360,16 @@ export default function PesquisasAdmin() {
                             })()
                             : 0} 
                           <span className="text-sm font-medium text-gray-500"> / dia</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 border border-purple-100 p-4 rounded-xl flex items-center gap-4">
+                      <div className="bg-purple-500 text-white p-3 rounded-lg"><Target className="w-6 h-6" /></div>
+                      <div>
+                        <p className="text-sm font-bold text-purple-600 uppercase tracking-wide">Meta por Entrevistador</p>
+                        <p className="text-2xl font-black text-gray-900">
+                          {pesquisaResultado.entrevistadores.length > 0 ? Math.round((pesquisaResultado.metaEntrevistas || 1000) / pesquisaResultado.entrevistadores.length) : (pesquisaResultado.metaEntrevistas || 1000)}
+                          <span className="text-sm font-medium text-gray-500"> por pessoa</span>
                         </p>
                       </div>
                     </div>
