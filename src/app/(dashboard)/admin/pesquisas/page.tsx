@@ -22,6 +22,7 @@ type Entrevistador = { id: number; nome: string; cpf: string; telefone: string; 
 export default function PesquisasAdmin() {
   const [activeTab, setActiveTab] = useState<'pesquisas' | 'entrevistadores' | 'resultados'>('pesquisas');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
   const [isEntrevistadorModal, setIsEntrevistadorModal] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState<Record<number, boolean>>({});
   const [resultadoPesquisaId, setResultadoPesquisaId] = useState<number | null>(null);
@@ -88,17 +89,24 @@ export default function PesquisasAdmin() {
 
   const handleSavePesquisa = () => {
     if (!novaPesquisa.nome || novasOpcoes.filter(o => o.nome.trim()).length < 2) return;
-    addPesquisa({
+    const payload = {
       nome: novaPesquisa.nome, tipo: novaPesquisa.tipo,
       status: 'Ativa', induzida: novaPesquisa.induzida,
       multiSelect: novaPesquisa.multiSelect,
       metaDiaria: novaPesquisa.metaDiaria,
+      metaEntrevistas: novaPesquisa.metaEntrevistas,
       exigeMorador: novaPesquisa.exigeMorador,
       idadeMinima: novaPesquisa.idadeMinima,
       opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0, foto: o.foto })),
       entrevistadores: entrevSelecionados,
-    });
-    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, exigeMorador: false, idadeMinima: 16 });
+    };
+    if (editandoId) {
+      updatePesquisa(editandoId, payload);
+    } else {
+      addPesquisa(payload);
+    }
+    setEditandoId(null);
+    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 });
     setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]);
     setEntrevSelecionados([]);
     setIsModalOpen(false);
@@ -175,7 +183,7 @@ export default function PesquisasAdmin() {
       {activeTab === 'pesquisas' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center"><Plus className="w-5 h-5 mr-2" /> Nova Pesquisa</button>
+            <button onClick={() => { setEditandoId(null); setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 }); setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]); setEntrevSelecionados([]); setIsModalOpen(true); }} className="btn-primary flex items-center"><Plus className="w-5 h-5 mr-2" /> Nova Pesquisa</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pesquisas.map(p => (
