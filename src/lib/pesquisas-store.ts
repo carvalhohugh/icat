@@ -11,6 +11,10 @@ export type Resposta = {
   cpf?: string;
   telefone?: string;
   idade?: number;
+  genero?: string;
+  estado?: string;
+  cidade?: string;
+  bairro?: string;
   opcaoIdxs: number[];  // supports multi-select
   entrevistadorId?: number;
   fonte: 'entrevistador' | 'publico';
@@ -102,7 +106,7 @@ export function getPesquisa(id: number): Pesquisa | undefined {
   return loadStore().find(p => p.id === id);
 }
 
-export function addResposta(pesquisaId: number, resposta: Omit<Resposta, 'id' | 'data'>) {
+export function addResposta(pesquisaId: number, resposta: Omit<Resposta, 'id' | 'data'>, novasOpcoesNomes?: string[]) {
   const pesquisas = loadStore();
   const idx = pesquisas.findIndex(p => p.id === pesquisaId);
   if (idx === -1) return;
@@ -115,6 +119,24 @@ export function addResposta(pesquisaId: number, resposta: Omit<Resposta, 'id' | 
   };
 
   // Update votos counts
+  if (novasOpcoesNomes && novasOpcoesNomes.length > 0) {
+    novasOpcoesNomes.forEach(nome => {
+      const cleanName = nome.trim();
+      if (!cleanName) return;
+      
+      const existingIdx = pesquisa.opcoes.findIndex(o => o.nome.toLowerCase() === cleanName.toLowerCase());
+      if (existingIdx !== -1) {
+        if (!novaResposta.opcaoIdxs.includes(existingIdx)) {
+          novaResposta.opcaoIdxs.push(existingIdx);
+        }
+      } else {
+        const novoIdx = pesquisa.opcoes.length;
+        pesquisa.opcoes.push({ nome: cleanName, votos: 0 });
+        novaResposta.opcaoIdxs.push(novoIdx);
+      }
+    });
+  }
+
   novaResposta.opcaoIdxs.forEach(opcaoIdx => {
     if (pesquisa.opcoes[opcaoIdx]) {
       pesquisa.opcoes[opcaoIdx].votos += 1;

@@ -39,6 +39,31 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
   const [isMorador, setIsMorador] = useState<string>('sim');
   const [selecionados, setSelecionados] = useState<number[]>([]);
   const [outroNome, setOutroNome] = useState('');
+  const [genero, setGenero] = useState('');
+  const [local, setLocal] = useState({ estado: '', cidade: '', bairro: '' });
+  const [estados, setEstados] = useState<any[]>([]);
+  const [cidades, setCidades] = useState<any[]>([]);
+  const [bairrosSalvos, setBairrosSalvos] = useState<string[]>(['Centro', 'Castelo Branco', 'Santa Cruz', 'Nossa Senhora de Fátima']); // Mock inicial de bairros
+  const [novoBairroModo, setNovoBairroModo] = useState(false);
+  const [showLocalPopup, setShowLocalPopup] = useState(true); // Always show on open
+
+  useEffect(() => {
+      if (local.estado) {
+        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${local.estado}/municipios`)
+          .then(res => res.json())
+          .then(data => setCidades(data))
+          .catch(console.error);
+      } else {
+        setCidades([]);
+      }
+    }, [local.estado]);
+
+    useEffect(() => {
+      fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+        .then(res => res.json())
+        .then(data => setEstados(data))
+        .catch(console.error);
+    }, []);
 
   useEffect(() => {
     const p = getPesquisa(Number(params.id));
@@ -48,7 +73,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
   }, [params.id]);
 
   const reset = () => { setIsMorador('sim');
-    setStep(0); setNome(''); setCpf(''); setTelefone(''); setNascimento(''); setIdade(undefined); setSelecionados([]); setOutroNome('');
+    setStep(0); setNome(''); setCpf(''); setTelefone(''); setNascimento(''); setIdade(undefined); setSelecionados([]); setOutroNome(''); setGenero('');
   };
 
   if (!pesquisa) return (
@@ -94,13 +119,9 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
       entrevistado: nome || 'Sem nome',
       cpf,
       telefone,
-      idade,
-      opcaoIdxs: selecionados.filter(i => i < pesquisa.opcoes.length),
-      entrevistadorId: entrevistador?.id,
-      fonte: 'entrevistador',
-      lat,
-      lng,
-    });
+      idade, genero, estado: local.estado, cidade: local.cidade, bairro: local.bairro, opcaoIdxs: selecionados.filter(i => i < pesquisa.opcoes.length),
+      entrevistadorId: entrevistador?.id, fonte: 'entrevistador', lat, lng }, 
+  outroNome ? [outroNome] : []);
     setStep(3);
   };
 
