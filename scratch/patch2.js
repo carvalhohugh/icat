@@ -1,0 +1,9 @@
+const fs = require('fs'); 
+const file = 'src/app/pesquisa/[id]/page.tsx'; 
+let content = fs.readFileSync(file, 'utf8'); 
+content = content.replace(/const \[idade, setIdade\] = useState<number \| undefined>\(undefined\);/, 'const [idade, setIdade] = useState<number | undefined>(undefined);\n  const [isMorador, setIsMorador] = useState<string>(\'sim\');'); 
+content = content.replace(/const reset = \(\) => \{/, 'const reset = () => { setIsMorador(\'sim\');'); 
+content = content.replace(/<div>\s*<label className=\"block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider\">Nascimento<\/label>/, '{pesquisa.exigeMorador && (<div className=\"mb-4\"><label className=\"block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider\">Você é morador do município?</label><div className=\"flex gap-4\"><label className=\"flex items-center gap-2\"><input type=\"radio\" name=\"morador\" checked={isMorador === \'sim\'} onChange={() => setIsMorador(\'sim\')} /><span>Sim</span></label><label className=\"flex items-center gap-2\"><input type=\"radio\" name=\"morador\" checked={isMorador === \'nao\'} onChange={() => setIsMorador(\'nao\')} /><span>Não</span></label></div></div>)}<div><label className=\"block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider\">Nascimento</label>'); 
+content = content.replace(/onClick=\{.*?setStep\(1\).*?\}/, 'onClick={() => { if (pesquisa.exigeMorador && isMorador === \'nao\') { alert(\'Pesquisa encerrada: Necessário ser morador do município.\'); reset(); return; } if (pesquisa.idadeMinima && idade !== undefined && idade < pesquisa.idadeMinima) { alert(\'Pesquisa encerrada: Você é menor que a idade mínima permitida.\'); reset(); return; } setStep(1); }}'); 
+fs.writeFileSync(file, content, 'utf8'); 
+console.log('Patched');

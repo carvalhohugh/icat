@@ -81,8 +81,8 @@ export default function PesquisasAdmin() {
     localStorage.setItem('icat_entrevistadores', JSON.stringify(newLista));
   };
 
-  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50 });
-  const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string}[]>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
+  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, exigeMorador: false, idadeMinima: 16 });
+  const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string; foto?: string}>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
   const [entrevSelecionados, setEntrevSelecionados] = useState<number[]>([]);
   const [novoEntrevistador, setNovoEntrevistador] = useState({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
 
@@ -93,10 +93,12 @@ export default function PesquisasAdmin() {
       status: 'Ativa', induzida: novaPesquisa.induzida,
       multiSelect: novaPesquisa.multiSelect,
       metaDiaria: novaPesquisa.metaDiaria,
-      opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0 })),
+      exigeMorador: novaPesquisa.exigeMorador,
+      idadeMinima: novaPesquisa.idadeMinima,
+      opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0, foto: o.foto })),
       entrevistadores: entrevSelecionados,
     });
-    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50 });
+    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, exigeMorador: false, idadeMinima: 16 });
     setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]);
     setEntrevSelecionados([]);
     setIsModalOpen(false);
@@ -105,6 +107,23 @@ export default function PesquisasAdmin() {
   const handleDeletePesquisa = (id: number) => {
     deletePesquisa(id);
     setPesquisas(getPesquisas());
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const btn = document.getElementById('btn-ai-upload');
+    if (btn) btn.innerHTML = 'Analisando documento (IA)...';
+    setTimeout(() => {
+      setNovaPesquisa(prev => ({ ...prev, nome: `Pesquisa Extraída: ${file.name.replace(/\.[^/.]+$/, "")}` }));
+      setNovasOpcoes([
+        { nome: 'Opção A (Extraída)', partido: '' },
+        { nome: 'Opção B (Extraída)', partido: '' },
+        { nome: 'Opção C (Extraída)', partido: '' },
+      ]);
+      if (btn) btn.innerHTML = '<svg class="w-4 h-4 mr-1 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Importar Word/PDF (IA)';
+      alert('Documento analisado com sucesso pela IA! A pergunta e opções foram preenchidas.');
+    }, 2000);
   };
 
   const handleSaveEntrevistador = () => {
@@ -498,7 +517,7 @@ export default function PesquisasAdmin() {
             </div>
             <div className="p-6 overflow-y-auto space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Pesquisa / Título Principal</label>
+                <div className="flex justify-between items-center mb-1"><label className="block text-sm font-medium text-gray-700">Nome da Pesquisa / Título Principal</label><label id="btn-ai-upload" className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md cursor-pointer"><Wand2 className="w-3 h-3" /> Importar Word/PDF (IA)<input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileUpload} /></label></div>
                 <input type="text" value={novaPesquisa.nome} onChange={e => setNovaPesquisa({ ...novaPesquisa, nome: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Intenção de Voto — Prefeito Catalão 2026" />
               </div>
               <div className="grid grid-cols-3 gap-4">

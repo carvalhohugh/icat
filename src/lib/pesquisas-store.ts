@@ -3,7 +3,7 @@
 // The admin panel reads from this store
 import { supabase } from '@/lib/supabase';
 
-export type Opcao = { nome: string; partido?: string; votos: number };
+export type Opcao = { nome: string; partido?: string; votos: number; foto?: string };
 
 export type Resposta = {
   id: string;
@@ -26,6 +26,8 @@ export type Pesquisa = {
   status: string;
   induzida: boolean;
   multiSelect?: boolean;
+  exigeMorador?: boolean;
+  idadeMinima?: number;
   opcoes: Opcao[];
   entrevistadores: number[];
   respostas: Resposta[];

@@ -36,6 +36,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
   const [telefone, setTelefone] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [idade, setIdade] = useState<number | undefined>(undefined);
+  const [isMorador, setIsMorador] = useState<string>('sim');
   const [selecionados, setSelecionados] = useState<number[]>([]);
   const [outroNome, setOutroNome] = useState('');
 
@@ -46,7 +47,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
     setEntrevistador(ev);
   }, [params.id]);
 
-  const reset = () => {
+  const reset = () => { setIsMorador('sim');
     setStep(0); setNome(''); setCpf(''); setTelefone(''); setNascimento(''); setIdade(undefined); setSelecionados([]); setOutroNome('');
   };
 
@@ -144,8 +145,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
                   placeholder="000.000.000-00 (opcional)" />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nascimento</label>
+                {pesquisa.exigeMorador && (<div className="mb-4"><label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">É morador do município?</label><div className="flex gap-4"><label className="flex items-center gap-2"><input type="radio" name="morador" checked={isMorador === 'sim'} onChange={() => setIsMorador('sim')} /><span>Sim</span></label><label className="flex items-center gap-2"><input type="radio" name="morador" checked={isMorador === 'nao'} onChange={() => setIsMorador('nao')} /><span>Não</span></label></div></div>)}<div><label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nascimento</label>
                   <input type="date" value={nascimento} onChange={e => {
                     setNascimento(e.target.value);
                     if (e.target.value) {
@@ -162,7 +162,7 @@ export default function EntrevistadorColeta({ params }: { params: { id: string }
                     placeholder="(64) 99000-0000" />
                 </div>
               </div>
-              <button onClick={() => setStep(1)}
+              <button onClick={() => { if (pesquisa.exigeMorador && isMorador === 'nao') { alert('Pesquisa encerrada: O entrevistado não é morador do município.'); reset(); return; } if (pesquisa.idadeMinima && idade !== undefined && idade < pesquisa.idadeMinima) { alert('Pesquisa encerrada: O entrevistado é menor que a idade mínima permitida.'); reset(); return; } setStep(1); }}
                 className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mt-4">
                 Iniciar Pesquisa <ArrowRight className="w-5 h-5" />
               </button>

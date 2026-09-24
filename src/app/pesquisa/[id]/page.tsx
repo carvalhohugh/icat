@@ -125,7 +125,7 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
                   </div>
                 </div>
               </div>
-              <button onClick={() => { if (cpf.trim()) setStep(1); }}
+              <button onClick={() => { if (pesquisa.exigeMorador && isMorador === 'nao') { alert('Pesquisa encerrada: Necessário ser morador do município.'); reset(); return; } if (pesquisa.idadeMinima && idade !== undefined && idade < pesquisa.idadeMinima) { alert('Pesquisa encerrada: Você é menor que a idade mínima permitida.'); reset(); return; } setStep(1); }}}
                 disabled={!cpf.trim()}
                 className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-40 flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 mt-8">
                 Começar Pesquisa <ArrowRight className="w-5 h-5" />
