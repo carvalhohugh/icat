@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X, ClipboardList, Users, BarChart3, Copy, Check, Download, Wand2, Eye, Link2 , Target, TrendingUp, CheckSquare} from 'lucide-react';
+import { Plus, Trash2, X, ClipboardList, Users, BarChart3, CheckSquare, TrendingUp, Target, Copy, Check, Download, Wand2, Eye, Link2 } from 'lucide-react';
 import { getPesquisas, addPesquisa, deletePesquisa, updatePesquisa, type Pesquisa } from '@/lib/pesquisas-store';
 import { PrintHeader } from '@/components/PrintHeader';
 
@@ -82,36 +82,32 @@ export default function PesquisasAdmin() {
     localStorage.setItem('icat_entrevistadores', JSON.stringify(newLista));
   };
 
-  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 });
-  const [novasPerguntas, setNovasPerguntas] = useState<{id: string, titulo: string, tipo: 'Espontânea' | 'Induzida', multiSelect: boolean, opcoes: {id: string, nome: string, partido: string, foto?: string}[]}[]>([{id: 'p1', titulo: '', tipo: 'Induzida', multiSelect: false, opcoes: [{id: 'o1', nome: '', partido: '', foto: ''}, {id: 'o2', nome: '', partido: '', foto: ''}]}]);
+  const [novaPesquisa, setNovaPesquisa] = useState({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 });
+  const [novasOpcoes, setNovasOpcoes] = useState<{nome: string; partido: string; foto?: string}[]>([{nome: '', partido: ''}, {nome: '', partido: ''}]);
   const [entrevSelecionados, setEntrevSelecionados] = useState<number[]>([]);
   const [novoEntrevistador, setNovoEntrevistador] = useState({ nome: '', cpf: '', telefone: '', email: '', senha: '' });
 
-    const handleSavePesquisa = () => {
-    if (!novaPesquisa.nome || novasPerguntas.length === 0) return;
+  const handleSavePesquisa = () => {
+    if (!novaPesquisa.nome || novasOpcoes.filter(o => o.nome.trim()).length < 2) return;
     const payload = {
       nome: novaPesquisa.nome, tipo: novaPesquisa.tipo,
-      status: 'Ativa', induzida: true,
+      status: 'Ativa', induzida: novaPesquisa.induzida,
+      multiSelect: novaPesquisa.multiSelect,
+      metaDiaria: novaPesquisa.metaDiaria,
       metaEntrevistas: novaPesquisa.metaEntrevistas,
       exigeMorador: novaPesquisa.exigeMorador,
       idadeMinima: novaPesquisa.idadeMinima,
-      perguntas: novasPerguntas.map(p => ({
-        id: p.id,
-        titulo: p.titulo.trim(),
-        tipo: p.tipo,
-        multiSelect: p.multiSelect,
-        opcoes: p.opcoes.filter(o => o.nome.trim()).map(o => ({ id: o.id, nome: o.nome.trim(), partido: o.partido?.trim() || undefined, foto: o.foto?.trim() || undefined, votos: 0 }))
-      })),
+      opcoes: novasOpcoes.filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), partido: o.partido.trim() || undefined, votos: 0, foto: o.foto })),
       entrevistadores: entrevSelecionados,
     };
     if (editandoId) {
       updatePesquisa(editandoId, payload);
     } else {
-      addPesquisa(payload as Omit<Pesquisa, 'id' | 'respostas'>);
+      addPesquisa(payload);
     }
     setEditandoId(null);
-    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 });
-    setNovasPerguntas([{id: 'p1', titulo: '', tipo: 'Induzida', multiSelect: false, opcoes: [{id: 'o1', nome: '', partido: '', foto: ''}, {id: 'o2', nome: '', partido: '', foto: ''}]}]);
+    setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 });
+    setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]);
     setEntrevSelecionados([]);
     setIsModalOpen(false);
   };
@@ -128,7 +124,11 @@ export default function PesquisasAdmin() {
     if (btn) btn.innerHTML = 'Analisando documento (IA)...';
     setTimeout(() => {
       setNovaPesquisa(prev => ({ ...prev, nome: `Pesquisa Extraída: ${file.name.replace(/\.[^/.]+$/, "")}` }));
-      setNovasPerguntas([{ id: 'p1', titulo: 'Pergunta Extraída', tipo: 'Induzida', multiSelect: false, opcoes: [{ id: 'o1', nome: 'Opção A (Extraída)', partido: '' }, { id: 'o2', nome: 'Opção B (Extraída)', partido: '' }, { id: 'o3', nome: 'Opção C (Extraída)', partido: '' }] }]);
+      setNovasOpcoes([
+        { nome: 'Opção A (Extraída)', partido: '' },
+        { nome: 'Opção B (Extraída)', partido: '' },
+        { nome: 'Opção C (Extraída)', partido: '' },
+      ]);
       if (btn) btn.innerHTML = '<svg class="w-4 h-4 mr-1 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Importar Word/PDF (IA)';
       alert('Documento analisado com sucesso pela IA! A pergunta e opções foram preenchidas.');
     }, 2000);
@@ -150,8 +150,8 @@ export default function PesquisasAdmin() {
   };
 
   const pesquisaResultado = pesquisas.find(p => p.id === resultadoPesquisaId);
-  const totalVotos = pesquisaResultado?.respostas?.length || 0;
-  
+  const totalVotos = pesquisaResultado?.opcoes.reduce((s, o) => s + o.votos, 0) || 0;
+  const topOpcao = pesquisaResultado && totalVotos > 0 ? pesquisaResultado.opcoes.reduce((prev, current) => (prev.votos > current.votos) ? prev : current) : null;
   const entrevistador = entrevistadores.find(e => e.id === relatorioEntrevistadorId);
   const pesquisasDoEntrevistador = pesquisas.filter(p => p.entrevistadores.includes(relatorioEntrevistadorId!));
 
@@ -183,33 +183,25 @@ export default function PesquisasAdmin() {
       {activeTab === 'pesquisas' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => { setEditandoId(null); setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 }); setNovasPerguntas([{id: 'p1', titulo: '', tipo: 'Induzida', multiSelect: false, opcoes: [{id: 'o1', nome: '', partido: '', foto: ''}, {id: 'o2', nome: '', partido: '', foto: ''}]}]); setEntrevSelecionados([]); setIsModalOpen(true); }} className="btn-primary flex items-center"><Plus className="w-5 h-5 mr-2" /> Nova Pesquisa</button>
+            <button onClick={() => { setEditandoId(null); setNovaPesquisa({ nome: '', tipo: 'Intenção de Voto', induzida: true, multiSelect: false, metaDiaria: 50, metaEntrevistas: 1000, exigeMorador: false, idadeMinima: 16 }); setNovasOpcoes([{nome: '', partido: ''}, {nome: '', partido: ''}]); setEntrevSelecionados([]); setIsModalOpen(true); }} className="btn-primary flex items-center"><Plus className="w-5 h-5 mr-2" /> Nova Pesquisa</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pesquisas.map(p => (
               <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md transition-shadow relative cursor-pointer" onClick={(e) => {
-    // ignore clicks on the action buttons area
     if ((e.target as HTMLElement).closest('button')) return;
     setEditandoId(p.id);
     setNovaPesquisa({
       nome: p.nome,
       tipo: p.tipo,
+      induzida: p.induzida,
+      multiSelect: p.multiSelect || false,
       metaDiaria: p.metaDiaria || 50,
       metaEntrevistas: p.metaEntrevistas || 1000,
       exigeMorador: p.exigeMorador || false,
       idadeMinima: p.idadeMinima || 16
     });
-    if (p.perguntas && p.perguntas.length > 0) {
-      setNovasPerguntas(p.perguntas.map(perg => ({
-        id: perg.id, titulo: perg.titulo, tipo: perg.tipo, multiSelect: perg.multiSelect,
-        opcoes: perg.opcoes.map(o => ({ id: o.id, nome: o.nome, partido: o.partido || '', foto: o.foto || '' }))
-      })));
-    } else if (p.opcoes) {
-      setNovasPerguntas([{
-        id: 'legacy', titulo: p.nome, tipo: p.induzida ? 'Induzida' : 'Espontânea', multiSelect: p.multiSelect || false,
-        opcoes: p.opcoes.map(o => ({ id: o.id || Math.random().toString(), nome: o.nome, partido: o.partido || '' }))
-      }]);
-    }
+    setNovasOpcoes(p.opcoes.map(o => ({ nome: o.nome, partido: o.partido || '', foto: o.foto || '' })));
+    setEntrevSelecionados([...p.entrevistadores]);
     setIsModalOpen(true);
   }}>
                 <div className="absolute top-4 right-4 flex items-center gap-1">
@@ -236,13 +228,13 @@ export default function PesquisasAdmin() {
                 </div>
                 <h3 className="font-bold text-gray-900 text-lg leading-tight mb-2 pr-12">{p.nome}</h3>
                 <div className="space-y-1 mb-4 flex-1">
-                  {(p.perguntas?.[0]?.opcoes || p.opcoes || []).slice(0, 3).map((o, i) => (
+                  {p.opcoes.slice(0, 3).map((o, i) => (
                     <div key={i} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-1.5 truncate pr-2"><div className={`w-2 h-2 rounded-full ${CORES[i % CORES.length]}`}></div><span className="text-gray-600 truncate">{o.nome}</span></div>
                       <span className="font-semibold text-gray-900 bg-gray-50 px-2 py-0.5 rounded text-xs">{o.votos}</span>
                     </div>
                   ))}
-                  {(p.perguntas?.[0]?.opcoes || p.opcoes || []).length > 3 && <div className="text-xs text-gray-400 pl-3.5 pt-1">+{(p.perguntas?.[0]?.opcoes || p.opcoes || []).length - 3} opções...</div>}
+                  {p.opcoes.length > 3 && <div className="text-xs text-gray-400 pl-3.5 pt-1">+{p.opcoes.length - 3} opções...</div>}
                 </div>
                 <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
                   <div className="flex items-center gap-2">
@@ -339,7 +331,7 @@ export default function PesquisasAdmin() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 max-w-2xl mx-auto print:hidden">
             <select value={resultadoPesquisaId || ''} onChange={e => setResultadoPesquisaId(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm font-medium">
               <option value="">Selecione uma pesquisa para ver os resultados...</option>
-              {pesquisas.map(p => <option key={p.id} value={p.id}>{p.nome} ({p.respostas?.length || 0} respostas)</option>)}
+              {pesquisas.map(p => <option key={p.id} value={p.id}>{p.nome} ({p.opcoes.reduce((s, o) => s + o.votos, 0)} respostas)</option>)}
             </select>
           </div>
           {pesquisaResultado && (
@@ -398,9 +390,9 @@ export default function PesquisasAdmin() {
                     <p className="text-sm text-gray-500">{totalVotos} respostas coletadas</p>
                   </div>
                   <div className="flex flex-wrap justify-end gap-2 print:hidden">
-                    {pesquisaResultado.tipo === 'Intenção de Voto' && (pesquisaResultado.perguntas?.[0]?.opcoes?.length || 0) > 2 && (
+                    {pesquisaResultado.tipo === 'Intenção de Voto' && pesquisaResultado.opcoes.length > 2 && (
                       <button onClick={() => {
-                        const candidatos = [...(pesquisaResultado.perguntas?.[0]?.opcoes || [])]
+                        const candidatos = [...pesquisaResultado.opcoes]
                           .filter(o => o.nome.toLowerCase() !== 'branco/nulo' && o.nome.toLowerCase() !== 'não sabe' && o.nome.toLowerCase() !== 'indeciso')
                           .sort((a, b) => b.votos - a.votos);
                         if (candidatos.length >= 2) {
@@ -413,7 +405,12 @@ export default function PesquisasAdmin() {
                             induzida: true,
                             multiSelect: false,
                             metaDiaria: 50,
-                            perguntas: [{ id: 'p1', titulo: 'Se as eleições fossem hoje, em quem você votaria no 2º turno?', tipo: 'Induzida', multiSelect: false, opcoes: [{ id: 'o1', nome: c1.nome, partido: c1.partido, votos: 0 }, { id: 'o2', nome: c2.nome, partido: c2.partido, votos: 0 }, { id: 'o3', nome: 'Branco/Nulo', partido: '', votos: 0 }, { id: 'o4', nome: 'Não Sabe', partido: '', votos: 0 }]}],
+                            opcoes: [
+                              { nome: c1.nome, partido: c1.partido, votos: 0 },
+                              { nome: c2.nome, partido: c2.partido, votos: 0 },
+                              { nome: 'Branco/Nulo', partido: '', votos: 0 },
+                              { nome: 'Não Sabe', partido: '', votos: 0 }
+                            ],
                             entrevistadores: pesquisaResultado.entrevistadores
                           });
                           alert(`Simulação de 2º Turno criada com sucesso entre ${c1.nome} e ${c2.nome}!`);
@@ -441,63 +438,50 @@ export default function PesquisasAdmin() {
                   </div>
                 </div>
                 
-                <div className="space-y-8 mb-8">
-                  {pesquisaResultado.perguntas?.map((perg, pIdx) => {
-                    const totalRespostas = perg.opcoes.reduce((s, o) => s + o.votos, 0);
-                    const opcoesOrdenadas = [...perg.opcoes].sort((a, b) => b.votos - a.votos);
-                    
-                    return (
-                      <div key={perg.id} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-4">
-                          <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-4 border-b pb-2">Pergunta {pIdx + 1}: {perg.titulo}</h4>
-                          {opcoesOrdenadas.map((o, i) => {
-                            const perc = totalRespostas > 0 ? ((o.votos / totalRespostas) * 100).toFixed(1) : '0.0';
-                            return (
-                              <div key={i} className="relative">
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span className="font-medium text-gray-800">{o.nome} {o.partido && <span className="text-gray-400 text-xs font-normal">({o.partido})</span>}</span>
-                                  <span className="font-bold text-gray-900">{perc}% <span className="text-gray-400 font-normal ml-1">({o.votos})</span></span>
-                                </div>
-                                <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                                  <div className={`h-2.5 rounded-full ${CORES[i % CORES.length]}`} style={{ width: `${perc}%` }}></div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        
-                        {perg.tipo === 'Induzida' && (
-                          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col justify-center items-center text-center">
-                            <BarChart3 className="w-12 h-12 text-icat-green mb-3 opacity-20" />
-                            <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Líder: {perg.titulo.substring(0, 20)}...</h4>
-                            {(() => {
-                              const validVotes = perg.opcoes.filter(o => o.nome.toLowerCase() !== 'branco/nulo' && o.nome.toLowerCase() !== 'não sabe' && o.nome.toLowerCase() !== 'indeciso').reduce((sum, o) => sum + o.votos, 0);
-                              const topOpc = opcoesOrdenadas[0];
-                              const isTopOpcaoValid = topOpc && topOpc.nome.toLowerCase() !== 'branco/nulo' && topOpc.nome.toLowerCase() !== 'não sabe' && topOpc.nome.toLowerCase() !== 'indeciso';
-                              
-                              return topOpc && topOpc.votos > 0 && isTopOpcaoValid ? (
-                                <>
-                                  <p className="text-2xl font-black text-gray-900 mb-1">{topOpc.nome}</p>
-                                  <div className="flex flex-col gap-1 items-center">
-                                    <span className="text-icat-green font-bold bg-green-50 px-3 py-1 rounded-full text-sm inline-block">
-                                      {((topOpc.votos / totalRespostas) * 100).toFixed(1)}% (Total)
-                                    </span>
-                                    {validVotes > 0 && (
-                                      <span className="text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full text-sm inline-block">
-                                        {((topOpc.votos / validVotes) * 100).toFixed(1)}% dos Votos Válidos
-                                      </span>
-                                    )}
-                                  </div>
-                                </>
-                              ) : (
-                                <p className="text-gray-400 text-sm">Nenhum voto computado ainda.</p>
-                              );
-                            })()}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <div className="space-y-4">
+                    <h4 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-4 border-b pb-2">Desempenho (Opções)</h4>
+                    {pesquisaResultado.opcoes.sort((a, b) => b.votos - a.votos).map((o, i) => {
+                      const perc = totalVotos > 0 ? ((o.votos / totalVotos) * 100).toFixed(1) : '0.0';
+                      return (
+                        <div key={i} className="relative">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium text-gray-800">{o.nome} {o.partido && <span className="text-gray-400 text-xs font-normal">({o.partido})</span>}</span>
+                            <span className="font-bold text-gray-900">{perc}% <span className="text-gray-400 font-normal ml-1">({o.votos})</span></span>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                            <div className={`h-2.5 rounded-full ${CORES[i % CORES.length]}`} style={{ width: `${perc}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col justify-center items-center text-center">
+                    <BarChart3 className="w-12 h-12 text-icat-green mb-3 opacity-20" />
+                    <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Líder Atual</h4>
+                    {(() => {
+                      const validVotes = pesquisaResultado.opcoes.filter(o => o.nome.toLowerCase() !== 'branco/nulo' && o.nome.toLowerCase() !== 'não sabe' && o.nome.toLowerCase() !== 'indeciso').reduce((sum, o) => sum + o.votos, 0);
+                      const isTopOpcaoValid = topOpcao && topOpcao.nome.toLowerCase() !== 'branco/nulo' && topOpcao.nome.toLowerCase() !== 'não sabe' && topOpcao.nome.toLowerCase() !== 'indeciso';
+                      
+                      return topOpcao && topOpcao.votos > 0 && isTopOpcaoValid ? (
+                        <>
+                          <p className="text-2xl font-black text-gray-900 mb-1">{topOpcao.nome}</p>
+                          <div className="flex flex-col gap-1 items-center">
+                            <span className="text-icat-green font-bold bg-green-50 px-3 py-1 rounded-full text-sm inline-block">
+                              {((topOpcao.votos / totalVotos) * 100).toFixed(1)}% (Total)
+                            </span>
+                            {validVotes > 0 && (
+                              <span className="text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full text-sm inline-block">
+                                {((topOpcao.votos / validVotes) * 100).toFixed(1)}% dos Votos Válidos
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-gray-400 text-sm">Nenhum voto computado para candidatos ainda.</p>
+                      );
+                    })()}
+                  </div>
                 </div>
 
                 {pesquisaResultado.respostas.length > 0 && (
@@ -552,16 +536,15 @@ export default function PesquisasAdmin() {
                             if (votosNaFaixa.length === 0) return <div key={faixa.label} className="text-xs text-gray-400 mb-2">{faixa.label}: Sem dados</div>;
                             
                             // Agrupa votos por opção na faixa
-                            const contagem = {} as Record<string, number>;
+                            const contagem = {} as Record<number, number>;
                             votosNaFaixa.forEach(r => {
-                              r.respostas?.[0]?.opcaoIds?.forEach((id: string) => contagem[id] = (contagem[id] || 0) + 1);
+                              r.opcaoIdxs.forEach(idx => contagem[idx] = (contagem[idx] || 0) + 1);
                             });
                             
                             // Acha vencedor
-                            const keys = Object.keys(contagem);
-                            const vencedorId = keys.length > 0 ? keys.reduce((a, b) => contagem[a] > contagem[b] ? a : b, keys[0]) : null;
-                            const vencedorNome = (vencedorId && pesquisaResultado.perguntas?.[0]?.opcoes.find(o => o.id === vencedorId)?.nome) || 'N/A';
-                            const perc = vencedorId ? ((contagem[vencedorId] / votosNaFaixa.length) * 100).toFixed(1) : '0.0';
+                            const vencedorIdx = Object.keys(contagem).reduce((a, b) => contagem[Number(a)] > contagem[Number(b)] ? a : b, Object.keys(contagem)[0]);
+                            const vencedorNome = pesquisaResultado.opcoes[Number(vencedorIdx)]?.nome || 'N/A';
+                            const perc = ((contagem[Number(vencedorIdx)] / votosNaFaixa.length) * 100).toFixed(1);
                             
                             return (
                               <div key={faixa.label} className="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100 mb-2">
@@ -607,7 +590,7 @@ export default function PesquisasAdmin() {
                 <div className="flex justify-between items-center mb-1"><label className="block text-sm font-medium text-gray-700">Nome da Pesquisa / Título Principal</label><label id="btn-ai-upload" className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md cursor-pointer"><Wand2 className="w-3 h-3" /> Importar Word/PDF (IA)<input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileUpload} /></label></div>
                 <input type="text" value={novaPesquisa.nome} onChange={e => setNovaPesquisa({ ...novaPesquisa, nome: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" placeholder="Ex: Intenção de Voto — Prefeito Catalão 2026" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
                   <select value={novaPesquisa.tipo} onChange={e => setNovaPesquisa({ ...novaPesquisa, tipo: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
@@ -615,65 +598,56 @@ export default function PesquisasAdmin() {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Formato</label>
+                  <select value={novaPesquisa.induzida ? 'true' : 'false'} onChange={e => setNovaPesquisa({ ...novaPesquisa, induzida: e.target.value === 'true' })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none">
+                    <option value="true">Induzida (fixas)</option>
+                    <option value="false">Espontânea (+ Outro)</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Meta Diária</label>
                   <input type="number" min="1" value={novaPesquisa.metaDiaria} onChange={e => setNovaPesquisa({ ...novaPesquisa, metaDiaria: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none" />
                 </div>
               </div>
-              
-              <div className="space-y-6 mt-4">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <h3 className="font-bold text-gray-900">Perguntas ({novasPerguntas.length})</h3>
-                  <button type="button" onClick={() => setNovasPerguntas([...novasPerguntas, {id: Math.random().toString(), titulo: '', tipo: 'Induzida', multiSelect: false, opcoes: [{id: Math.random().toString(), nome: '', partido: ''}]}])} className="text-sm text-icat-blue font-semibold hover:underline flex items-center gap-1"><Plus className="w-4 h-4" /> Adicionar Pergunta</button>
-                </div>
-                
-                {novasPerguntas.map((perg, pIdx) => (
-                  <div key={perg.id} className="bg-gray-50 p-4 rounded-xl border border-gray-200 relative">
-                    {novasPerguntas.length > 1 && (
-                      <button onClick={() => setNovasPerguntas(novasPerguntas.filter((_, i) => i !== pIdx))} className="absolute top-4 right-4 text-gray-400 hover:text-red-500">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Título da Pergunta {pIdx + 1}</label>
-                        <input type="text" value={perg.titulo} onChange={e => { const arr = [...novasPerguntas]; arr[pIdx].titulo = e.target.value; setNovasPerguntas(arr); }} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder="Ex: Em quem você votaria?" />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Formato</label>
-                          <select value={perg.tipo} onChange={e => { const arr = [...novasPerguntas]; arr[pIdx].tipo = e.target.value as 'Espontânea' | 'Induzida'; setNovasPerguntas(arr); }} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm">
-                            <option value="Induzida">Induzida (fixas)</option>
-                            <option value="Espontânea">Espontânea (+ Outro)</option>
-                          </select>
-                        </div>
-                        <div className="flex items-end pb-2">
-                          <label className="flex items-center gap-3 cursor-pointer">
-                            <div onClick={() => { const arr = [...novasPerguntas]; arr[pIdx].multiSelect = !arr[pIdx].multiSelect; setNovasPerguntas(arr); }} className={`relative w-11 h-6 rounded-full transition-colors ${perg.multiSelect ? 'bg-icat-green' : 'bg-gray-300'}`}>
-                              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${perg.multiSelect ? 'translate-x-6' : 'translate-x-1'}`}></div>
-                            </div>
-                            <span className="text-sm font-medium text-gray-700">Múltipla escolha</span>
-                          </label>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Opções</label>
-                        <div className="space-y-2">
-                          {perg.opcoes.map((op, oIdx) => (
-                            <div key={op.id} className="flex items-center gap-2">
-                              <span className={`w-4 h-4 rounded-full flex-shrink-0 ${CORES[oIdx % CORES.length]}`}></span>
-                              <input type="text" value={op.nome} onChange={e => { const arr = [...novasPerguntas]; arr[pIdx].opcoes[oIdx].nome = e.target.value; setNovasPerguntas(arr); }} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder={`Opção ${oIdx + 1}`} />
-                              <input type="text" value={op.partido} onChange={e => { const arr = [...novasPerguntas]; arr[pIdx].opcoes[oIdx].partido = e.target.value; setNovasPerguntas(arr); }} className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder="Partido" />
-                              {perg.opcoes.length > 1 && <button onClick={() => { const arr = [...novasPerguntas]; arr[pIdx].opcoes = arr[pIdx].opcoes.filter((_, i) => i !== oIdx); setNovasPerguntas(arr); }} className="p-1.5 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>}
-                            </div>
-                          ))}
-                        </div>
-                        <button type="button" onClick={() => { const arr = [...novasPerguntas]; arr[pIdx].opcoes.push({id: Math.random().toString(), nome: '', partido: ''}); setNovasPerguntas(arr); }} className="mt-2 text-sm text-icat-blue font-semibold hover:underline flex items-center gap-1"><Plus className="w-4 h-4" /> Adicionar Opção</button>
-                      </div>
-                    </div>
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <div onClick={() => setNovaPesquisa({...novaPesquisa, multiSelect: !novaPesquisa.multiSelect})} className={`relative w-11 h-6 rounded-full transition-colors ${novaPesquisa.multiSelect ? 'bg-icat-green' : 'bg-gray-300'}`}>
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${novaPesquisa.multiSelect ? 'translate-x-6' : 'translate-x-1'}`}></div>
                   </div>
-                ))}
+                  <span className="text-sm font-medium text-gray-700">Permitir múltipla escolha <span className="text-gray-400 font-normal">(ex: pesquisas de opinião)</span></span>
+                </label>
+              </div>
+              <div>
+                <div className="flex justify-between items-end mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Opções de Resposta</label>
+                  <button 
+                    type="button"
+                    onClick={async () => {
+                      if(!novaPesquisa.nome) return alert('Digite o Nome da Pesquisa primeiro para a IA buscar as opções!');
+                      const btn = document.getElementById('btn-ai-pesquisa');
+                      if(btn) btn.innerHTML = 'Buscando...';
+                      const { mockAiGenerator } = await import('@/lib/ai-generator');
+                      const aiOptions = await mockAiGenerator.generateSurveyOptions(novaPesquisa.nome);
+                      setNovasOpcoes(aiOptions);
+                      if(btn) btn.innerHTML = '<svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg> Sugerir Opções com IA';
+                    }}
+                    id="btn-ai-pesquisa"
+                    className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors bg-indigo-50 px-2 py-1 rounded-md"
+                  >
+                    <Wand2 className="w-3 h-3" /> Sugerir Opções com IA
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {novasOpcoes.map((op, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className={`w-4 h-4 rounded-full flex-shrink-0 ${CORES[i % CORES.length]}`}></span>
+                      <input type="text" value={op.nome} onChange={e => { const arr = [...novasOpcoes]; arr[i].nome = e.target.value; setNovasOpcoes(arr); }} className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder={`Opção ${i + 1}`} />
+                      <input type="text" value={op.partido} onChange={e => { const arr = [...novasOpcoes]; arr[i].partido = e.target.value; setNovasOpcoes(arr); }} className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-icat-green outline-none text-sm" placeholder="Partido" />
+                      {novasOpcoes.length > 2 && <button onClick={() => setNovasOpcoes(novasOpcoes.filter((_, j) => j !== i))} className="p-1.5 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setNovasOpcoes([...novasOpcoes, {nome: '', partido: ''}])} className="mt-2 text-sm text-icat-blue font-semibold hover:underline flex items-center gap-1"><Plus className="w-4 h-4" /> Adicionar Opção</button>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Atribuir Entrevistadores</label>

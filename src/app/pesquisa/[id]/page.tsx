@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Check, Send, Phone, Heart, Shield, GraduationCap, Wrench, Bus, Droplets, Wifi, TreePine, Building2, Utensils, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
-import { getPesquisa, addResposta, type Pesquisa } from '@/lib/pesquisas-store';
+import { getPesquisa, addResposta, type Pesquisa, type RespostaItem } from '@/lib/pesquisas-store';
 
 const CORES_BG = [
   'from-blue-500 to-blue-600', 'from-red-500 to-red-600', 'from-green-500 to-green-600',
@@ -25,12 +25,20 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
-  const [selecionados, setSelecionados] = useState<number[]>([]);
-  const [outroNome, setOutroNome] = useState('');
+
+  const [respostas, setRespostas] = useState<Record<string, { opcaoIds: string[], novasOpcoesNomes: string[] }>>({});
+  const [perguntaAtualIdx, setPerguntaAtualIdx] = useState(0);
 
   useEffect(() => {
     const p = getPesquisa(Number(params.id));
-    if (p) setPesquisa(p);
+    if (p) {
+      const initResp: Record<string, { opcaoIds: string[], novasOpcoesNomes: string[] }> = {};
+      p.perguntas?.forEach(perg => {
+        initResp[perg.id] = { opcaoIds: [], novasOpcoesNomes: [] };
+      });
+      setRespostas(initResp);
+      setPesquisa(p);
+    }
   }, [params.id]);
 
   if (!pesquisa) return (
@@ -44,36 +52,85 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
     </div>
   );
 
-  const multiSelect = pesquisa.multiSelect ?? false;
-  const outroIdx = pesquisa.opcoes.length;
+  const perguntaAtual = pesquisa.perguntas?.[perguntaAtualIdx];
+  const respAtual = perguntaAtual ? respostas[perguntaAtual.id] : { opcaoIds: [], novasOpcoesNomes: [] };
+  const hasOutro = respAtual.opcaoIds.includes('outro');
 
-  const toggleSelecao = (i: number) => {
-    if (multiSelect) {
-      setSelecionados(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
+  const podeAvancarPergunta = respAtual.opcaoIds.length > 0 && (!hasOutro || (respAtual.novasOpcoesNomes.length > 0 && respAtual.novasOpcoesNomes[0].trim().length > 0));
+
+  const toggleSelecao = (idOpcao: string) => {
+    if (!perguntaAtual) return;
+    setRespostas(prev => {
+      const cur = prev[perguntaAtual.id];
+      const isSelected = cur.opcaoIds.includes(idOpcao);
+      
+      let newOpcaoIds = [...cur.opcaoIds];
+      if (perguntaAtual.multiSelect) {
+        if (isSelected) {
+          newOpcaoIds = newOpcaoIds.filter(x => x !== idOpcao);
+        } else {
+          newOpcaoIds.push(idOpcao);
+        }
+      } else {
+        newOpcaoIds = [idOpcao];
+      }
+      return {
+        ...prev,
+        [perguntaAtual.id]: {
+          ...cur,
+          opcaoIds: newOpcaoIds
+        }
+      };
+    });
+  };
+
+  const handleOutroChange = (val: string) => {
+    if (!perguntaAtual) return;
+    setRespostas(prev => ({
+      ...prev,
+      [perguntaAtual.id]: {
+        ...prev[perguntaAtual.id],
+        novasOpcoesNomes: val ? [val] : []
+      }
+    }));
+  };
+
+  const nextPergunta = () => {
+    if (!pesquisa.perguntas) return;
+    if (perguntaAtualIdx < pesquisa.perguntas.length - 1) {
+      setPerguntaAtualIdx(perguntaAtualIdx + 1);
     } else {
-      setSelecionados([i]);
+      setStep(2); // Confirmar
     }
   };
 
-  const podeAvancar = selecionados.length > 0 && (
-    !selecionados.includes(outroIdx) || outroNome.trim().length > 0
-  );
+  const prevPergunta = () => {
+    if (perguntaAtualIdx > 0) {
+      setPerguntaAtualIdx(perguntaAtualIdx - 1);
+    } else {
+      setStep(0);
+    }
+  };
 
   const handleSubmit = () => {
+    const respostasFormatadas: RespostaItem[] = Object.keys(respostas).map(perguntaId => {
+      const resp = respostas[perguntaId];
+      return {
+        perguntaId,
+        opcaoIds: resp.opcaoIds.filter(id => id !== 'outro'),
+        novasOpcoesNomes: resp.novasOpcoesNomes
+      };
+    });
+
     addResposta(pesquisa.id, {
       entrevistado: nome || 'Anônimo',
       cpf,
       telefone,
-      opcaoIdxs: selecionados.filter(i => i < pesquisa.opcoes.length),
+      respostas: respostasFormatadas,
       fonte: 'publico',
     });
     setStep(3);
   };
-
-  const nomesSelecionados = selecionados
-    .filter(i => i < pesquisa.opcoes.length)
-    .map(i => pesquisa.opcoes[i].nome)
-    .join(', ');
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center">
@@ -89,9 +146,9 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
         <div className="flex-1 p-6 flex flex-col">
           {step < 3 && (
             <div className="flex gap-2 mb-8 mt-2">
-              {[0, 1, 2].map(i => (
-                <div key={i} className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= i ? 'bg-icat-green' : 'bg-gray-100'}`}></div>
-              ))}
+              <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 0 ? 'bg-icat-green' : 'bg-gray-100'}`}></div>
+              <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-icat-green' : 'bg-gray-100'}`}></div>
+              <div className={`flex-1 h-2 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-icat-green' : 'bg-gray-100'}`}></div>
             </div>
           )}
 
@@ -125,7 +182,7 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
                   </div>
                 </div>
               </div>
-              <button onClick={() => { if (pesquisa.exigeMorador && isMorador === 'nao') { alert('Pesquisa encerrada: Necessário ser morador do município.'); reset(); return; } if (pesquisa.idadeMinima && idade !== undefined && idade < pesquisa.idadeMinima) { alert('Pesquisa encerrada: Você é menor que a idade mínima permitida.'); reset(); return; } setStep(1); }}
+              <button onClick={() => setStep(1)}
                 disabled={!cpf.trim()}
                 className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-40 flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 mt-8">
                 Começar Pesquisa <ArrowRight className="w-5 h-5" />
@@ -134,29 +191,30 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
           )}
 
           {/* ═══ STEP 1: PERGUNTA ═══ */}
-          {step === 1 && (
+          {step === 1 && perguntaAtual && (
             <div className="space-y-6 animate-in fade-in flex-1 flex flex-col">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {pesquisa.tipo === 'Intenção de Voto' ? 'Em quem você votaria?' : 'O que precisa de melhoria?'}
+                <span className="text-xs font-bold text-gray-400">Pergunta {perguntaAtualIdx + 1} de {pesquisa.perguntas?.length}</span>
+                <h2 className="text-2xl font-bold text-gray-900 mt-2">
+                  {perguntaAtual.titulo}
                 </h2>
                 <p className="text-gray-500 mt-2 text-sm">
-                  {multiSelect ? 'Selecione uma ou mais opções.' : 'Selecione apenas uma opção.'}
+                  {perguntaAtual.multiSelect ? 'Selecione uma ou mais opções.' : 'Selecione apenas uma opção.'}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 flex-1">
-                {pesquisa.opcoes.map((op, i) => {
-                  const selected = selecionados.includes(i);
+                {perguntaAtual.opcoes.map((op, i) => {
+                  const selected = respAtual.opcaoIds.includes(op.id);
                   const icone = ICONES[op.nome];
                   return (
-                    <button key={i} onClick={() => toggleSelecao(i)}
+                    <button key={op.id} onClick={() => toggleSelecao(op.id)}
                       className={`relative rounded-2xl p-5 text-left transition-all duration-300 border-2 flex flex-col items-start ${
                         selected ? 'border-icat-green bg-green-50/50 shadow-xl shadow-green-500/10 scale-[1.02]' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'
                       }`}>
                       <div className="flex w-full justify-between items-start mb-4">
                         <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${CORES_BG[i % CORES_BG.length]} flex items-center justify-center shadow-sm text-white flex-shrink-0`}>
-                          {icone || <span className="text-2xl font-black">{op.nome.charAt(0)}</span>}
+                          {op.foto ? <img src={op.foto} alt={op.nome} className="w-full h-full object-cover" /> : icone || <span className="text-2xl font-black">{op.nome.charAt(0)}</span>}
                         </div>
                         {op.partido && <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full uppercase tracking-wider">{op.partido}</span>}
                       </div>
@@ -170,16 +228,16 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
                   );
                 })}
 
-                {!pesquisa.induzida && (
-                  <button onClick={() => toggleSelecao(outroIdx)}
+                {perguntaAtual.tipo === 'Espontânea' && (
+                  <button onClick={() => toggleSelecao('outro')}
                     className={`relative rounded-2xl p-5 text-left transition-all duration-300 border-2 border-dashed flex flex-col items-start ${
-                      selecionados.includes(outroIdx) ? 'border-icat-green bg-green-50/50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                      hasOutro ? 'border-icat-green bg-green-50/50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                     }`}>
                     <div className="h-14 w-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4 text-gray-500">
                       <span className="text-2xl font-black">?</span>
                     </div>
                     <p className="font-bold text-gray-600 text-[15px]">Outro</p>
-                    {selecionados.includes(outroIdx) && (
+                    {hasOutro && (
                       <div className="absolute top-4 right-4 h-6 w-6 rounded-full bg-icat-green flex items-center justify-center shadow-sm">
                         <Check className="w-4 h-4 text-white" />
                       </div>
@@ -188,20 +246,20 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
                 )}
               </div>
 
-              {selecionados.includes(outroIdx) && !pesquisa.induzida && (
+              {hasOutro && perguntaAtual.tipo === 'Espontânea' && (
                 <div className="animate-in slide-in-from-bottom-2">
-                  <input type="text" value={outroNome} onChange={e => setOutroNome(e.target.value)}
+                  <input type="text" value={respAtual.novasOpcoesNomes[0] || ''} onChange={e => handleOutroChange(e.target.value)}
                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-icat-green outline-none font-bold text-gray-900 text-center"
                     placeholder="Digite sua resposta..." autoFocus />
                 </div>
               )}
 
               <div className="flex gap-3 mt-8">
-                <button onClick={() => setStep(0)} className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50">
+                <button onClick={prevPergunta} className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50">
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <button onClick={() => { if (podeAvancar) setStep(2); }}
-                  disabled={!podeAvancar}
+                <button onClick={() => { if (podeAvancarPergunta) nextPergunta(); }}
+                  disabled={!podeAvancarPergunta}
                   className="flex-1 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 disabled:opacity-40 flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 py-3">
                   Continuar <ArrowRight className="w-5 h-5" />
                 </button>
@@ -213,34 +271,44 @@ export default function PublicPesquisa({ params }: { params: { id: string } }) {
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in flex-1 flex flex-col">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900">Confirme sua resposta</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Confirme suas respostas</h2>
                 <p className="text-gray-500 mt-2 text-sm">Revise antes de confirmar.</p>
               </div>
-              <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 flex-1 space-y-4">
+              <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 flex-1 space-y-4 max-h-[50vh] overflow-y-auto">
                 <div className="bg-white p-4 rounded-2xl shadow-sm">
                   <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">CPF</span>
                   <span className="block text-base font-bold text-gray-900">{cpf}</span>
                   {nome && <span className="block text-sm text-gray-500 mt-0.5">{nome}</span>}
                 </div>
-                <div className="bg-white p-5 rounded-2xl shadow-sm border-2 border-green-100">
-                  <span className="block text-xs font-bold text-green-500 uppercase tracking-wider mb-3">
-                    {multiSelect ? 'Suas Escolhas' : 'Sua Escolha'}
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {selecionados.filter(i => i < pesquisa.opcoes.length).map(i => (
-                      <span key={i} className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r ${CORES_BG[i % CORES_BG.length]} text-white font-bold text-sm`}>
-                        {pesquisa.opcoes[i].nome}
-                        {pesquisa.opcoes[i].partido && <span className="opacity-75 text-xs">({pesquisa.opcoes[i].partido})</span>}
+                
+                {pesquisa.perguntas?.map((perg, idx) => {
+                  const resp = respostas[perg.id];
+                  if (!resp) return null;
+                  return (
+                    <div key={perg.id} className="bg-white p-5 rounded-2xl shadow-sm border-2 border-green-100">
+                      <span className="block text-xs font-bold text-green-500 uppercase tracking-wider mb-3">
+                        {perg.titulo}
                       </span>
-                    ))}
-                    {selecionados.includes(outroIdx) && outroNome && (
-                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-600 text-white font-bold text-sm">{outroNome}</span>
-                    )}
-                  </div>
-                </div>
+                      <div className="flex flex-wrap gap-2">
+                        {resp.opcaoIds.filter(id => id !== 'outro').map((opId, i) => {
+                          const opInfo = perg.opcoes.find(o => o.id === opId);
+                          return opInfo ? (
+                            <span key={opId} className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r ${CORES_BG[i % CORES_BG.length]} text-white font-bold text-sm`}>
+                              {opInfo.nome}
+                              {opInfo.partido && <span className="opacity-75 text-xs">({opInfo.partido})</span>}
+                            </span>
+                          ) : null;
+                        })}
+                        {resp.opcaoIds.includes('outro') && resp.novasOpcoesNomes[0] && (
+                          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-600 text-white font-bold text-sm">{resp.novasOpcoesNomes[0]}</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep(1)} className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50">
+                <button onClick={() => { setStep(1); setPerguntaAtualIdx((pesquisa.perguntas?.length || 1) - 1); }} className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50">
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <button onClick={handleSubmit}
